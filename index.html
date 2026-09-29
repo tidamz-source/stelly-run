@@ -920,7 +920,7 @@ function smash(o){
 function catchDisc(o){
   o.got = true;
   combo = (t - lastCatch < 1.3) ? Math.min(combo+1, 5) : 1; lastCatch = t;
-  if (o.g && groups[o.g]){ const G = groups[o.g]; G.got++; if (G.n >= 5 && G.got === G.n) toast('Combo !'); }
+  if (o.g && groups[o.g]){ const G = groups[o.g]; G.got++; if (G.n >= 5 && G.got === G.n){ toast('Combo ! +500'); bonus += 500; pops.push({ x:o.x, y:o.y-22, s:'+500', t:-.25, col:C.white }); } }
   discCount++; $('dcn').textContent = discCount;
   const pts = 10*combo; bonus += pts; sfx.disc(combo);
   pops.push({ x:o.x, y:o.y-10, s: combo > 1 ? '+'+pts+' x'+combo : '+'+pts, t:0, col: C.white });
@@ -1324,7 +1324,7 @@ function resize(){
   const vw = wrap.parentElement.clientWidth, vh = wrap.parentElement.clientHeight, a = vw/vh;
   wide = a >= 1.5;
   if (wide){ H = 200; W = Math.max(300, Math.min(460, Math.round(200*a))); GY = H - 36; }
-  else { W = 300; H = Math.max(200, Math.min(640, Math.round(300/a))); GY = H - Math.max(36, Math.round(H*.42)); }
+  else { W = 300; H = Math.max(200, Math.min(640, Math.round(300/a))); GY = a >= 1 ? H - 36 : H - Math.max(36, Math.round(H*.42)); }
   FT = GY - 26;
   lay.ey = wide ? 86 : Math.round(Math.max(90, GY*.46));
   lay.ry = lay.ey + 40; lay.by = lay.ry + 21; lay.ly = wide ? GY + 7 : lay.by + 30; lay.py = wide ? 3 : Math.max(4, lay.ey - 104);
