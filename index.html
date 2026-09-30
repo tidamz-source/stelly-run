@@ -391,7 +391,22 @@ function frisbee(top, rimC, outC, badge){
       g.fillStyle = c; g.fillRect(x,y,1,1); }
   });
 }
-const DISC = frisbee(C.white, C.cream, C.disc, [C.discB, C.discY, C.ring]);
+// frisbee de base : pixel art retouché à la main
+const DISC = mk(28, 13, g => pm(g, [
+  '............................',
+  '.............oooooooo.......',
+  '.......oooooorwwwwwrroooo...',
+  '....ooorwwwwwwwwwwwwwwwrroo.',
+  '..oorrwwwwwwbbbbbbwwwwwrrwo.',
+  '.owrrwwwwbbybbbbybbwwwwrrco.',
+  '.owrrwwwwbbbyyybbwwwwwrrrco.',
+  '.owrrrwwwwwwwwwwwwwrrrrcco..',
+  '.ocrrrrrrrrrrrrrrrrrccooo...',
+  '..oocccccrrrrccccccooo......',
+  '....ooooooooooooooo.........',
+  '............................',
+  '............................'
+], 0, 0, false, { o:'#E08A2C', w:'#FFFFFF', r:'#EEDFCB', c:'#F4E6D2', b:'#5A3A10', y:'#FDB60D' }));
 const FDISC = frisbee('#8058A2', '#512A7E', C.plum, [C.discB, '#F5A81C', '#6A4596']);
 
 /* ================= Chaussette ================= */
@@ -583,23 +598,22 @@ function buildThemes(){
   /* --- 1 : gymnase --- */
   const T1 = {};
   const winY = Math.max(22, FT - 118);
-  T1.sky = mk(W, FT, g => {
-    g.fillStyle = '#EDE6D6'; g.fillRect(0, 0, W, FT);
-    for (let y = 20; y < FT; y += 7){ g.fillStyle = '#E2D9C6'; g.fillRect(0, y, W, 1); for (let x = (y/7)%2 ? 0 : 10; x < W; x += 20) g.fillRect(x, y-6, 1, 6); }
-    g.fillStyle = '#5C564C'; g.fillRect(0, 0, W, 14); g.fillStyle = '#6E685C'; g.fillRect(0, 12, W, 2); g.fillStyle = C.plum; g.fillRect(0, 14, W, 1);
-    g.fillStyle = '#D5CBB5'; g.fillRect(0, 15, W, 2);
-  });
-  T1.far = mk(192, FT, g => {
+  T1.sky = mk(W, FT, g => { g.fillStyle = '#EDE6D6'; g.fillRect(0, 0, W, FT); });
+  // mur, plafond, fenêtres et lampes : un seul plan, qui défile avec les paniers et les espaliers
+  T1.far = mk(320, FT, g => {
+    g.fillStyle = '#EDE6D6'; g.fillRect(0, 0, 320, FT);
+    for (let y = 20; y < FT; y += 7){ g.fillStyle = '#E2D9C6'; g.fillRect(0, y, 320, 1); for (let x = (y/7)%2 ? 0 : 10; x < 320; x += 20) g.fillRect(x, y-6, 1, 6); }
+    g.fillStyle = '#5C564C'; g.fillRect(0, 0, 320, 14); g.fillStyle = '#6E685C'; g.fillRect(0, 12, 320, 2); g.fillStyle = C.plum; g.fillRect(0, 14, 320, 1);
+    g.fillStyle = '#D5CBB5'; g.fillRect(0, 15, 320, 2);
     // charpente
-    g.fillStyle = '#474238'; for (let x=0;x<192;x+=24){ for (let i=0;i<12;i++){ g.fillRect(x+i, 12-i, 1, 1); g.fillRect(x+23-i, 12-i, 1, 1); } g.fillRect(x, 1, 24, 1); }
+    g.fillStyle = '#474238'; for (let x=0;x<320;x+=32){ for (let i=0;i<12;i++){ g.fillRect(x+i, 12-i, 1, 1); g.fillRect(x+31-i, 12-i, 1, 1); } } g.fillRect(0, 1, 320, 1);
     // lampes suspendues
-    for (const lx of [40, 136]){ g.fillStyle = C.plum; g.fillRect(lx, 14, 1, 8); g.fillRect(lx-5, 22, 11, 3); g.fillStyle = '#FFF7CF'; g.fillRect(lx-4, 25, 9, 1); g.fillStyle = C.yellowL; g.fillRect(lx-3, 26, 7, 1); }
+    for (const lx of [60, 160, 260]){ g.fillStyle = C.plum; g.fillRect(lx, 14, 1, 8); g.fillRect(lx-5, 22, 11, 3); g.fillStyle = '#FFF7CF'; g.fillRect(lx-4, 25, 9, 1); g.fillStyle = C.yellowL; g.fillRect(lx-3, 26, 7, 1); }
     // fenêtres hautes
-    for (const wx of [8, 104]){ const ww = 80, wh = 26;
+    for (const wx of [15, 120, 225]){ const ww = 80, wh = 26;
       g.fillStyle = '#8C8577'; g.fillRect(wx-1, winY-1, ww+2, wh+2); g.fillStyle = C.plum; g.fillRect(wx-2, winY+wh+1, ww+4, 1);
       for (let y=0;y<wh;y++) for (let x=0;x<ww;x++){ g.fillStyle = y < wh*.5 ? '#9FD6F2' : '#BFE6F7'; if ((x - y*1.2) % 30 > 22) g.fillStyle = '#E9F7FD'; g.fillRect(wx+x, winY+y, 1, 1); }
       g.fillStyle = C.white; for (let x=0;x<=ww;x+=20) g.fillRect(wx+x-1, winY, 2, wh); g.fillRect(wx, winY+12, ww, 2);
-      // puits de lumière
       g.fillStyle = 'rgba(255,247,207,.28)'; for (let y=0;y<FT-winY-wh-4;y++){ g.fillRect(wx + 6 + Math.round(y*.45), winY+wh+2+y, ww-12, 1); }
     }
   });
@@ -1185,7 +1199,7 @@ function drawBack(th){
     tile(state === 'title' ? T.midN : T.mid, bgX*.3, FT - 12);
     if (state === 'title') nightGround();
   } else if (th === 1){
-    tile(T.far, bgX*.12, 0);
+    tile(T.far, bgX*.3, 0);
     tile(T.mid, bgX*.3, FT - 70);
   } else if (th === 2){
     drawClouds('#CFEAF7'); drawSea(); drawFlags();
