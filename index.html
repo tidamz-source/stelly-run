@@ -1001,10 +1001,10 @@ function update(dt){
       if (o.smashed) continue;
       if (o.k === 'hole'){
         if (P.ground && fireT <= 0 && graceT <= 0 && P.x > o.x + 6 && P.x < o.x + o.w - 6){ if (o.th === 1) die('slip'); else if (o.th === 3) die('ski'); else { P.x = Math.round(o.x + o.w/2); die('hole'); } break; }
+        if (o.jumper){ const cr = critter(o), cxh = o.x + o.w/2;
+          if (cr.show && cr.lift > 2 && P.x + 6 > cxh - 5 && P.x - 6 < cxh + 5 && P.y > cr.top + 2 && P.y - 44 < cr.top + 8){ if (fireT > 0 || graceT > 0){ o.jumper = false; } else { die(o.th === 2 ? 'crab' : 'mole'); break; } } }
         continue;
       }
-      if (o.k === 'hole' && o.jumper){ const cr = critter(o), cxh = o.x + o.w/2;
-        if (cr.show && cr.lift > 2 && P.x + 6 > cxh - 5 && P.x - 6 < cxh + 5 && P.y > cr.top + 2 && P.y - 44 < cr.top + 8){ if (fireT > 0 || graceT > 0){ o.jumper = false; } else { die(o.th === 2 ? 'crab' : 'mole'); break; } } }
       for (const [x0, x1, top] of hitboxes(o)){
         if (P.x+6 > x0 && P.x-6 < x1 && P.y > top){ if (fireT > 0 || graceT > 0){ o.smashed = true; smash(o); } else die('hit'); break; }
       }
