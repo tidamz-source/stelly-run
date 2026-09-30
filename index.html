@@ -113,6 +113,8 @@ body{
   text-shadow:0 calc(var(--s)*2px) 0 var(--plum); pointer-events:none;
 }
 #toast.show{ animation:toast 1.1s ease-out both; }
+#toast.big{ font-size:calc(var(--s)*18px); -webkit-text-stroke:calc(var(--s)*2.2px) var(--plum); text-shadow:0 calc(var(--s)*3px) 0 var(--plum); }
+#toast.big.show{ animation-duration:1.6s; }
 @keyframes toast{
   0%{ opacity:0; transform:translate(-50%,-50%) scale(.5); }
   18%{ opacity:1; transform:translate(-50%,-50%) scale(1.12); }
@@ -458,6 +460,10 @@ const FORT = castle(36, 32, [[3,16,30,16],[0,8,9,24],[0,6,2,2],[3.5,6,2,2],[7,6,
   g.fillStyle = C.purple; g.fillRect(5,0,4,2); g.fillStyle = C.yellow; g.fillRect(32,0,4,2); g.fillStyle = C.red; g.fillRect(19,2,4,2);
 });
 
+const CASTLE3 = castle(38, 46, [[1,34,36,12],[1,32,3,2],[7,32,3,2],[28,32,3,2],[34,32,3,2],[7,22,24,12],[7,20,3,2],[13,20,3,2],[22,20,3,2],[28,20,3,2],[13,10,12,12],[13,8,3,2],[17.5,8,3,2],[22,8,3,2]], g => {
+  g.fillStyle = '#7A4E22'; g.fillRect(17,39,4,7); g.fillRect(10,27,2,3); g.fillRect(26,27,2,3); g.fillRect(18,14,2,3);
+  g.fillStyle = C.plum; g.fillRect(19,0,1,8); g.fillStyle = C.red; g.fillRect(20,0,4,2); g.fillRect(20,2,2,1);
+});
 /* ================= Neige : bonshommes ================= */
 function snowmanSprite(w, h, balls, deco){
   return mk(w, h, g => {
@@ -483,6 +489,7 @@ function snowballs(w, h, balls){
   });
 }
 const SNOWMAN = snowballs(16, 15, [[8,8,7]]);
+const SNOW3 = snowballs(38, 41, [[7,34,6.6],[19,34,6.6],[31,34,6.6],[13,23,6.4],[25,23,6.4],[19,12.4,6.2]]);
 const BIGSNOW = snowballs(26, 22, [[7,15,6.6],[19,15,6.6],[13,7.2,6.2]]);
 
 /* ================= Police pixel (points) ================= */
@@ -816,7 +823,7 @@ let state = 'title', clock = 0, titleT = 0, t = 0, dist = 0, bonus = 0, speed = 
 let best = 0; try { best = +localStorage.getItem('stellyrun_best') || 0; } catch(e){}
 let shake = 0, flash = 0, overT = 0, bgX = 0, nextObs = 0, sockIn = 0, fireIn = 0, lastCatch = -9, combo = 0, milestone = 500;
 let graceT = 0, theme = 0, prevTheme = 0, transT = 0, fireT = 0, boost = 1, deathKind = 'hit', titleSlammed = false;
-let groups = {}, gidN = 0, discCount = 0;
+let groups = {}, gidN = 0, discCount = 0, streak = 0;
 const newGroup = n => { gidN++; groups[gidN] = { n, got:0 }; return gidN; };
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
@@ -831,7 +838,7 @@ const pad = n => String(n).padStart(5,'0');
 function showTitleRecord(){ ui.trec.hidden = best <= 0; ui.trec.textContent = 'Record ' + pad(best); }
 
 function reset(){
-  t = 0; dist = 0; bonus = 0; groups = {}; discCount = 0; $('dcn').textContent = '0'; speed = 190; spEff = 190; obs = []; discs = []; items = []; parts = []; pops = []; debris = []; lines = [];
+  t = 0; dist = 0; bonus = 0; groups = {}; discCount = 0; streak = 0; $('dcn').textContent = '0'; speed = 190; spEff = 190; obs = []; discs = []; items = []; parts = []; pops = []; debris = []; lines = [];
   nextObs = 170; sockIn = 11 + Math.random()*6; fireIn = 26 + Math.random()*10; lastCatch = -9; combo = 0; milestone = 500; shownScore = -1;
   theme = 0; prevTheme = 0; transT = 0; fireT = 0; graceT = 0; boost = 1; shark = null;
   Object.assign(P, { y:GY, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, land:0, sink:false });
@@ -853,7 +860,7 @@ function goHome(){
 function iceToast(){
   const el = $('icetoast'); el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
 }
-function toast(msg){ ui.toast.textContent = msg; ui.toast.classList.remove('show'); void ui.toast.offsetWidth; ui.toast.classList.add('show'); }
+function toast(msg, big){ ui.toast.textContent = msg; ui.toast.classList.toggle('big', !!big); ui.toast.classList.remove('show'); void ui.toast.offsetWidth; ui.toast.classList.add('show'); }
 
 /* ================= Génération ================= */
 const lvl = () => 1 - Math.exp(-t/90);
@@ -867,16 +874,17 @@ function spawnObstacle(){
   const th = theme, x0 = W + 16, d = lvl(), sockOn = P.sockT > 1.2, c = Math.random() < .5 ? 0 : 1;
   const r = Math.random(), pHole = t > 12 ? .1 + .22*d : 0, pPyr = t > 22 ? .07 + .2*d : 0;
   let o;
-  if (r < pHole) o = { k:'hole', x:x0, w: Math.round(24 + 12*d + Math.random()*6), th, ph:Math.random()*6 };
+  if (r < pHole) o = { k:'hole', x:x0, w: Math.round(24 + 12*d + Math.random()*6), th, ph:Math.random()*6, jumper: (th === 0 || th === 2) && t > 35 && Math.random() < .3 + .4*d };
+  else if (t > 45 && r < pHole + .12 + .15*d && Math.random() < .5) o = { k:'pyr3', x:x0, w: 39, th, c };
   else if (r < pHole + pPyr) o = { k:'pyr', x:x0, w: th === 2 ? 36 : 26, th, c };
   else { let n = 1; if (Math.random() < .1 + .4*d) n = Math.random() < .35*d ? 3 : 2; const pw = th === 2 ? 14 : (th === 3 ? 16 : 12); o = { k:'cone', x:x0, n, w:n*pw+1, th, c }; }
   obs.push(o);
   const cx = x0 + o.w/2, fireOn = fireT > 0;
   if (Math.random() < (sockOn || fireOn ? .75 : .42)){
-    const peak = sockOn ? 92 : (o.k === 'pyr' ? 56 : 46), sp = Math.max(28, speed*(sockOn ? .1 : .07)), half = sp >= 36 ? 2 : 1;
+    const peak = sockOn ? 92 : (o.k === 'pyr3' ? 66 : (o.k === 'pyr' ? 56 : 46)), sp = Math.max(28, speed*(sockOn ? .1 : .07)), half = sp >= 36 ? 2 : 1;
     const gid = newGroup(2*half+1); for (let i=-half;i<=half;i++){ const hh = peak * (1 - Math.pow(i/(half+.7), 2)); discs.push({ x: cx + i*sp, y: GY - 30 - hh, g: gid }); }
   }
-  const gap = gapFor() + o.w + (o.k === 'pyr' ? 30 : 0); nextObs = gap;
+  const gap = gapFor() + o.w + (o.k === 'pyr' ? 30 : (o.k === 'pyr3' ? 45 : 0)); nextObs = gap;
   const mx = x0 + o.w + (gap - o.w)/2, roomy = gap - o.w > speed*.64 + 125;
   if (fireIn <= 0 && !fireOn && !items.length && gap - o.w > 190){ items.push({ k:'fire', x: mx, y: GY - 76 }); fireIn = 32 + Math.random()*14; return; }
   if (sockIn <= 0 && P.sockT <= 0 && !items.length && gap - o.w > 190){ items.push({ k:'sock', x: mx, y: GY - 88 }); sockIn = 15 + Math.random()*10; return; }
@@ -889,11 +897,15 @@ function spawnObstacle(){
   }
 }
 function hitboxes(o){
+  if (o.k === 'pyr3') return o.th === 2 ? [[o.x+2, o.x+36, GY-11],[o.x+8, o.x+30, GY-23],[o.x+14, o.x+24, GY-35]]
+    : (o.th === 3 ? [[o.x+2, o.x+36, GY-11],[o.x+8, o.x+30, GY-21],[o.x+14, o.x+24, GY-31]] : [[o.x+3, o.x+36, GY-12],[o.x+9, o.x+30, GY-24],[o.x+16, o.x+23, GY-36]]);
   if (o.k === 'cone'){ const pw = o.th === 2 ? 14 : (o.th === 3 ? 16 : 12), out = []; for (let i=0;i<o.n;i++) out.push(o.th === 2 ? [o.x+i*pw+2, o.x+i*pw+12, GY-13] : (o.th === 3 ? [o.x+i*pw+3, o.x+i*pw+13, GY-11] : [o.x+i*pw+3, o.x+i*pw+10, GY-12])); return out; }
   if (o.k === 'pyr') return o.th === 2 ? [[o.x+2, o.x+34, GY-22]] : (o.th === 3 ? [[o.x+2, o.x+24, GY-11],[o.x+8, o.x+18, GY-19]] : [[o.x+3, o.x+10, GY-12],[o.x+16, o.x+23, GY-12],[o.x+9, o.x+17, GY-24]]);
   return [];
 }
 function pieces(o){
+  if (o.k === 'pyr3'){ if (o.th === 2) return [[CASTLE3, o.x, GY-46]]; if (o.th === 3) return [[SNOW3, o.x, GY-41]];
+    const cn = CONES[o.c]; return [[cn, o.x, GY-16],[cn, o.x+13, GY-16],[cn, o.x+26, GY-16],[cn, o.x+6, GY-28],[cn, o.x+19, GY-28],[cn, o.x+13, GY-40]]; }
   if (o.k === 'cone') return Array.from({length:o.n}, (_,i) => o.th === 2 ? [CASTLE, o.x+i*14, GY-20] : (o.th === 3 ? [SNOWMAN, o.x+i*16, GY-15] : [CONES[o.c], o.x+i*12, GY-16]));
   if (o.k === 'pyr') return o.th === 2 ? [[FORT, o.x, GY-32]] : (o.th === 3 ? [[BIGSNOW, o.x, GY-22]] : [[CONES[o.c], o.x, GY-16],[CONES[o.c], o.x+13, GY-16],[CONES[o.c], o.x+6, GY-28]]);
   return [];
@@ -934,7 +946,11 @@ function smash(o){
 function catchDisc(o){
   o.got = true;
   combo = (t - lastCatch < 1.3) ? Math.min(combo+1, 5) : 1; lastCatch = t;
-  if (o.g && groups[o.g]){ const G = groups[o.g]; G.got++; if (G.n >= 5 && G.got === G.n){ toast('Combo ! +500'); bonus += 500; pops.push({ x:o.x, y:o.y-22, s:'+500', t:-.25, col:C.white }); } }
+  if (o.g && groups[o.g]){ const G = groups[o.g]; G.got++; if (G.n >= 5 && G.got === G.n){ toast('Combo !'); bonus += 500; } }
+  streak++;
+  if (streak === 10){ bonus += 1000; toast('Super Combo !', true); sfx.mile(); }
+  else if (streak === 50){ bonus += 5000; toast('Méga Combo !', true); sfx.world(); }
+  else if (streak % 100 === 0){ bonus += 10000; toast('Giga Combo !', true); sfx.world(); flash = .15; }
   discCount++; $('dcn').textContent = discCount;
   const pts = 10*combo; bonus += pts; sfx.disc(combo);
   pops.push({ x:o.x, y:o.y-10, s: combo > 1 ? '+'+pts+' x'+combo : '+'+pts, t:0, col: C.white });
@@ -955,7 +971,8 @@ function update(dt){
   if (state !== 'title'){
     if (state === 'play') dist += dx;
     for (const o of obs) o.x -= dx; for (const o of discs) o.x -= dx; for (const o of items) o.x -= dx;
-    obs = obs.filter(o => o.x + o.w > -30); discs = discs.filter(o => o.x > -30 && !o.got); items = items.filter(o => o.x > -30 && !o.got);
+    obs = obs.filter(o => o.x + o.w > -30); for (const o of discs) if (!o.got && !o.missed && o.x < P.x - 20 && state === 'play'){ o.missed = true; streak = 0; }
+    discs = discs.filter(o => o.x > -30 && !o.got); items = items.filter(o => o.x > -30 && !o.got);
   }
 
   if (state === 'play'){
@@ -986,6 +1003,8 @@ function update(dt){
         if (P.ground && fireT <= 0 && graceT <= 0 && P.x > o.x + 6 && P.x < o.x + o.w - 6){ if (o.th === 1) die('slip'); else if (o.th === 3) die('ski'); else { P.x = Math.round(o.x + o.w/2); die('hole'); } break; }
         continue;
       }
+      if (o.k === 'hole' && o.jumper){ const cr = critter(o), cxh = o.x + o.w/2;
+        if (cr.show && cr.lift > 2 && P.x + 6 > cxh - 5 && P.x - 6 < cxh + 5 && P.y > cr.top + 2 && P.y - 44 < cr.top + 8){ if (fireT > 0 || graceT > 0){ o.jumper = false; } else { die(o.th === 2 ? 'crab' : 'mole'); break; } } }
       for (const [x0, x1, top] of hitboxes(o)){
         if (P.x+6 > x0 && P.x-6 < x1 && P.y > top){ if (fireT > 0 || graceT > 0){ o.smashed = true; smash(o); } else die('hit'); break; }
       }
@@ -1021,7 +1040,7 @@ function update(dt){
     ui.bestline.className = 'line' + (P.newBest ? ' new' : '');
     ui.hi.textContent = 'Record ' + pad(best);
     ui.sockbar.hidden = true; ui.firebar.hidden = true; ui.over.hidden = false;
-    ui.over.querySelector('h2').textContent = deathKind === 'hole' ? 'Tombée dans le trou !' : (deathKind === 'slip' ? 'Glissade dans la flaque !' : (deathKind === 'ski' ? 'Emmêlée dans les skis !' : 'Plot touché !'));
+    ui.over.querySelector('h2').textContent = deathKind === 'hole' ? 'Tombée dans le trou !' : (deathKind === 'slip' ? 'Glissade dans la flaque !' : (deathKind === 'ski' ? 'Emmêlée dans les skis !' : (deathKind === 'crab' ? 'Pincée par un crabe !' : (deathKind === 'mole' ? 'Mordue par une taupe !' : 'Plot touché !'))));
   }
 
   // requin (plage)
@@ -1213,6 +1232,15 @@ function drawBack(th){
   if (H - GY > 60) tile(T.fg, bgX, GY + Math.round((H-GY)*.8) - 26);
   if (th === 3) drawFlakes();
 }
+// taupes et crabes : sortent la tête ; avec la difficulté, certains sautent un peu hors du trou
+function critter(o){
+  if (!(o.th === 0 || o.th === 2)) return { show:false, lift:0, top:0 };
+  if (!o.jumper){ const v = Math.sin(clock*1.8 + o.ph); if (v < .3) return { show:false, lift:0, top:0 }; const up = v > .6 ? 0 : 3; return { show:true, lift:0, top: GY - 8 + up }; }
+  const ph = ((clock*.9 + o.ph) % 1 + 1) % 1;
+  if (ph < .3) return { show:false, lift:0, top:0 };
+  let lift = 0; if (ph > .5 && ph < .8) lift = Math.round(15*Math.sin(Math.PI*(ph - .5)/.3));
+  return { show:true, lift, top: GY - 8 - lift + (ph < .4 ? 3 : 0) };
+}
 function drawHole(o){
   const x = Math.round(o.x), w = o.w, cx = x + w/2;
   if (o.th === 1){
@@ -1241,12 +1269,13 @@ function drawHole(o){
   }
   const rim = o.th === 0 ? '#6B4424' : C.sandD, deep = o.th === 0 ? '#2A1A0E' : '#6B4F22', mid2 = o.th === 0 ? '#4A2E18' : '#8A6A30';
   ell(cx, GY + 2, w/2, 4.5, (u, v, d) => d > .72 ? rim : (v > .1 ? deep : mid2));
-  if (o.th === 2 && Math.sin(clock*1.9 + o.ph) > .45){
-    const up = Math.sin(clock*1.9 + o.ph) > .7 ? 0 : 1;
-    pm(ctx, ['...ow...wo...','...ok...ko...','oo..o...o..oo','oroooooooooro','.orrrrrrrrro.','..orrrrrrro..'], cx - 6, GY - 5 + up, false, Object.assign({}, PAL, { r:C.red, w:C.white, k:C.plum }));
-  }
-  if (o.th === 0 && Math.sin(clock*1.7 + o.ph) > .55){
-    pm(ctx, ['.oooo.','owkkwo','oggggo','ogrrgo'], cx - 3, GY - 3, false, Object.assign({}, PAL, { g:'#6B6470', k:C.plum, w:C.white, r:C.tongue }));
+  const cr = critter(o);
+  if (cr.show){
+    ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, GY + 2); ctx.clip();
+    if (o.th === 2) pm(ctx, ['....ow...wo....','....ok...ko....','.oo..o...o..oo.','orro.o...o.orro','.oroooooooooro.','..orrrrrrrrro..','.orrrrrrrrrrro.','..orrrrrrrrro..','...ooooooooo...'], cx - 7, cr.top, false, Object.assign({}, PAL, { r:C.red, w:C.white, k:C.plum }));
+    else pm(ctx, ['...oooo...','.oohhhhoo.','ohhhhhhhho','ohkhhhhkho','ohhhrrhhho','oghhrrhhgo','occggggcco','occggggcco','oggggggggo'], cx - 5, cr.top, false, Object.assign({}, PAL, { h:'#8E8794', g:'#6B6470', k:C.plum, r:C.tongue, c:'#F2C6CF' }));
+    ctx.restore();
+    if (cr.lift > 2){ ctx.globalAlpha = .3; ctx.fillStyle = C.plum; ctx.fillRect(Math.round(cx - 5), GY + 1, 10, 1); ctx.globalAlpha = 1; }
   }
 }
 
