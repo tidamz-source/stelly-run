@@ -105,6 +105,15 @@ body{
 #dcount{ position:absolute; top:calc(var(--s)*16px); right:calc(var(--s)*4px); display:flex; align-items:center; gap:calc(var(--s)*2px); pointer-events:none;
   font-family:var(--num); font-size:max(calc(var(--s)*7px),12px); color:var(--white); -webkit-text-stroke:calc(var(--s)*1.2px) var(--plum); paint-order:stroke fill; text-shadow:0 calc(var(--s)*1px) 0 var(--plum); }
 #dcount canvas{ height:calc(var(--s)*8px); width:auto; image-rendering:pixelated; }
+#soundmenu{ position:absolute; z-index:20; top:calc(var(--s)*15px); right:calc(var(--s)*4px); display:flex; flex-direction:column; gap:calc(var(--s)*2px);
+  background:var(--white); border:calc(var(--s)*1px) solid var(--plum); border-radius:calc(var(--s)*2px); padding:calc(var(--s)*2.5px); box-shadow:0 calc(var(--s)*2px) 0 rgba(46,14,48,.35); }
+#soundmenu .tg{ display:flex; align-items:center; justify-content:space-between; gap:calc(var(--s)*5px); font-family:inherit; font-weight:700; font-size:max(calc(var(--s)*6px),12px);
+  color:var(--plum); background:none; border:0; padding:calc(var(--s)*1px) calc(var(--s)*1px); cursor:pointer; }
+#soundmenu .tg b{ position:relative; width:calc(var(--s)*16px); height:calc(var(--s)*8px); border:calc(var(--s)*1px) solid var(--plum); border-radius:calc(var(--s)*4px); background:#C9C2D3; }
+#soundmenu .tg b::after{ content:''; position:absolute; top:calc(var(--s)*.5px); left:calc(var(--s)*.5px); width:calc(var(--s)*5px); height:calc(var(--s)*5px); border-radius:50%; background:var(--white); border:calc(var(--s)*.5px) solid var(--plum); transition:transform .15s; }
+#soundmenu .tg[aria-pressed="true"] b{ background:var(--green-l); }
+#soundmenu .tg[aria-pressed="true"] b::after{ transform:translateX(calc(var(--s)*8px)); }
+#soundmenu .tg:focus-visible{ outline:calc(var(--s)*1px) dashed var(--plum); }
 #pausebtn{ position:absolute; top:calc(var(--s)*3px); right:calc(var(--s)*31px); height:calc(var(--s)*10px); width:calc(var(--s)*10px);
   display:flex; align-items:center; justify-content:center; gap:calc(var(--s)*1.5px); background:rgba(255,255,255,.8);
   border:calc(var(--s)*1px) solid var(--plum); border-radius:calc(var(--s)*1.5px); padding:0; cursor:pointer; }
@@ -134,8 +143,8 @@ body{
   100%{ opacity:0; transform:translate(-50%,-80%) scale(1); }
 }
 
-#firebar{ color:#1F7A3A; }
-#firebar b{ background:#4FC25A; box-shadow:inset 0 calc(var(--s)*-1px) 0 #1F7A3A; }
+#firebar{ color:#B5660C; }
+#firebar b{ background:#F6C65C; box-shadow:inset 0 calc(var(--s)*-1px) 0 #C8790F; }
 .btn.alt{ background:var(--white); box-shadow:inset 0 calc(var(--s)*-2.5px) 0 #D8D3DF, 0 calc(var(--s)*2.5px) 0 var(--plum); }
 .btn.alt:hover{ background:#F3F0F7; }
 .row{ display:flex; gap:calc(var(--s)*5px); }
@@ -232,6 +241,10 @@ body{
     </div>
 
     <button id="mute" aria-label="Couper le son">Son</button>
+    <div id="soundmenu" hidden role="group" aria-label="Réglages du son">
+      <button id="tgMusic" class="tg" aria-pressed="true"><span>Musique</span><b></b></button>
+      <button id="tgSfx" class="tg" aria-pressed="true"><span>Effets</span><b></b></button>
+    </div>
     <button id="pausebtn" hidden aria-label="Mettre en pause"><i></i><i></i></button>
     <div id="zone" hidden aria-live="polite"></div>
     <div id="dcount" hidden aria-label="Frisbees attrapés"><canvas id="icoCount"></canvas><span id="dcn">0</span></div>
@@ -797,6 +810,39 @@ const FLAMES = [0,1,2].map(f => mk(26, 18, g => {
   g.fillStyle = C.plum; const dy = [[3,5],[22,4],[6,1],[19,0]][f % 4]; g.fillRect(dy[0], dy[1], 2, 3); g.fillStyle = '#1F7A3A'; g.fillRect(dy[0], dy[1]+1, 1, 1);
 }));
 // frisbee de feu ramassable : 3 images de flammes, en vert puis en blanc pour le clignotement
+// gourde d'invincibilité (d'après le visuel fourni)
+const BOTTLE = mk(12, 28, g => pm(g, [
+  '...oooooo...',
+  '..okkkkkko..',
+  '..oko..oko..',
+  '.oooooooooo.',
+  '.okKkKkKkko.',
+  '.okKkKkKkko.',
+  '.oooooooooo.',
+  '.oDOOOOOOLo.',
+  'oDOOOOOOOOLo',
+  'oDOOOOOOOLLo',
+  'oDOOOOOOOLLo',
+  'oDOOOOOOOLLo',
+  'oDOOOOpppLLo',
+  'oDOOOpyypLLo',
+  'oDOOpyypOLLo',
+  'oDOpyyyypLLo',
+  'oDOppyypOLLo',
+  'oDOOpypOOLLo',
+  'oDOOppOOOLLo',
+  'oDOOOOOOOLLo',
+  'oDOOOOOOOLLo',
+  'oDOOOOOOOLLo',
+  'oDOOOOOOOLLo',
+  'oDOOOOOOOLLo',
+  'oDOOOOOOOLLo',
+  'oDOOOOOOOOLo',
+  '.oDDOOOOOLo.',
+  '..oooooooo..'
+], 0, 0, false, { o:C.plum, p:C.plum, k:'#2B2B30', K:'#56565F', D:'#C8790F', O:'#E9A21C', L:'#F6C65C', y:'#FFE34A' }));
+const BOTTLE_W = mk(12, 28, g => { g.drawImage(BOTTLE, 0, 0); g.globalCompositeOperation = 'source-atop'; g.fillStyle = 'rgba(255,255,255,.75)'; g.fillRect(0, 0, 12, 28); });
+const floatY = o => { if (o.fp === undefined){ o.fp = Math.random()*6.28; o.fa = 1.5 + Math.random()*2; o.fs = 1.8 + Math.random()*2.6; } return Math.round(Math.sin(clock*o.fs + o.fp)*o.fa); };
 const FIRE_ITEM = [0,1,2].map(f => mk(28, 27, g => { g.drawImage(FLAMES[f], 1, 0); g.drawImage(FDISC, 0, 14); }));
 const FIRE_ITEM_W = FIRE_ITEM.map(c => mk(28, 27, g => { g.drawImage(c, 0, 0); g.globalCompositeOperation = 'source-atop'; g.fillStyle = 'rgba(255,255,255,.75)'; g.fillRect(0, 0, 28, 27); }));
 const SHARK = mk(26, 14, g => {
@@ -811,15 +857,22 @@ const SHARK = mk(26, 14, g => {
 const BOAT = mk(14, 11, g => pm(g, ['......o.......','......oww.....','......owww....','......owwww...','......owwwww..','......o.......','ooooooooooooo.','.oLLLLLLLLLo..','..ooooooooo...'], 0, 2));
 
 /* ================= Audio ================= */
-let actx = null, muted = false;
-try { muted = localStorage.getItem('stellyrun_muted') === '1'; } catch(e){}
-function ensureAudio(){ if (!actx){ try { actx = new (window.AudioContext||window.webkitAudioContext)(); } catch(e){} } if (actx && actx.state === 'suspended') actx.resume(); }
+let actx = null, musicOn = true, sfxOn = true, sfxBus = null, musBus = null;
+try { const old = localStorage.getItem('stellyrun_muted') === '1', m = localStorage.getItem('stellyrun_music'), x = localStorage.getItem('stellyrun_sfx');
+  musicOn = m === null ? !old : m === '1'; sfxOn = x === null ? !old : x === '1'; } catch(e){}
+function ensureAudio(){
+  if (!actx){ try { actx = new (window.AudioContext||window.webkitAudioContext)();
+    sfxBus = actx.createGain(); sfxBus.gain.value = sfxOn ? 1 : 0; sfxBus.connect(actx.destination);
+    musBus = actx.createGain(); musBus.gain.value = musicOn ? .6 : 0; musBus.connect(actx.destination);
+    if (state === 'title') MUSIC.play('title'); } catch(e){} }
+  if (actx && actx.state === 'suspended') actx.resume();
+}
 function tone(f1, f2, dur, type, vol, delay){
-  if (muted || !actx) return; const t0 = actx.currentTime + (delay||0);
+  if (!sfxOn || !actx) return; const t0 = actx.currentTime + (delay||0);
   const o = actx.createOscillator(), g = actx.createGain(); o.type = type||'square';
   o.frequency.setValueAtTime(f1, t0); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t0+dur);
   g.gain.setValueAtTime(vol||.05, t0); g.gain.exponentialRampToValueAtTime(.0001, t0+dur);
-  o.connect(g).connect(actx.destination); o.start(t0); o.stop(t0+dur+.02);
+  o.connect(g).connect(sfxBus); o.start(t0); o.stop(t0+dur+.02);
 }
 const sfx = {
   jump: () => tone(360, 740, .12, 'square', .04),
@@ -834,6 +887,89 @@ const sfx = {
   start: () => [392,523,659,784].forEach((f,i) => tone(f, 0, .12, 'square', .05, i*.06))
 };
 
+/* ================= Musique chiptune (synthétisée, aucune ressource externe) ================= */
+const MUSIC = (() => {
+  const API = { tempo: 1, target: 1, fire: false };
+  let song = null, next = null, step = 0, nextT = 0, running = false, paused = false, pulse25 = null, pulse12 = null, echoIn = null, noise = null;
+  const N = m => 440 * Math.pow(2, (m - 69) / 12);
+  // mélodie commune (8 mesures de 16 doubles-croches), notes MIDI, '-' = tenue, '.' = silence
+  const MEL = [
+    [76,'.',79,'.',84,'.',79,'.',76,'.',79,'.',81,79,76,'.'],
+    [72,'.',76,'.',81,'.',76,'.',72,'.',76,'.',79,76,74,'.'],
+    [77,'.',81,'.',84,'.',81,'.',77,'.',81,'.',83,81,77,'.'],
+    [79,'-','-','.',74,'.',79,'.',83,'-',81,'.',79,'.',74,'.'],
+    [76,'-','-','-',79,'.',76,'.',84,'-','-','-',83,'.',81,'.'],
+    [81,'-','-','.',79,'.',76,'.',72,'.',76,'.',81,'-','-','.'],
+    [77,'.',81,'.',84,'.',86,'.',84,'.',81,'.',77,'.',81,'.'],
+    [79,'-','-','-',83,'-','-','-',86,'-','-','-','-','-','.','.']
+  ];
+  const ROOTS = [48, 45, 41, 43, 48, 45, 41, 43];
+  const CHORDS = { 48:[60,64,67], 45:[57,60,64], 41:[53,57,60], 43:[55,59,62] };
+  const SONGS = {
+    title:  { bpm:112, tr:0,  lead:'tri',     stac:.95, echo:true,  drums:{ k:'', s:'', h:'..h...h...h...h.' }, bars:4, lv:.10 },
+    0:      { bpm:152, tr:0,  lead:'pulse25', stac:.85, echo:false, drums:{ k:'k.....k.k.......', s:'....s.......s...', h:'h.h.h.h.h.h.h.h.' }, bars:8, lv:.11 },
+    1:      { bpm:150, tr:2,  lead:'pulse12', stac:.8,  echo:true,  drums:{ k:'k.......k.k.....', s:'....s..s....s...', h:'..h...h...h...h.' }, bars:8, lv:.10 },
+    2:      { bpm:160, tr:5,  lead:'pulse25', stac:.45, echo:false, drums:{ k:'k.....k...k.....', s:'....s.......s.s.', h:'hhhhhhhhhhhhhhhh' }, bars:8, lv:.11 },
+    3:      { bpm:140, tr:-3, lead:'bell',    stac:1,   echo:true,  drums:{ k:'k...............', s:'........s.......', h:'h...h...h...h...' }, bars:8, lv:.12 }
+  };
+  function init(){
+    if (pulse25 || !actx) return;
+    const mkPulse = duty => { const n = 32, re = new Float32Array(n), im = new Float32Array(n); for (let k=1;k<n;k++){ im[k] = 2*Math.sin(Math.PI*k*duty)/(Math.PI*k); } return actx.createPeriodicWave(re, im); };
+    pulse25 = mkPulse(.25); pulse12 = mkPulse(.125);
+    noise = actx.createBuffer(1, actx.sampleRate, actx.sampleRate); const d = noise.getChannelData(0); for (let i=0;i<d.length;i++) d[i] = Math.random()*2 - 1;
+    echoIn = actx.createDelay(1); const fb = actx.createGain(), wet = actx.createGain(); echoIn.delayTime.value = .21; fb.gain.value = .32; wet.gain.value = .35;
+    echoIn.connect(fb).connect(echoIn); echoIn.connect(wet).connect(musBus);
+  }
+  function voice(t, freq, dur, kind, vol, useEcho){
+    const g = actx.createGain(); g.connect(musBus); if (useEcho) g.connect(echoIn);
+    if (kind === 'bell'){
+      [[1, 1], [2.01, .35], [3.98, .12]].forEach(([m, a]) => { const o = actx.createOscillator(); o.type = 'sine'; o.frequency.value = freq*m; const gg = actx.createGain(); gg.gain.setValueAtTime(vol*a, t); gg.gain.exponentialRampToValueAtTime(.0001, t + Math.max(.35, dur*1.6)); o.connect(gg).connect(g); o.start(t); o.stop(t + Math.max(.4, dur*1.7)); });
+      g.gain.value = 1; return;
+    }
+    const o = actx.createOscillator();
+    if (kind === 'pulse25') o.setPeriodicWave(pulse25); else if (kind === 'pulse12') o.setPeriodicWave(pulse12); else o.type = kind;
+    o.frequency.setValueAtTime(freq, t);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + .006); g.gain.setValueAtTime(vol, t + Math.max(.01, dur - .03)); g.gain.linearRampToValueAtTime(0, t + dur);
+    o.connect(g); o.start(t); o.stop(t + dur + .02);
+  }
+  function drum(t, kind, vol){
+    if (kind === 'k'){ const o = actx.createOscillator(), g = actx.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(42, t + .12); g.gain.setValueAtTime(vol*2.4, t); g.gain.exponentialRampToValueAtTime(.0001, t + .14); o.connect(g).connect(musBus); o.start(t); o.stop(t + .16); return; }
+    const s = actx.createBufferSource(), f = actx.createBiquadFilter(), g = actx.createGain(); s.buffer = noise;
+    f.type = 'highpass'; f.frequency.value = kind === 's' ? 1400 : 7000; const len = kind === 's' ? .11 : .035;
+    g.gain.setValueAtTime(vol*(kind === 's' ? 1.3 : .45), t); g.gain.exponentialRampToValueAtTime(.0001, t + len);
+    s.connect(f).connect(g).connect(musBus); s.start(t, Math.random()*.5); s.stop(t + len + .01);
+  }
+  function holdLen(bar, i){ let n = 1; while (i + n < 16 && MEL[bar][i + n] === '-') n++; return n; }
+  function schedule(t, st){
+    const S = song, bar = Math.floor(st/16) % S.bars, i = st % 16, sd = 60/(S.bpm*API.tempo)/4, lv = S.lv;
+    const m = MEL[bar][i];
+    if (typeof m === 'number') voice(t, N(m + S.tr), holdLen(bar, i)*sd*S.stac, S.lead, lv, S.echo);
+    const root = ROOTS[bar] + S.tr;
+    if (i % 2 === 0) voice(t, N(root + (i % 4 === 2 ? 12 : 0)), sd*1.6, 'triangle', lv*1.25, false);
+    const ch = CHORDS[ROOTS[bar]], arpStep = API.fire ? 1 : 2;
+    if (i % arpStep === 0) voice(t, N(ch[(i/arpStep) % 3] + S.tr + 12), sd*.7, 'pulse12' === S.lead ? 'pulse25' : 'pulse12', lv*.35, false);
+    const D = S.drums; if (D.k[i] === 'k') drum(t, 'k', lv); if (D.s[i] === 's') drum(t, 's', lv);
+    if (D.h[i] === 'h' || (API.fire && S !== SONGS.title)) drum(t, 'h', lv);
+  }
+  function tick(){
+    if (!actx || !running || paused || !song) return;
+    while (nextT < actx.currentTime + .14){
+      schedule(nextT, step);
+      nextT += 60/(song.bpm*API.tempo)/4; step++;
+      if (step % 16 === 0){ if (next){ song = next; next = null; step = 0; } else if (step >= song.bars*16) step = 0; }
+    }
+  }
+  setInterval(tick, 25);
+  API.play = (id, restart) => { if (!actx) return; init(); const s = SONGS[id]; if (!s) return;
+    if (!running || restart){ song = s; next = null; step = 0; nextT = actx.currentTime + .06; running = true; paused = false; }
+    else if (s !== song) next = s; };
+  API.stop = () => { running = false; next = null; };
+  API.pause = () => { paused = true; };
+  API.resume = () => { if (!actx) return; paused = false; nextT = actx.currentTime + .05; };
+  API.jingle = () => { if (!actx) return; init(); const t = actx.currentTime + .05; [79, 76, 72, 67].forEach((m, k) => voice(t + k*.13, N(m), .12, 'pulse25', .11, false)); voice(t + .52, N(60), .4, 'triangle', .14, false); };
+  return API;
+})();
+
 /* ================= État ================= */
 let titleCaught = false;
 let state = 'title', clock = 0, titleT = 0, t = 0, dist = 0, bonus = 0, speed = 30, spEff = 30, score = 0, shownScore = -1;
@@ -845,7 +981,7 @@ const newGroup = n => { gidN++; groups[gidN] = { n, got:0 }; return gidN; };
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.2';
+const APP_VERSION = '5.3';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf'];
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
 
@@ -862,13 +998,13 @@ function reset(){
   Object.assign(P, { y:GY, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, land:0, sink:false });
 }
 function startGame(){
-  ensureAudio(); sfx.start(); reset(); state = 'play';
+  ensureAudio(); sfx.start(); reset(); state = 'play'; MUSIC.tempo = MUSIC.target = 1; MUSIC.fire = false; MUSIC.play(0, true);
   ui.title.hidden = true; ui.over.hidden = true; ui.pause.hidden = true; ui.hud.hidden = false;
   ui.hi.textContent = 'Record ' + pad(best); ui.firebar.hidden = true; ui.sockbar.hidden = true; ui.dcount.hidden = false; $('pausebtn').hidden = false; clearTimeout(zoneTimer); $('zone').hidden = true;
   if (document.activeElement) document.activeElement.blur();
 }
 function goHome(){
-  state = 'title'; titleT = 0; titleSlammed = false; titleCaught = false; ui.dcount.hidden = true; $('pausebtn').hidden = true; $('zone').hidden = true; theme = 0; prevTheme = 0; transT = 0; confetti = [];
+  state = 'title'; titleT = 0; titleSlammed = false; titleCaught = false; MUSIC.tempo = 1; MUSIC.fire = false; MUSIC.play('title', true); ui.dcount.hidden = true; $('pausebtn').hidden = true; $('zone').hidden = true; theme = 0; prevTheme = 0; transT = 0; confetti = [];
   obs = []; discs = []; items = []; debris = []; parts = []; pops = []; fireT = 0; boost = 1;
   ui.over.hidden = true; ui.hud.hidden = true; ui.title.hidden = false; showTitleRecord();
   // relance les animations CSS de l'accueil
@@ -892,7 +1028,7 @@ function spawnObstacle(){
   const th = theme, x0 = W + 16, d = lvl(), sockOn = P.sockT > 1.2, c = Math.random() < .5 ? 0 : 1;
   const r = Math.random(), pHole = t > 12 ? .1 + .22*d : 0, pPyr = t > 22 ? .07 + .2*d : 0;
   let o;
-  if (r < pHole) o = { k:'hole', x:x0, w: Math.round(24 + 12*d + Math.random()*6), th, ph:Math.random()*6, jumper: (th === 0 || th === 2) && t > 35 && Math.random() < .3 + .4*d };
+  if (r < pHole) o = { k:'hole', x:x0, w: Math.round(24 + 12*d + Math.random()*6), th, ph:Math.random()*6, mode: (th === 0 || th === 2) ? (() => { const r2 = Math.random(), pl = .25 + .3*d; return (r2 < pl && W/Math.max(1, speed) > .62) ? 'leap' : (r2 < pl + .4 ? 'peek' : 'stay'); })() : null, trig: .4 + Math.random()*.2 };
   else if (t > 45 && r < pHole + .12 + .15*d && Math.random() < .5) o = { k:'pyr3', x:x0, w: 39, th, c };
   else if (r < pHole + pPyr) o = { k:'pyr', x:x0, w: th === 2 ? 36 : 26, th, c };
   else { let n = 1; if (Math.random() < .1 + .4*d) n = Math.random() < .35*d ? 3 : 2; const pw = th === 2 ? 14 : (th === 3 ? 16 : 12); o = { k:'cone', x:x0, n, w:n*pw+1, th, c }; }
@@ -950,7 +1086,7 @@ function addConfetti(n, fromTop, cx, cy){
 function die(kind){
   if (state !== 'play') return;
   $('pausebtn').hidden = true;
-  state = 'over'; overT = 0; deathKind = kind; flash = .12; fireT = 0; graceT = 0;
+  state = 'over'; overT = 0; deathKind = kind; flash = .12; fireT = 0; graceT = 0; MUSIC.stop(); MUSIC.fire = false; MUSIC.jingle();
   if (kind === 'hole'){ P.sink = true; P.vy = 30; P.ground = false; sfx.fall(); dust(P.x, GY, 10); shake = .15; }
   else { P.vy = -180; P.ground = false; shake = .35; sfx.hit(); burst(P.x, P.y-28, 16, kind === 'slip' ? ['#3FA3E0', '#BFE8FF', C.white] : (kind === 'ski' ? [C.white, '#DCE9F5', C.purple] : [C.yellow, C.orange, C.white]), 95, 300); }
   P.newBest = score > best;
@@ -989,7 +1125,7 @@ function update(dt){
   const dx = spEff*dt; bgX += dx;
   if (state !== 'title'){
     if (state === 'play') dist += dx;
-    for (const o of obs) o.x -= dx; for (const o of discs) o.x -= dx; for (const o of items) o.x -= dx;
+    for (const o of obs){ o.x -= dx; if (o.leapT !== undefined) o.leapT += dt; } for (const o of discs) o.x -= dx; for (const o of items) o.x -= dx;
     obs = obs.filter(o => o.x + o.w > -30); for (const o of discs) if (!o.got && !o.missed && o.x < P.x - 20 && state === 'play'){ o.missed = true; streak = 0; }
     discs = discs.filter(o => o.x > -30 && !o.got); items = items.filter(o => o.x > -30 && !o.got);
   }
@@ -1001,6 +1137,7 @@ function update(dt){
       P.vy = -(P.sockT > 0 ? 460 : 330); P.ground = false; P.buf = 0; sfx.jump(); dust(P.x-2, GY-1, 6);
       if (P.sockT > 0) burst(P.x-8, P.y-4, 8, [C.white, '#E6DCF0'], 60, 80);
     }
+    { const tg = (fireT > 0 ? 1.3 : 1) * (1 + Math.min(.25, Math.max(0, speed/190 - 1)*.15)); MUSIC.tempo += (tg - MUSIC.tempo) * Math.min(1, dt*(tg > MUSIC.tempo ? 4 : 1.5)); MUSIC.fire = fireT > 0; }
     P.sockT = Math.max(0, P.sockT - dt); graceT = Math.max(0, graceT - dt); { const had = fireT > 0; fireT = Math.max(0, fireT - dt); if (had && fireT <= 0) graceT = 1; }
     P.anim += dt * (10 + spEff/17);
     if (P.ground && P.land <= 0){ P.dust -= dt; if (P.dust <= 0){ dust(P.x-5, GY-1, 1); P.dust = .08; } }
@@ -1019,9 +1156,12 @@ function update(dt){
     for (const o of obs){
       if (o.smashed) continue;
       if (o.k === 'hole'){
-        if (P.ground && fireT <= 0 && graceT <= 0 && P.x > o.x + 6 && P.x < o.x + o.w - 6){ if (o.th === 1) die('slip'); else if (o.th === 3) die('ski'); else { P.x = Math.round(o.x + o.w/2); die('hole'); } break; }
-        if (o.jumper){ const cr = critter(o), cxh = o.x + o.w/2;
-          if (cr.show && cr.lift > 2 && P.x + 6 > cxh - 5 && P.x - 6 < cxh + 5 && P.y > cr.top + 2 && P.y - 44 < cr.top + 8){ if (fireT > 0 || graceT > 0){ o.jumper = false; } else { die(o.th === 2 ? 'crab' : 'mole'); break; } } }
+        if (o.mode){
+          const cxh = o.x + o.w/2;
+          if (o.mode === 'leap' && o.leapT === undefined && (cxh - P.x) / Math.max(60, spEff) <= o.trig) o.leapT = 0;
+          const cr = critter(o);
+          if (cr.show && fireT <= 0 && graceT <= 0 && P.x + 6 > cxh - 6 && P.x - 6 < cxh + 6 && P.y > cr.top + 1 && P.y - 48 < cr.top + 9){ die(o.th === 2 ? 'crab' : 'mole'); break; }
+        } else if (P.ground && fireT <= 0 && graceT <= 0 && P.x > o.x + 6 && P.x < o.x + o.w - 6){ if (o.th === 1) die('slip'); else if (o.th === 3) die('ski'); else { P.x = Math.round(o.x + o.w/2); die('hole'); } break; }
         continue;
       }
       for (const [x0, x1, top] of hitboxes(o)){
@@ -1040,14 +1180,14 @@ function update(dt){
       if (s.k === 'sock' && Math.abs(s.x+9 - P.x) < 17 && s.y+14 > P.y-56 && s.y+6 < P.y+2){
         s.got = true; P.sockT = 7; sfx.sock(); toast('Super saut !'); burst(s.x+9, s.y+12, 16, [C.purpleL, C.white, C.purple], 85, 100);
       }
-      if (s.k === 'fire'){ flame(s.x, s.y-2, 1, 18, ['#B8F0A8', '#4FC25A', '#1F7A3A', C.white]);
+      if (s.k === 'fire'){ if (Math.random() < .35) flame(s.x, s.y-6, 1, 16, ['#FFE34A', '#F6C65C', '#E9A21C', C.white]);
         if (Math.abs(s.x - P.x) < 18 && s.y > P.y-58 && s.y < P.y+2){ s.got = true; fireT = 7; sfx.fire(); toast('Invincible !'); flash = .1; flame(P.x, P.y-28, 30, 40); } }
     }
     score = Math.floor(dist/12) + bonus;
     if (score >= milestone){ milestone += 500; sfx.mile(); ui.score.classList.add('pulse'); setTimeout(() => ui.score.classList.remove('pulse'), 220); }
     if (score !== shownScore){ ui.score.textContent = pad(score); shownScore = score; }
     const nt = themeFor(score);
-    if (nt !== theme){ prevTheme = theme; theme = nt; setZone(nt); transT = .8; flash = .25; sfx.world(); }
+    if (nt !== theme){ prevTheme = theme; theme = nt; setZone(nt); MUSIC.play(nt); transT = .8; flash = .25; sfx.world(); }
     ui.sockbar.hidden = P.sockT <= 0; if (P.sockT > 0) ui.sockfill.style.transform = 'scaleX(' + (P.sockT/7).toFixed(3) + ')';
     ui.firebar.hidden = fireT <= 0; if (fireT > 0) ui.firefill.style.transform = 'scaleX(' + (fireT/7).toFixed(3) + ')';
   }
@@ -1253,12 +1393,11 @@ function drawBack(th){
 }
 // taupes et crabes : sortent la tête ; avec la difficulté, certains sautent un peu hors du trou
 function critter(o){
-  if (!(o.th === 0 || o.th === 2)) return { show:false, lift:0, top:0 };
-  if (!o.jumper){ const v = Math.sin(clock*1.8 + o.ph); if (v < .3) return { show:false, lift:0, top:0 }; const up = v > .6 ? 0 : 3; return { show:true, lift:0, top: GY - 8 + up }; }
-  const ph = ((clock*.9 + o.ph) % 1 + 1) % 1;
-  if (ph < .3) return { show:false, lift:0, top:0 };
-  let lift = 0; if (ph > .5 && ph < .8) lift = Math.round(15*Math.sin(Math.PI*(ph - .5)/.3));
-  return { show:true, lift, top: GY - 8 - lift + (ph < .4 ? 3 : 0) };
+  if (!o.mode || o.mode === 'stay') return { show:false, lift:0, top:0 };
+  if (o.mode === 'peek') return { show:true, lift:0, top: GY - 8 + (Math.sin(clock*5 + o.ph) > .3 ? 0 : 1) };
+  if (o.leapT === undefined || o.leapT > 1.15) return { show:false, lift:0, top:0 };
+  const k = o.leapT / 1.15, lift = Math.round(76*Math.sin(Math.PI*k));
+  return { show:true, lift, top: GY - 8 - lift };
 }
 function drawHole(o){
   const x = Math.round(o.x), w = o.w, cx = x + w/2;
@@ -1345,10 +1484,10 @@ function draw(){
     for (const l of lines){ ctx.globalAlpha = .7; ctx.fillStyle = C.white; ctx.fillRect(Math.round(l.x), Math.round(l.y), Math.round(l.len), 1); ctx.globalAlpha = 1; }
     for (const o of obs){ if (o.k === 'hole') drawHole(o); else for (const [img, x, y] of pieces(o)) ctx.drawImage(img, Math.round(x), y); }
     for (const s of items){
-      if (s.k === 'sock'){ const f = Math.floor(clock*8)%2; ctx.drawImage(SOCK[f], Math.round(s.x), Math.round(s.y + Math.sin(clock*4)*3)); }
-      else { const by = Math.round(s.y + Math.sin(clock*4)*2), f = Math.floor(clock*12)%3; ctx.drawImage((Math.floor(clock*14) % 2 ? FIRE_ITEM_W : FIRE_ITEM)[f], Math.round(s.x) - 14, by - 19); }
+      if (s.k === 'sock'){ const f = Math.floor(clock*8)%2; ctx.drawImage(SOCK[f], Math.round(s.x), Math.round(s.y) + floatY(s)); }
+      else { const by = Math.round(s.y) + floatY(s); ctx.drawImage(Math.floor(clock*14) % 2 ? BOTTLE_W : BOTTLE, Math.round(s.x) - 6, by - 18); }
     }
-    for (const o of discs) ctx.drawImage(DISC, Math.round(o.x - 14), Math.round(o.y - 5));
+    for (const o of discs) ctx.drawImage(DISC, Math.round(o.x - 14), Math.round(o.y - 5) + floatY(o));
     for (const d of debris){ ctx.save(); ctx.translate(Math.round(d.x + d.img.width/2), Math.round(d.y + d.img.height/2)); ctx.rotate(d.rot); ctx.drawImage(d.img, -Math.round(d.img.width/2), -Math.round(d.img.height/2)); ctx.restore(); }
 
     if (!P.sink){ const hgt = GY - P.y, sw = Math.max(6, Math.round(22 - hgt*.14)); ctx.globalAlpha = .3; ctx.fillStyle = C.plum; ctx.fillRect(Math.round(P.x - sw/2), GY+1, sw, 2); ctx.globalAlpha = 1; }
@@ -1408,7 +1547,7 @@ function resize(){
 /* ================= Icônes ================= */
 function icon(id, img){ const c = $(id); c.width = img.width; c.height = img.height; c.getContext('2d').drawImage(img, 0, 0); }
 icon('icoDisc', DISC); icon('icoCount', DISC); icon('icoSock', SOCK[0]); icon('icoCone', CONES[0]);
-icon('icoFire', mk(28, 24, g => { g.drawImage(FLAMES[0], 1, 0); g.drawImage(FDISC, 0, 11); }));
+icon('icoFire', BOTTLE);
 
 /* ================= Contrôles ================= */
 function press(){
@@ -1419,8 +1558,8 @@ function press(){
   P.hold = true; P.buf = .13;
 }
 function release(){ P.hold = false; }
-function pause(){ if (state !== 'play') return; state = 'pause'; ui.pause.hidden = false; $('pausebtn').hidden = true; P.hold = false; }
-function resume(){ state = 'play'; ui.pause.hidden = true; $('pausebtn').hidden = false; last = 0; }
+function pause(){ if (state !== 'play') return; MUSIC.pause(); state = 'pause'; ui.pause.hidden = false; $('pausebtn').hidden = true; P.hold = false; }
+function resume(){ MUSIC.resume(); state = 'play'; ui.pause.hidden = true; $('pausebtn').hidden = false; last = 0; }
 let zoneTimer = 0;
 function setZone(n){ const z = $('zone'); z.textContent = THEME_NAMES[n]; z.hidden = false; z.classList.toggle('ice', n === 3); z.classList.remove('pop'); void z.offsetWidth; z.classList.add('pop'); clearTimeout(zoneTimer); zoneTimer = setTimeout(() => { z.hidden = true; }, 3000); }
 $('pausebtn').addEventListener('click', e => { e.stopPropagation(); pause(); });
@@ -1430,16 +1569,25 @@ addEventListener('keydown', e => {
   else if (e.code === 'Escape' || e.code === 'KeyP'){ state === 'pause' ? resume() : pause(); }
 });
 addEventListener('keyup', e => { if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') release(); });
-wrap.addEventListener('pointerdown', e => { if (e.target.closest('button')) return; e.preventDefault(); press(); });
+wrap.addEventListener('pointerdown', e => { if (e.target.closest('button') || e.target.closest('#soundmenu')) return; if (!smenu.hidden){ smenu.hidden = true; return; } e.preventDefault(); press(); });
 addEventListener('pointerup', release); addEventListener('pointercancel', release);
 $('start').addEventListener('click', e => { e.stopPropagation(); startGame(); });
 $('again').addEventListener('click', e => { e.stopPropagation(); startGame(); });
 $('home').addEventListener('click', e => { e.stopPropagation(); goHome(); });
 $('resume').addEventListener('click', e => { e.stopPropagation(); resume(); });
-function setMute(m){ muted = m; ui.mute.textContent = m ? 'Muet' : 'Son'; ui.mute.setAttribute('aria-label', m ? 'Activer le son' : 'Couper le son'); try { localStorage.setItem('stellyrun_muted', m ? '1' : '0'); } catch(e){} }
-ui.mute.addEventListener('click', e => { e.stopPropagation(); ensureAudio(); setMute(!muted); ui.mute.blur(); });
-setMute(muted); showTitleRecord(); $('ver').textContent = 'v' + APP_VERSION;
-document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
+const smenu = $('soundmenu');
+function refreshSound(){
+  $('tgMusic').setAttribute('aria-pressed', musicOn); $('tgSfx').setAttribute('aria-pressed', sfxOn);
+  ui.mute.textContent = (musicOn || sfxOn) ? 'Son' : 'Muet';
+  if (musBus) musBus.gain.setTargetAtTime(musicOn ? .6 : 0, actx.currentTime, .05);
+  if (sfxBus) sfxBus.gain.setTargetAtTime(sfxOn ? 1 : 0, actx.currentTime, .02);
+  try { localStorage.setItem('stellyrun_music', musicOn ? '1' : '0'); localStorage.setItem('stellyrun_sfx', sfxOn ? '1' : '0'); } catch(e){}
+}
+ui.mute.addEventListener('click', e => { e.stopPropagation(); ensureAudio(); smenu.hidden = !smenu.hidden; if (!smenu.hidden) pause(); ui.mute.blur(); });
+$('tgMusic').addEventListener('click', e => { e.stopPropagation(); ensureAudio(); musicOn = !musicOn; refreshSound(); });
+$('tgSfx').addEventListener('click', e => { e.stopPropagation(); ensureAudio(); sfxOn = !sfxOn; refreshSound(); });
+refreshSound(); showTitleRecord(); $('ver').textContent = 'v' + APP_VERSION;
+document.addEventListener('visibilitychange', () => { if (document.hidden){ pause(); if (actx) actx.suspend(); } else if (actx) actx.resume(); });
 addEventListener('blur', pause);
 addEventListener('resize', resize);
 
