@@ -82,6 +82,7 @@ body{
 #wrap .copy{ position:absolute; right:calc(var(--s)*4px); bottom:calc(var(--s)*2px); margin:0; font-weight:700; font-size:max(calc(var(--s)*5px),10px); color:var(--white);
   -webkit-text-stroke:calc(var(--s)*1px) var(--plum); paint-order:stroke fill; animation:fade .5s ease-out 1.6s both; }
 #wrap.tall .copy{ right:0; left:0; text-align:center; }
+#wrap .ver{ position:absolute; left:calc(var(--s)*4px); bottom:calc(var(--s)*2px); margin:0; font-family:var(--num); font-size:max(calc(var(--s)*4px),9px); color:var(--white); -webkit-text-stroke:calc(var(--s)*.8px) var(--plum); paint-order:stroke fill; animation:fade .5s ease-out 1.6s both; }
 @keyframes fade{ from{ opacity:0; transform:translateY(calc(var(--s)*4px)); } to{ opacity:1; transform:none; } }
 
 /* ----- HUD ----- */
@@ -133,8 +134,8 @@ body{
   100%{ opacity:0; transform:translate(-50%,-80%) scale(1); }
 }
 
-#firebar{ color:#4A2679; }
-#firebar b{ background:#AB96CC; box-shadow:inset 0 calc(var(--s)*-1px) 0 #512A7E; }
+#firebar{ color:#1F7A3A; }
+#firebar b{ background:#4FC25A; box-shadow:inset 0 calc(var(--s)*-1px) 0 #1F7A3A; }
 .btn.alt{ background:var(--white); box-shadow:inset 0 calc(var(--s)*-2.5px) 0 #D8D3DF, 0 calc(var(--s)*2.5px) 0 var(--plum); }
 .btn.alt:hover{ background:#F3F0F7; }
 .row{ display:flex; gap:calc(var(--s)*5px); }
@@ -209,6 +210,7 @@ body{
         <span class="rec" id="trec" hidden></span>
       </div></div>
       <button id="install" hidden>Installer l’appli</button>
+    <p class="ver" id="ver"></p>
     <p class="copy">© Lutèce Games</p>
     </div>
 
@@ -421,7 +423,7 @@ const DISC = mk(28, 13, g => pm(g, [
   '............................',
   '............................'
 ], 0, 0, false, { o:'#E08A2C', w:'#FFFFFF', r:'#EEDFCB', c:'#F4E6D2', b:'#5A3A10', y:'#FDB60D' }));
-const FDISC = frisbee('#8058A2', '#512A7E', C.plum, [C.discB, '#F5A81C', '#6A4596']);
+const FDISC = frisbee('#4FC25A', '#1F7A3A', C.plum, [C.discB, '#F5A81C', '#3E9E4A']);
 
 /* ================= Chaussette ================= */
 function sockBody(g, ox, oy){
@@ -789,11 +791,14 @@ const FLAMES = [0,1,2].map(f => mk(26, 18, g => {
   const hs = []; for (let x=0;x<26;x++){ const c = 1 - Math.abs(x-12.5)/13.5; hs[x] = Math.max(0, Math.round(c*(6 + 9*c) * (.6 + .4*Math.abs(Math.sin(x*.9 + f*2.1))))); }
   for (let x=0;x<26;x++){ const hh = hs[x];
     for (let y=0;y<hh;y++){ const inner = Math.abs(x-12.5) < 4.5 && y < hh*.7, mid = Math.abs(x-12.5) < 8 && y < hh*.85;
-      g.fillStyle = inner ? '#AB96CC' : (mid ? '#8058A2' : '#512A7E'); g.fillRect(x, 17 - y, 1, 1); }
+      g.fillStyle = inner ? '#B8F0A8' : (mid ? '#4FC25A' : '#1F7A3A'); g.fillRect(x, 17 - y, 1, 1); }
     if (hh) { g.fillStyle = C.plum; g.fillRect(x, 17 - hh, 1, 1); } }
   for (let x=1;x<25;x++){ if (hs[x] > hs[x-1] + 1){ g.fillStyle = C.plum; for (let y=hs[x-1]; y<hs[x]; y++) g.fillRect(x, 17-y, 1, 1); } if (hs[x] > hs[x+1] + 1){ g.fillStyle = C.plum; for (let y=hs[x+1]; y<hs[x]; y++) g.fillRect(x, 17-y, 1, 1); } }
-  g.fillStyle = C.plum; const dy = [[3,5],[22,4],[6,1],[19,0]][f % 4]; g.fillRect(dy[0], dy[1], 2, 3); g.fillStyle = '#512A7E'; g.fillRect(dy[0], dy[1]+1, 1, 1);
+  g.fillStyle = C.plum; const dy = [[3,5],[22,4],[6,1],[19,0]][f % 4]; g.fillRect(dy[0], dy[1], 2, 3); g.fillStyle = '#1F7A3A'; g.fillRect(dy[0], dy[1]+1, 1, 1);
 }));
+// frisbee de feu ramassable : 3 images de flammes, en vert puis en blanc pour le clignotement
+const FIRE_ITEM = [0,1,2].map(f => mk(28, 27, g => { g.drawImage(FLAMES[f], 1, 0); g.drawImage(FDISC, 0, 14); }));
+const FIRE_ITEM_W = FIRE_ITEM.map(c => mk(28, 27, g => { g.drawImage(c, 0, 0); g.globalCompositeOperation = 'source-atop'; g.fillStyle = 'rgba(255,255,255,.75)'; g.fillRect(0, 0, 28, 27); }));
 const SHARK = mk(26, 14, g => {
   const body = (x,y) => { const dx = (x+.5-14)/10, dy = (y+.5-8)/3.6; return dx*dx+dy*dy <= 1; };
   const fin = (x,y) => y >= 1 && y <= 5 && x >= 12 && x - 12 <= (5 - y) * .9 + 1 && x >= 12 + (5-y)*.2;
@@ -840,6 +845,7 @@ const newGroup = n => { gidN++; groups[gidN] = { n, got:0 }; return gidN; };
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
+const APP_VERSION = '5.2';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf'];
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
 
@@ -858,7 +864,7 @@ function reset(){
 function startGame(){
   ensureAudio(); sfx.start(); reset(); state = 'play';
   ui.title.hidden = true; ui.over.hidden = true; ui.pause.hidden = true; ui.hud.hidden = false;
-  ui.hi.textContent = 'Record ' + pad(best); ui.firebar.hidden = true; ui.sockbar.hidden = true; ui.dcount.hidden = false; $('pausebtn').hidden = false; setZone(0, false);
+  ui.hi.textContent = 'Record ' + pad(best); ui.firebar.hidden = true; ui.sockbar.hidden = true; ui.dcount.hidden = false; $('pausebtn').hidden = false; clearTimeout(zoneTimer); $('zone').hidden = true;
   if (document.activeElement) document.activeElement.blur();
 }
 function goHome(){
@@ -930,9 +936,9 @@ function burst(x, y, n, cols, pow, grav){
 }
 const DUST_COLS = [[C.gL, C.line, C.g3], ['#CFE0F7', C.white, C.floorL], [C.sandL, C.sand2, C.sandD], [C.white, '#DCE9F5', '#BFD3E6']];
 function dust(x, y, n){ const cols = DUST_COLS[theme]; for (let i=0;i<n;i++) parts.push({ x:x+Math.random()*4-2, y, vx:-25-Math.random()*35, vy:-12-Math.random()*28, t:0, life:.3+Math.random()*.25, col:cols[i%3], g:70, s:1 }); }
-function flame(x, y, n, spread){
+function flame(x, y, n, spread, cols){
   for (let i=0;i<n;i++) parts.push({ x:x+(Math.random()-.5)*spread, y:y+(Math.random()-.5)*spread*.8, vx:-30-Math.random()*50, vy:-30-Math.random()*50, t:0, life:.25+Math.random()*.25,
-    col:['#AB96CC', '#8058A2', '#512A7E', C.white][Math.floor(Math.random()*4)], g:-40, s:Math.random()<.5?2:1, fire:true });
+    col:(cols || ['#AB96CC', '#8058A2', '#512A7E', C.white])[Math.floor(Math.random()*4)], g:-40, s:Math.random()<.5?2:1, fire:true });
 }
 const CONF_COLS = [C.yellow, C.purpleL, C.white, C.orange, C.g1, C.purple];
 function addConfetti(n, fromTop, cx, cy){
@@ -1034,14 +1040,14 @@ function update(dt){
       if (s.k === 'sock' && Math.abs(s.x+9 - P.x) < 17 && s.y+14 > P.y-56 && s.y+6 < P.y+2){
         s.got = true; P.sockT = 7; sfx.sock(); toast('Super saut !'); burst(s.x+9, s.y+12, 16, [C.purpleL, C.white, C.purple], 85, 100);
       }
-      if (s.k === 'fire'){ flame(s.x, s.y-2, 1, 18);
+      if (s.k === 'fire'){ flame(s.x, s.y-2, 1, 18, ['#B8F0A8', '#4FC25A', '#1F7A3A', C.white]);
         if (Math.abs(s.x - P.x) < 18 && s.y > P.y-58 && s.y < P.y+2){ s.got = true; fireT = 7; sfx.fire(); toast('Invincible !'); flash = .1; flame(P.x, P.y-28, 30, 40); } }
     }
     score = Math.floor(dist/12) + bonus;
     if (score >= milestone){ milestone += 500; sfx.mile(); ui.score.classList.add('pulse'); setTimeout(() => ui.score.classList.remove('pulse'), 220); }
     if (score !== shownScore){ ui.score.textContent = pad(score); shownScore = score; }
     const nt = themeFor(score);
-    if (nt !== theme){ prevTheme = theme; theme = nt; setZone(nt, true); transT = .8; flash = .25; if (nt === 3) iceToast(); else toast(THEME_NAMES[nt] + ' !'); sfx.world(); }
+    if (nt !== theme){ prevTheme = theme; theme = nt; setZone(nt); transT = .8; flash = .25; sfx.world(); }
     ui.sockbar.hidden = P.sockT <= 0; if (P.sockT > 0) ui.sockfill.style.transform = 'scaleX(' + (P.sockT/7).toFixed(3) + ')';
     ui.firebar.hidden = fireT <= 0; if (fireT > 0) ui.firefill.style.transform = 'scaleX(' + (fireT/7).toFixed(3) + ')';
   }
@@ -1340,7 +1346,7 @@ function draw(){
     for (const o of obs){ if (o.k === 'hole') drawHole(o); else for (const [img, x, y] of pieces(o)) ctx.drawImage(img, Math.round(x), y); }
     for (const s of items){
       if (s.k === 'sock'){ const f = Math.floor(clock*8)%2; ctx.drawImage(SOCK[f], Math.round(s.x), Math.round(s.y + Math.sin(clock*4)*3)); }
-      else { const by = Math.round(s.y + Math.sin(clock*4)*2); ctx.drawImage(FLAMES[Math.floor(clock*12)%3], Math.round(s.x) - 13, by - 19); ctx.drawImage(FDISC, Math.round(s.x) - 14, by - 5); }
+      else { const by = Math.round(s.y + Math.sin(clock*4)*2), f = Math.floor(clock*12)%3; ctx.drawImage((Math.floor(clock*14) % 2 ? FIRE_ITEM_W : FIRE_ITEM)[f], Math.round(s.x) - 14, by - 19); }
     }
     for (const o of discs) ctx.drawImage(DISC, Math.round(o.x - 14), Math.round(o.y - 5));
     for (const d of debris){ ctx.save(); ctx.translate(Math.round(d.x + d.img.width/2), Math.round(d.y + d.img.height/2)); ctx.rotate(d.rot); ctx.drawImage(d.img, -Math.round(d.img.width/2), -Math.round(d.img.height/2)); ctx.restore(); }
@@ -1415,7 +1421,8 @@ function press(){
 function release(){ P.hold = false; }
 function pause(){ if (state !== 'play') return; state = 'pause'; ui.pause.hidden = false; $('pausebtn').hidden = true; P.hold = false; }
 function resume(){ state = 'play'; ui.pause.hidden = true; $('pausebtn').hidden = false; last = 0; }
-function setZone(n, anim){ const z = $('zone'); z.textContent = THEME_NAMES[n]; z.hidden = false; z.classList.toggle('ice', n === 3); if (anim){ z.classList.remove('pop'); void z.offsetWidth; z.classList.add('pop'); } }
+let zoneTimer = 0;
+function setZone(n){ const z = $('zone'); z.textContent = THEME_NAMES[n]; z.hidden = false; z.classList.toggle('ice', n === 3); z.classList.remove('pop'); void z.offsetWidth; z.classList.add('pop'); clearTimeout(zoneTimer); zoneTimer = setTimeout(() => { z.hidden = true; }, 3000); }
 $('pausebtn').addEventListener('click', e => { e.stopPropagation(); pause(); });
 
 addEventListener('keydown', e => {
@@ -1431,7 +1438,7 @@ $('home').addEventListener('click', e => { e.stopPropagation(); goHome(); });
 $('resume').addEventListener('click', e => { e.stopPropagation(); resume(); });
 function setMute(m){ muted = m; ui.mute.textContent = m ? 'Muet' : 'Son'; ui.mute.setAttribute('aria-label', m ? 'Activer le son' : 'Couper le son'); try { localStorage.setItem('stellyrun_muted', m ? '1' : '0'); } catch(e){} }
 ui.mute.addEventListener('click', e => { e.stopPropagation(); ensureAudio(); setMute(!muted); ui.mute.blur(); });
-setMute(muted); showTitleRecord();
+setMute(muted); showTitleRecord(); $('ver').textContent = 'v' + APP_VERSION;
 document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
 addEventListener('blur', pause);
 addEventListener('resize', resize);
