@@ -104,6 +104,16 @@ body{
 #dcount{ position:absolute; top:calc(var(--s)*16px); right:calc(var(--s)*4px); display:flex; align-items:center; gap:calc(var(--s)*2px); pointer-events:none;
   font-family:var(--num); font-size:max(calc(var(--s)*7px),12px); color:var(--white); -webkit-text-stroke:calc(var(--s)*1.2px) var(--plum); paint-order:stroke fill; text-shadow:0 calc(var(--s)*1px) 0 var(--plum); }
 #dcount canvas{ height:calc(var(--s)*8px); width:auto; image-rendering:pixelated; }
+#pausebtn{ position:absolute; top:calc(var(--s)*3px); right:calc(var(--s)*31px); height:calc(var(--s)*10px); width:calc(var(--s)*10px);
+  display:flex; align-items:center; justify-content:center; gap:calc(var(--s)*1.5px); background:rgba(255,255,255,.8);
+  border:calc(var(--s)*1px) solid var(--plum); border-radius:calc(var(--s)*1.5px); padding:0; cursor:pointer; }
+#pausebtn i{ display:block; width:calc(var(--s)*1.6px); height:calc(var(--s)*5px); background:var(--plum); }
+#pausebtn:focus-visible{ outline:calc(var(--s)*1px) dashed var(--plum); outline-offset:2px; }
+#zone{ position:absolute; right:calc(var(--s)*5px); bottom:calc(var(--s)*4px); pointer-events:none; font-weight:700; font-size:max(calc(var(--s)*8px),14px); line-height:1;
+  color:var(--white); -webkit-text-stroke:calc(var(--s)*1.3px) var(--plum); paint-order:stroke fill; text-shadow:0 calc(var(--s)*1.5px) 0 var(--plum); transform-origin:right bottom; }
+#zone.ice{ color:#E8F7FF; -webkit-text-stroke-color:#1E4E7A; text-shadow:0 calc(var(--s)*1.5px) 0 #1E4E7A; }
+#zone.pop{ animation:zonepop .6s cubic-bezier(.3,1.6,.5,1); }
+@keyframes zonepop{ 0%{ transform:scale(.4); opacity:0; } 100%{ transform:scale(1); opacity:1; } }
 #mute:focus-visible{ outline:calc(var(--s)*1px) dashed var(--plum); outline-offset:2px; }
 
 #toast{
@@ -220,6 +230,8 @@ body{
     </div>
 
     <button id="mute" aria-label="Couper le son">Son</button>
+    <button id="pausebtn" hidden aria-label="Mettre en pause"><i></i><i></i></button>
+    <div id="zone" hidden aria-live="polite"></div>
     <div id="dcount" hidden aria-label="Frisbees attrapés"><canvas id="icoCount"></canvas><span id="dcn">0</span></div>
   </div>
 </div>
@@ -846,11 +858,11 @@ function reset(){
 function startGame(){
   ensureAudio(); sfx.start(); reset(); state = 'play';
   ui.title.hidden = true; ui.over.hidden = true; ui.pause.hidden = true; ui.hud.hidden = false;
-  ui.hi.textContent = 'Record ' + pad(best); ui.firebar.hidden = true; ui.sockbar.hidden = true; ui.dcount.hidden = false;
+  ui.hi.textContent = 'Record ' + pad(best); ui.firebar.hidden = true; ui.sockbar.hidden = true; ui.dcount.hidden = false; $('pausebtn').hidden = false; setZone(0, false);
   if (document.activeElement) document.activeElement.blur();
 }
 function goHome(){
-  state = 'title'; titleT = 0; titleSlammed = false; titleCaught = false; ui.dcount.hidden = true; theme = 0; prevTheme = 0; transT = 0; confetti = [];
+  state = 'title'; titleT = 0; titleSlammed = false; titleCaught = false; ui.dcount.hidden = true; $('pausebtn').hidden = true; $('zone').hidden = true; theme = 0; prevTheme = 0; transT = 0; confetti = [];
   obs = []; discs = []; items = []; debris = []; parts = []; pops = []; fireT = 0; boost = 1;
   ui.over.hidden = true; ui.hud.hidden = true; ui.title.hidden = false; showTitleRecord();
   // relance les animations CSS de l'accueil
@@ -931,6 +943,7 @@ function addConfetti(n, fromTop, cx, cy){
 /* ================= Mise à jour ================= */
 function die(kind){
   if (state !== 'play') return;
+  $('pausebtn').hidden = true;
   state = 'over'; overT = 0; deathKind = kind; flash = .12; fireT = 0; graceT = 0;
   if (kind === 'hole'){ P.sink = true; P.vy = 30; P.ground = false; sfx.fall(); dust(P.x, GY, 10); shake = .15; }
   else { P.vy = -180; P.ground = false; shake = .35; sfx.hit(); burst(P.x, P.y-28, 16, kind === 'slip' ? ['#3FA3E0', '#BFE8FF', C.white] : (kind === 'ski' ? [C.white, '#DCE9F5', C.purple] : [C.yellow, C.orange, C.white]), 95, 300); }
@@ -1028,7 +1041,7 @@ function update(dt){
     if (score >= milestone){ milestone += 500; sfx.mile(); ui.score.classList.add('pulse'); setTimeout(() => ui.score.classList.remove('pulse'), 220); }
     if (score !== shownScore){ ui.score.textContent = pad(score); shownScore = score; }
     const nt = themeFor(score);
-    if (nt !== theme){ prevTheme = theme; theme = nt; transT = .8; flash = .25; if (nt === 3) iceToast(); else toast(THEME_NAMES[nt] + ' !'); sfx.world(); }
+    if (nt !== theme){ prevTheme = theme; theme = nt; setZone(nt, true); transT = .8; flash = .25; if (nt === 3) iceToast(); else toast(THEME_NAMES[nt] + ' !'); sfx.world(); }
     ui.sockbar.hidden = P.sockT <= 0; if (P.sockT > 0) ui.sockfill.style.transform = 'scaleX(' + (P.sockT/7).toFixed(3) + ')';
     ui.firebar.hidden = fireT <= 0; if (fireT > 0) ui.firefill.style.transform = 'scaleX(' + (fireT/7).toFixed(3) + ')';
   }
@@ -1400,8 +1413,10 @@ function press(){
   P.hold = true; P.buf = .13;
 }
 function release(){ P.hold = false; }
-function pause(){ if (state !== 'play') return; state = 'pause'; ui.pause.hidden = false; P.hold = false; }
-function resume(){ state = 'play'; ui.pause.hidden = true; last = 0; }
+function pause(){ if (state !== 'play') return; state = 'pause'; ui.pause.hidden = false; $('pausebtn').hidden = true; P.hold = false; }
+function resume(){ state = 'play'; ui.pause.hidden = true; $('pausebtn').hidden = false; last = 0; }
+function setZone(n, anim){ const z = $('zone'); z.textContent = THEME_NAMES[n]; z.hidden = false; z.classList.toggle('ice', n === 3); if (anim){ z.classList.remove('pop'); void z.offsetWidth; z.classList.add('pop'); } }
+$('pausebtn').addEventListener('click', e => { e.stopPropagation(); pause(); });
 
 addEventListener('keydown', e => {
   if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW'){ e.preventDefault(); if (!e.repeat) press(); }
