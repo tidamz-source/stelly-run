@@ -188,18 +188,16 @@ body{
 .panel .sub{ margin:calc(var(--s)*1px) 0 0; font-size:max(calc(var(--s)*5px),10px); opacity:.8; }
 
 /* ----- Trophées ----- */
-#trobtn{ position:absolute; top:calc(var(--s)*7px); right:calc(var(--s)*36px); display:flex; align-items:center; justify-content:center;
-  font-family:inherit; font-weight:700; font-size:max(calc(var(--s)*6px),12px); line-height:normal;
-  background:rgba(255,255,255,.8); border:calc(var(--s)*1px) solid var(--plum); border-radius:calc(var(--s)*1.5px); padding:calc(var(--s)*1px) calc(var(--s)*3px); cursor:pointer; pointer-events:auto; z-index:3; animation:fade .5s ease-out 1.6s both; }
-#trobtn::before{ content:'\200B'; }
-#trobtn canvas{ height:1.15em; width:auto; image-rendering:pixelated; display:block; }
-#trobtn:focus-visible{ outline:calc(var(--s)*1px) dashed var(--plum); outline-offset:2px; }
+/* bouton trophées : carré, collé à droite de Start, Start reste centré */
+.ctarow{ position:relative; display:flex; }
+#trobtn{ position:absolute; top:0; height:100%; left:calc(100% + var(--s)*7px); aspect-ratio:1; padding:0; display:flex; align-items:center; justify-content:center; }
+#trobtn canvas{ height:calc(var(--s)*12px); width:auto; image-rendering:pixelated; display:block; margin-top:calc(var(--s)*-.5px); }
 .trstar{ position:absolute; display:flex; align-items:center; justify-content:center; pointer-events:none; }
 .trstar svg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
 .trstar polygon{ stroke:var(--plum); stroke-width:2.2; stroke-linejoin:round; }
-#trbadge{ top:calc(var(--s)*-6px); right:calc(var(--s)*-8px); width:calc(var(--s)*16px); height:calc(var(--s)*16px); animation:badge .5s cubic-bezier(.3,1.7,.5,1) 1.8s both; }
+#trbadge{ top:calc(var(--s)*-10px); right:calc(var(--s)*-11px); width:calc(var(--s)*18px); height:calc(var(--s)*18px); animation:badge .5s cubic-bezier(.3,1.7,.5,1) 1.8s both; }
 #trbadge polygon{ fill:var(--orange); }
-#trbadge b{ position:relative; margin-top:calc(var(--s)*2.6px); font-family:var(--num); font-weight:400; font-size:max(calc(var(--s)*3.8px),7px); line-height:1; color:var(--white);
+#trbadge b{ position:relative; margin-top:calc(var(--s)*2.6px); font-family:var(--num); font-weight:400; font-size:max(calc(var(--s)*4.3px),8px); line-height:1; color:var(--white);
   -webkit-text-stroke:calc(var(--s)*.9px) var(--plum); paint-order:stroke fill; }
 @keyframes badge{ from{ transform:scale(0) rotate(-90deg); } to{ transform:none; } }
 #trophies{ position:absolute; inset:0; z-index:30; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:calc(var(--s)*4px);
@@ -273,7 +271,8 @@ body{
     <div id="title" class="screen">
       <p class="at presents">Lutèce Games presents</p>
       <div class="at ribbon"><h1>Stelly Run</h1></div>
-      <div class="at cta"><button id="start" class="btn">Start</button></div>
+      <div class="at cta"><div class="ctarow"><button id="start" class="btn">Start</button>
+<button id="trobtn" class="btn alt" aria-label="Trophées"><canvas id="icoTrophy"></canvas><span id="trbadge" class="trstar" hidden><svg viewBox="0 0 24 24"><polygon points="12,1.5 14.9,8.6 22.5,9.2 16.7,14.2 18.5,21.6 12,17.6 5.5,21.6 7.3,14.2 1.5,9.2 9.1,8.6"/></svg><b></b></span></button></div></div>
       <div class="at legend"><div>
         <span><canvas id="icoDisc"></canvas>Points</span>
         <span><canvas id="icoSock"></canvas>Super saut</span>
@@ -281,7 +280,6 @@ body{
         <span><canvas id="icoCone"></canvas>À sauter</span>
         <span class="rec" id="trec" hidden></span>
       </div></div>
-      <button id="trobtn" aria-label="Trophées"><canvas id="icoTrophy"></canvas><span id="trbadge" class="trstar" hidden><svg viewBox="0 0 24 24"><polygon points="12,1.5 14.9,8.6 22.5,9.2 16.7,14.2 18.5,21.6 12,17.6 5.5,21.6 7.3,14.2 1.5,9.2 9.1,8.6"/></svg><b></b></span></button>
       <button id="install" hidden>Installer l’appli</button>
     <p class="ver" id="ver"></p>
     <p class="copy">© Lutèce Games</p>
@@ -1355,7 +1353,7 @@ let flyers = [], flyIn = 6;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.21';
+const APP_VERSION = '5.22';
 // le record repart de zéro à chaque nouvelle version déployée
 try { if (localStorage.getItem('stellyrun_best_ver') !== APP_VERSION){ localStorage.setItem('stellyrun_best_ver', APP_VERSION); localStorage.setItem('stellyrun_best', '0'); best = 0; } } catch(e){}
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
@@ -1385,7 +1383,7 @@ function goHome(){
   obs = []; discs = []; items = []; debris = []; parts = []; pops = []; fireT = 0; boost = 1;
   ui.over.hidden = true; ui.hud.hidden = true; ui.title.hidden = false; showTitleRecord(); refreshTrophyBadge();
   // relance les animations CSS de l'accueil
-  ui.title.querySelectorAll('.at, h1, #start').forEach(el => { el.style.animation = 'none'; void el.offsetWidth; el.style.animation = ''; });
+  ui.title.querySelectorAll('.at, h1, #start, #trbadge').forEach(el => { el.style.animation = 'none'; void el.offsetWidth; el.style.animation = ''; });
   if (document.activeElement) document.activeElement.blur();
 }
 function iceToast(){
@@ -2248,13 +2246,10 @@ function resize(){
   const rs = document.documentElement.style;
   rs.setProperty('--s', s.toFixed(3)); rs.setProperty('--gy', GY);
   rs.setProperty('--py', lay.py); rs.setProperty('--ry', lay.ry); rs.setProperty('--by', lay.by); rs.setProperty('--ly', lay.ly);
-  buildThemes(); RAYS = null; placeTrophyBtn();
+  buildThemes(); RAYS = null;
   if (state === 'title' || P.ground) P.y = GY;
   obs.length = 0; discs.length = 0; items.length = 0;
 }
-
-function placeTrophyBtn(){ const s = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--s')) || 1; $('trobtn').style.right = (9*s + ui.mute.offsetWidth + 3*s) + 'px'; }
-if (document.fonts) document.fonts.ready.then(placeTrophyBtn);
 
 /* ================= Icônes ================= */
 function icon(id, img){ const c = $(id); c.width = img.width; c.height = img.height; c.getContext('2d').drawImage(img, 0, 0); }
