@@ -1156,23 +1156,31 @@ const MUSIC = (() => {
     echoIn = actx.createDelay(1); const fb = actx.createGain(), wet = actx.createGain(); echoIn.delayTime.value = .21; fb.gain.value = .32; wet.gain.value = .35;
     echoIn.connect(fb).connect(echoIn); echoIn.connect(wet).connect(musBus);
   }
-  const curves = {};
+  const curves = {}, buses = {}; let busDrive = -1;
+  function rockBus(kind){
+    const drive = kind === 'rbass' ? 30 : (kind === 'lead' ? Math.min(200, song.drive) : song.drive);
+    let b = buses[kind];
+    if (!b){ const sh = actx.createWaveShaper(), f = actx.createBiquadFilter(), out = actx.createGain();
+      sh.oversample = 'none'; f.type = 'lowpass'; f.frequency.value = kind === 'chug' ? 950 : (kind === 'rbass' ? 700 : (kind === 'lead' ? 3600 : 2900)); f.Q.value = kind === 'chug' ? 3 : 1;
+      out.gain.value = kind === 'gtr' || kind === 'chug' ? .17 : (kind === 'lead' ? .3 : .35); sh.connect(f).connect(out).connect(musBus); b = buses[kind] = { sh, drive: -1 }; }
+    if (b.drive !== drive){ b.sh.curve = distCurve(drive); b.drive = drive; }
+    return b.sh;
+  }
   function distCurve(k){ k = Math.round(k/20)*20; if (curves[k]) return curves[k]; const n = 2048, c = new Float32Array(n);
     for (let i=0;i<n;i++){ const x = i*2/n - 1; c[i] = (3 + k)*x*20*Math.PI/180/(Math.PI + k*Math.abs(x)); } return curves[k] = c; }
   function voice(t, freq, dur, kind, vol, useEcho){
     const g = actx.createGain(); g.connect(musBus); if (useEcho) g.connect(echoIn);
     if (kind === 'gtr' || kind === 'chug' || kind === 'lead' || kind === 'rbass'){
-      const sh = actx.createWaveShaper(); sh.curve = distCurve(kind === 'rbass' ? 30 : (kind === 'lead' ? Math.min(200, song.drive) : song.drive)); sh.oversample = '2x';
-      const f = actx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = kind === 'chug' ? 950 : (kind === 'rbass' ? 700 : (kind === 'lead' ? 3600 : 2900)); f.Q.value = kind === 'chug' ? 3 : 1;
-      sh.connect(f).connect(g);
-      const notes = (kind === 'gtr') ? [freq, freq*1.4983, freq*2] : (kind === 'chug' ? [freq, freq*1.4983] : [freq]);
-      notes.forEach(fq => [-1, 1].forEach(sg => { const o = actx.createOscillator(); o.type = kind === 'rbass' ? (sg < 0 ? 'sawtooth' : 'square') : 'sawtooth';
-        o.frequency.setValueAtTime(fq, t); o.detune.value = sg*(kind === 'lead' ? 6 : 10);
-        if (kind === 'lead' && dur > .25){ const lfo = actx.createOscillator(), lg = actx.createGain(); lfo.frequency.value = 6; lg.gain.value = 12; lfo.connect(lg).connect(o.detune); lfo.start(t + .12); lfo.stop(t + dur + .05); }
-        o.connect(sh); o.start(t); o.stop(t + dur + .06); }));
-      const atk = kind === 'chug' ? .003 : .006, rel = kind === 'chug' ? dur*.9 : dur;
+      // une seule chaîne saturation + filtre par instrument (créée une fois) : chaque note ne crée que ses oscillateurs et une enveloppe
+      const bus = rockBus(kind);
+      g.disconnect(); g.connect(bus); if (useEcho) g.connect(echoIn);
+      const notes = kind === 'gtr' ? [freq, freq*1.4983, freq*2] : (kind === 'chug' ? [freq, freq*1.4983] : [freq]);
+      notes.forEach((fq, k) => { const o = actx.createOscillator(); o.type = kind === 'rbass' ? 'square' : 'sawtooth';
+        o.frequency.setValueAtTime(fq, t); o.detune.value = k === 0 ? 0 : (k % 2 ? 7 : -7);
+        o.connect(g); o.start(t); o.stop(t + dur + .06); });
+      const atk = kind === 'chug' ? .003 : .006;
       g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + atk);
-      if (kind === 'chug' || kind === 'rbass') g.gain.exponentialRampToValueAtTime(.0001, t + rel);
+      if (kind === 'chug' || kind === 'rbass') g.gain.exponentialRampToValueAtTime(.0001, t + dur*.9);
       else { g.gain.setValueAtTime(vol*.85, t + Math.max(.02, dur - .04)); g.gain.linearRampToValueAtTime(0, t + dur); }
       return;
     }
@@ -1265,7 +1273,7 @@ let flyers = [], flyIn = 6;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.15';
+const APP_VERSION = '5.16';
 // le record repart de zéro à chaque nouvelle version déployée
 try { if (localStorage.getItem('stellyrun_best_ver') !== APP_VERSION){ localStorage.setItem('stellyrun_best_ver', APP_VERSION); localStorage.setItem('stellyrun_best', '0'); best = 0; } } catch(e){}
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
@@ -1894,7 +1902,7 @@ let last = 0;
 function frame(ts){
   requestAnimationFrame(frame);
   if (!last) last = ts; let dt = (ts - last)/1000; last = ts; if (dt > .05) dt = .05;
-  if (state !== 'pause'){ const n = Math.max(1, Math.ceil(dt/.006)); for (let i=0;i<n;i++) update(dt/n); }
+  if (state !== 'pause'){ const n = Math.min(6, Math.max(1, Math.ceil(dt/.006))); for (let i=0;i<n;i++) update(dt/n); }
   draw();
 }
 
