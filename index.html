@@ -1273,7 +1273,7 @@ let flyers = [], flyIn = 6;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.16';
+const APP_VERSION = '5.17';
 // le record repart de zéro à chaque nouvelle version déployée
 try { if (localStorage.getItem('stellyrun_best_ver') !== APP_VERSION){ localStorage.setItem('stellyrun_best_ver', APP_VERSION); localStorage.setItem('stellyrun_best', '0'); best = 0; } } catch(e){}
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
@@ -1312,19 +1312,19 @@ function iceToast(){
 function toast(msg, big){ ui.toast.textContent = msg; ui.toast.classList.toggle('big', !!big); ui.toast.classList.remove('show'); void ui.toast.offsetWidth; ui.toast.classList.add('show'); }
 
 /* ================= Génération ================= */
-const lvl = () => 1 - Math.exp(-t/75);
+const lvl = () => 1 - Math.exp(-t/28);
 function gapFor(){
-  const min = speed*.64 + 72, spread = 1 + 1.1*Math.exp(-t/55);
+  const min = speed*.64 + 72, spread = 1 + 1.1*Math.exp(-t/20);
   let g = min * (1 + Math.random()*(spread-1));
   if (Math.random() < .1) g += speed*.7;
   return g;
 }
 function spawnObstacle(){
   const th = theme, x0 = W + 16, d = lvl(), sockOn = P.sockT > 1.2, c = Math.random() < .5 ? 0 : 1;
-  const r = Math.random(), pHole = (t > 12 && th <= 4) ? .1 + .22*d : 0, pPyr = t > 22 ? .07 + .2*d : 0;
+  const r = Math.random(), pHole = (t > 4 && th <= 4) ? .1 + .22*d : 0, pPyr = t > 8 ? .07 + .2*d : 0;
   let o;
   if (r < pHole) o = { k:'hole', x:x0, w: Math.round(24 + 12*d + Math.random()*6), th, ph:Math.random()*6, mode: (th === 0 || th === 2 || th === 3) ? (Math.random() < .6 ? 'peek' : 'empty') : null };
-  else if (t > 45 && r < pHole + .12 + .15*d && Math.random() < .5) o = { k:'pyr3', x:x0, w: 39, th, c };
+  else if (t > 18 && r < pHole + .12 + .15*d && Math.random() < .5) o = { k:'pyr3', x:x0, w: 39, th, c };
   else if (r < pHole + pPyr) o = { k:'pyr', x:x0, w: th === 2 ? 36 : 26, th, c };
   else { let n = 1; if (Math.random() < .1 + .4*d) n = Math.random() < .35*d ? 3 : 2; const pw = th === 2 ? 14 : (ROUND[th] ? 16 : 12); o = { k:'cone', x:x0, n, w:n*pw+1, th, c }; }
   obs.push(o);
@@ -1355,7 +1355,7 @@ function spawnFlyer(){
   if (conflict){ flyIn = .3; return; }
   const y0 = low ? GY - 13 - Math.random()*12 : GY - 64 - Math.random()*Math.min(38, GY - 110);
   flyers.push({ sp, x: W + 30, y0, k, t: 0, ph: Math.random()*6.28, fs: 2 + Math.random()*1.6, amp: sp === 'shuttle' ? 1.5 : (low ? 1.5 : 2 + Math.random()*1.5), drift: sp === 'shuttle' || low ? .8 : 2 + Math.random()*2, flap: sp === 'eagle' ? 7 : 11 + Math.random()*4 });
-  flyIn = Math.max(1.2, 4.2 - 2.4*lvl()) + Math.random()*2.5;
+  flyIn = Math.max(.9, 3.6 - 2.6*lvl()) + Math.random()*1.8;
 }
 const ROUND = { 3:[SNOWMAN, BIGSNOW, SNOW3], 5:[STUMP, LOGPYR, LOG3], 6:[BALE1, BALEPYR, BALE3] };
 const coneImg = o => o.th === 4 ? CHANTIER : CONES[o.c];
@@ -1429,7 +1429,7 @@ function update(dt){
   clock += dt;
   if (state === 'title') titleT += dt;
   if (state === 'play'){
-    t += dt; { const target = 235 * Math.pow(1.05, Math.floor(t/5)); speed = speed < target ? Math.min(target, speed + target*.125*dt) : target; }
+    t += dt; { const target = 235 * Math.pow(1.10, Math.floor(t/5)); speed = speed < target ? Math.min(target, speed + target*.25*dt) : target; }
     boost = lerp(boost, fireT > 0 ? 1.6 : 1, Math.min(1, dt*4));
     spEff = speed * boost; sockIn -= dt; if (t > 20) fireIn -= dt;
   } else if (state === 'over'){ spEff *= Math.pow(.004, dt); overT += dt; }
@@ -1443,7 +1443,7 @@ function update(dt){
     discs = discs.filter(o => o.x > -30 && !o.got); items = items.filter(o => o.x > -30 && !o.got);
   }
 
-  if (state === 'play' && t > 5){ flyIn -= dt; if (flyIn <= 0) spawnFlyer(); }
+  if (state === 'play' && t > 3){ flyIn -= dt; if (flyIn <= 0) spawnFlyer(); }
   if (state !== 'title'){
     for (const f of flyers){ f.t += dt; f.x -= Math.max(spEff, 60)*f.k*dt; }
     flyers = flyers.filter(f => f.x > -50 && !f.gone);
@@ -1513,7 +1513,7 @@ function update(dt){
     if (score !== shownScore){ ui.score.textContent = pad(score); shownScore = score; }
     let nt = theme; zoneT -= dt;
     if (zoneT <= 0){ zoneT = 12 + Math.random()*6; do { nt = Math.floor(Math.random()*THEME_NAMES.length); } while (nt === theme); }
-    if (nt !== theme){ prevTheme = theme; theme = nt; setZone(nt); MUSIC.play(nt); transT = .8; flash = .25; sfx.world(); }
+    if (nt !== theme){ prevTheme = theme; theme = nt; setZone(nt); transT = .8; flash = .25; sfx.world(); }
     ui.sockbar.hidden = P.sockT <= 0; if (P.sockT > 0) ui.sockfill.style.transform = 'scaleX(' + (P.sockT/7).toFixed(3) + ')';
     ui.firebar.hidden = fireT <= 0; if (fireT > 0) ui.firefill.style.transform = 'scaleX(' + (fireT/7).toFixed(3) + ')';
   }
