@@ -594,7 +594,8 @@ function birdSprite(o, frame){
     const tipY = frame === 0 ? 1.5 : (frame === 2 ? H2-1.5 : sy);
     for (let y=0;y<H2;y++) for (let x=0;x<W2;x++) if (inPoly(poly, x+.5, y+.5)){ const far = frame === 1 ? (x > sx + 5) : Math.abs(y+.5 - tipY) < Math.abs(tipY - sy)*.38; set(x, y, far ? C2.tip : C2.wing); }
     set(hx - 1, hy - 1, C2.eye);
-    if (o.owl){ [[-2,-1],[-1,-1],[1,-1],[2,-1],[-2,0],[2,0]].forEach(([a,b]) => set(hx + a - .5, hy + b, C2.eye)); set(hx - 1.5, hy, C.plum); set(hx + 1.5, hy, C.plum); set(hx - 3, hy - 4, C2.tip); set(hx + 2, hy - 4, C2.tip); set(hx - 3, hy - 5, C2.tip); set(hx + 2, hy - 5, C2.tip); }
+    if (o.owl){ [[-2,-1],[-1,-1],[1,-1],[2,-1],[-2,0],[2,0]].forEach(([a,b]) => set(hx + a - .5, hy + b, C2.eye)); set(hx - 1.5, hy, C.plum); set(hx + 1.5, hy, C.plum);
+      [[-2,-1],[1,0],[3,-2],[-1,1],[2,2]].forEach(([a,b]) => set(bx + a*1.6, by + b, C2.spot)); }
     const outl = [];
     for (let y=0;y<H2;y++) for (let x=0;x<W2;x++){ if (grid[y*W2+x]) continue;
       if ([[1,0],[-1,0],[0,1],[0,-1]].some(([a,b]) => { const X = x+a, Y = y+b; return X>=0 && Y>=0 && X<W2 && Y<H2 && grid[Y*W2+X]; })) outl.push(y*W2+x); }
@@ -610,7 +611,7 @@ const FLY_SPECS = {
   eagle:  { w:34, h:23, body:[18,12.5,9,4.6], head:[8.5,9,3.9], beak:3, hook:true, tail:6, hw:12, hh:6, k:[1.25,1.45],
     cols:{ body:'#6B4424', belly:'#5A3A1C', wing:'#7A5230', tip:'#3A2412', head:'#FFFFFF', eye:C.plum, beak:'#F2C12E', tail:'#F4F4F4' } },
   owl:    { w:25, h:21, body:[13.5,12,5.8,4.6], head:[7,9,4.2], beak:1, tail:3, hw:9, hh:6, k:[1.3,1.5], owl:true,
-    cols:{ body:'#8A6A44', belly:'#C9A77A', wing:'#6E5236', tip:'#4A3622', head:'#8A6A44', eye:'#FFCF00', beak:'#F29318', tail:'#6E5236' } },
+    cols:{ body:'#E4E8EE', belly:'#FFFFFF', wing:'#AEB5C1', tip:'#6E7684', head:'#F4F6F9', eye:'#FFCF00', beak:'#F29318', tail:'#AEB5C1', spot:'#8E96A4' } },
   crow:   { w:23, h:19, body:[12.5,10.5,6,3.6], head:[6,8.2,3], beak:3, tail:6, hw:8, hh:5, k:[1.35,1.6],
     cols:{ body:'#2A2630', belly:'#3A3542', wing:'#1E1B24', tip:'#3E3A48', head:'#2A2630', eye:C.white, beak:'#F29318', tail:'#1E1B24' } }
 };
@@ -1116,6 +1117,7 @@ const sfx = {
   sock: () => [523,659,784,1046].forEach((f,i) => tone(f, 0, .11, 'triangle', .08, i*.07)),
   fire: () => { [392,523,659,784,1046,1318].forEach((f,i) => tone(f, 0, .1, 'sawtooth', .05, i*.05)); tone(120, 900, .5, 'square', .03); },
   smash: () => tone(500, 120, .12, 'square', .05),
+  stomp: c => { const b = 330*Math.pow(1.12, c-1); tone(b*2, b, .07, 'square', .06); tone(b*2, b*3, .1, 'triangle', .05, .06); },
   hit: () => { tone(320, 60, .35, 'sawtooth', .07); tone(140, 40, .45, 'square', .05); },
   fall: () => { tone(700, 90, .5, 'triangle', .07); },
   mile: () => { tone(880, 0, .08, 'triangle', .06); tone(1320, 0, .14, 'triangle', .06, .08); },
@@ -1278,7 +1280,7 @@ let flyers = [], flyIn = 6;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.19';
+const APP_VERSION = '5.20';
 // le record repart de zéro à chaque nouvelle version déployée
 try { if (localStorage.getItem('stellyrun_best_ver') !== APP_VERSION){ localStorage.setItem('stellyrun_best_ver', APP_VERSION); localStorage.setItem('stellyrun_best', '0'); best = 0; } } catch(e){}
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
@@ -1295,7 +1297,7 @@ function reset(){
   t = 0; dist = 0; bonus = 0; zoneIdx = 0; zoneT = 12 + Math.random()*6; deer = null; flyers = []; flyIn = 4 + Math.random()*3; groups = {}; discCount = 0; streak = 0; $('dcn').textContent = '0'; speed = 235; spEff = 190; obs = []; discs = []; items = []; parts = []; pops = []; debris = []; lines = [];
   nextObs = 170; sockIn = 11 + Math.random()*6; fireIn = 17 + Math.random()*7; lastCatch = -9; combo = 0; milestone = 500; shownScore = -1;
   theme = 0; prevTheme = 0; transT = 0; fireT = 0; graceT = 0; boost = 1; shark = null;
-  Object.assign(P, { y:GY, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, land:0, sink:false });
+  Object.assign(P, { y:GY, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, land:0, sink:false, stomps:0 });
 }
 function startGame(){
   ensureAudio(); sfx.start(); reset(); state = 'play'; MUSIC.tempo = MUSIC.target = 1; MUSIC.fire = false; MUSIC.play(0, true);
@@ -1399,7 +1401,7 @@ function addConfetti(n, fromTop, cx, cy){
 
 /* ================= Mise à jour ================= */
 const DEATH_MSG = { hole:'Tombée dans le trou !', slip:'Glissade dans la flaque !', ski:'Emmêlée dans les skis !', crab:'Pincée par un crabe !', mole:'Mordue par une taupe !',
-  marmot:'Mordue par une marmotte !', pigeon:'Percutée par un pigeon !', sewer:'Tombée dans une bouche d’égout !', owl:'Percutée par un hibou !', crow:'Percutée par un corbeau !', stump:'Trébuchée sur du bois coupé !', bale:'Percutée par une botte de paille !', gull:'Percutée par une mouette !', shuttle:'Percutée par un volant !', eagle:'Percutée par un aigle !' };
+  marmot:'Mordue par une marmotte !', pigeon:'Percutée par un pigeon !', sewer:'Tombée dans une bouche d’égout !', owl:'Percutée par une chouette !', crow:'Percutée par un corbeau !', stump:'Trébuchée sur du bois coupé !', bale:'Percutée par une botte de paille !', gull:'Percutée par une mouette !', shuttle:'Percutée par un volant !', eagle:'Percutée par un aigle !' };
 function die(kind){
   if (state !== 'play') return;
   $('pausebtn').hidden = true;
@@ -1416,6 +1418,17 @@ function smash(o){
   if (o.th === 5) burst(o.x + o.w/2, GY-12, 14, ['#B5844A', '#D9B27A', '#5A3A1C'], 90, 240);
   if (o.th === 6) burst(o.x + o.w/2, GY-12, 18, ['#EDCD68', '#F7DD85', '#C9A23A'], 90, 200);
   sfx.smash(); shake = Math.max(shake, .08);
+}
+// Stelly retombe sur la tête d'un animal volant : il est assommé, elle rebondit ; enchaîner sans toucher le sol multiplie les points
+function stomp(f, fy){
+  f.ko = true; f.ky = fy; f.kvy = -60; f.kr = 0;
+  P.stomps = Math.min((P.stomps || 0) + 1, 5);
+  P.vy = -(P.sockT > 0 ? 420 : (P.hold ? 340 : 290)); P.y = Math.min(P.y, fy - FLY_SPECS[f.sp].hh);
+  const pts = 100*P.stomps; bonus += pts;
+  pops.push({ x:f.x, y:fy - 14, s: P.stomps > 1 ? '+'+pts+' x'+P.stomps : '+'+pts, t:0, col: C.yellow });
+  if (P.stomps === 3) toast('Triple rebond !'); else if (P.stomps === 5) toast('Rebond infernal !', true);
+  sfx.stomp(P.stomps); shake = Math.max(shake, .06);
+  burst(f.x, fy - 4, 10, [C.white, C.yellow, '#E6DCF0'], 70, 160);
 }
 function catchDisc(o){
   o.got = true;
@@ -1451,8 +1464,10 @@ function update(dt){
 
   if (state === 'play' && t > 3){ flyIn -= dt; if (flyIn <= 0) spawnFlyer(); }
   if (state !== 'title'){
-    for (const f of flyers){ f.t += dt; f.x -= Math.max(spEff, 60)*f.k*dt; }
-    flyers = flyers.filter(f => f.x > -50 && !f.gone);
+    for (const f of flyers){ f.t += dt;
+      if (f.ko){ f.x -= Math.max(spEff, 60)*.55*dt; f.kvy += 900*dt; f.ky += f.kvy*dt; f.kr = Math.min(Math.PI, f.kr + dt*9); }
+      else f.x -= Math.max(spEff, 60)*f.k*dt; }
+    flyers = flyers.filter(f => f.x > -50 && !f.gone && !(f.ko && f.ky > H + 30));
   }
   if (state === 'play'){
     nextObs -= dx; if (nextObs <= 0) spawnObstacle();
@@ -1472,7 +1487,7 @@ function update(dt){
     else if (!P.ground){
       const g = P.vy < 0 ? (P.hold && state === 'play' ? 1000 : 2400) : 1600;
       P.vy += g*dt; P.y += P.vy*dt;
-      if (P.y >= GY){ P.y = GY; P.vy = 0; P.ground = true; if (state === 'play'){ P.land = .09; dust(P.x, GY-1, 5); } }
+      if (P.y >= GY){ P.y = GY; P.vy = 0; P.ground = true; P.stomps = 0; if (state === 'play'){ P.land = .09; dust(P.x, GY-1, 5); } }
     }
   }
 
@@ -1495,8 +1510,10 @@ function update(dt){
     }
     obs = obs.filter(o => !o.smashed);
     for (const f of flyers){
+      if (f.ko) continue;
       const S = FLY_SPECS[f.sp], fy = flyerY(f);
       if (Math.abs(f.x - P.x) < S.hw + 7 && fy + S.hh > P.y - 46 && fy - S.hh < P.y - 2){
+        if (f.sp !== 'shuttle' && !P.ground && P.vy > 40 && P.y < fy + 3){ stomp(f, fy); continue; }
         if (fireT > 0 || graceT > 0){ f.gone = true; debris.push({ img: f.sp === 'shuttle' ? SHUTTLE : FLY_FR[f.sp][1], x: f.x - S.w/2, y: fy - S.h/2, vx: 220, vy: -260, rot: 0, vr: 14 }); sfx.smash(); }
         else { die(f.sp); break; }
       }
@@ -1869,6 +1886,12 @@ function draw(){
     for (const o of discs) ctx.drawImage(DISC, Math.round(o.x - 14), Math.round(o.y - 5) + floatY(o));
     for (const f of flyers){
       const S = FLY_SPECS[f.sp], fy = Math.round(flyerY(f)), fx = Math.round(f.x);
+      if (f.ko){
+        const ky = Math.round(f.ky); ctx.save(); ctx.translate(fx, ky); ctx.rotate(f.kr); ctx.drawImage(FLY_FR[f.sp][1], -(S.w >> 1), -(S.h >> 1)); ctx.restore();
+        for (let i=0;i<3;i++){ const a = clock*8 + i*2.09, sx = Math.round(fx + Math.cos(a)*8), sy = Math.round(ky + S.hh + 3 + Math.sin(a)*2.5);
+          ctx.fillStyle = C.yellow; ctx.fillRect(sx, sy - 1, 1, 3); ctx.fillRect(sx - 1, sy, 3, 1); }
+        continue;
+      }
       if (f.sp === 'shuttle'){ ctx.save(); ctx.translate(fx, fy); ctx.rotate(Math.sin(f.t*9 + f.ph)*.18); ctx.drawImage(SHUTTLE, -7, -4); ctx.restore(); }
       else {
         const cyc = Math.floor(f.t*f.flap + f.ph*3) % 4, glide = f.sp === 'eagle' && Math.sin(f.t*.9 + f.ph) > .35;
