@@ -187,6 +187,69 @@ body{
 .panel .new{ color:var(--yellow); }
 .panel .sub{ margin:calc(var(--s)*1px) 0 0; font-size:max(calc(var(--s)*5px),10px); opacity:.8; }
 
+/* ----- Trophées ----- */
+#trobtn{ position:absolute; top:calc(var(--s)*7px); right:calc(var(--s)*36px); display:flex; align-items:center; justify-content:center;
+  font-family:inherit; font-weight:700; font-size:max(calc(var(--s)*6px),12px); line-height:normal;
+  background:rgba(255,255,255,.8); border:calc(var(--s)*1px) solid var(--plum); border-radius:calc(var(--s)*1.5px); padding:calc(var(--s)*1px) calc(var(--s)*3px); cursor:pointer; pointer-events:auto; z-index:3; animation:fade .5s ease-out 1.6s both; }
+#trobtn::before{ content:'\200B'; }
+#trobtn canvas{ height:1.15em; width:auto; image-rendering:pixelated; display:block; }
+#trobtn:focus-visible{ outline:calc(var(--s)*1px) dashed var(--plum); outline-offset:2px; }
+.trstar{ position:absolute; display:flex; align-items:center; justify-content:center; pointer-events:none; }
+.trstar svg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+.trstar polygon{ stroke:var(--plum); stroke-width:2.2; stroke-linejoin:round; }
+#trbadge{ top:calc(var(--s)*-6px); right:calc(var(--s)*-8px); width:calc(var(--s)*16px); height:calc(var(--s)*16px); animation:badge .5s cubic-bezier(.3,1.7,.5,1) 1.8s both; }
+#trbadge polygon{ fill:var(--orange); }
+#trbadge b{ position:relative; margin-top:calc(var(--s)*2.6px); font-family:var(--num); font-weight:400; font-size:max(calc(var(--s)*3.8px),7px); line-height:1; color:var(--white);
+  -webkit-text-stroke:calc(var(--s)*.9px) var(--plum); paint-order:stroke fill; }
+@keyframes badge{ from{ transform:scale(0) rotate(-90deg); } to{ transform:none; } }
+#trophies{ position:absolute; inset:0; z-index:30; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:calc(var(--s)*4px);
+  background:repeating-linear-gradient(135deg, rgba(255,255,255,.035) 0 calc(var(--s)*6px), transparent 0 calc(var(--s)*12px)), var(--plum);
+  border-bottom:calc(var(--s)*2px) solid var(--yellow); box-shadow:0 calc(var(--s)*3px) 0 rgba(0,0,0,.35);
+  transform:translateY(calc(-100% - var(--s)*6px)); transition:transform .45s cubic-bezier(.6,0,.4,1); touch-action:none; }
+#trophies.open{ transform:none; transition:transform .55s cubic-bezier(.25,1.25,.45,1); }
+.trhead{ display:flex; align-items:baseline; gap:calc(var(--s)*5px); }
+.trhead h2{ margin:0; font-weight:700; line-height:1; font-size:calc(var(--s)*13px); color:var(--yellow);
+  -webkit-text-stroke:calc(var(--s)*1.6px) var(--plum); paint-order:stroke fill; text-shadow:0 calc(var(--s)*1px) 0 var(--orange), 0 calc(var(--s)*2px) 0 var(--orange-d); }
+#trcount{ font-family:var(--num); font-size:max(calc(var(--s)*4.5px),9px); color:var(--purple-l); }
+#trclose{ position:absolute; top:calc(var(--s)*7px); right:calc(var(--s)*9px); font-size:max(calc(var(--s)*7px),12px); padding:calc(var(--s)*1.5px) calc(var(--s)*5px) calc(var(--s)*2px); }
+.trbody{ display:flex; align-items:center; gap:calc(var(--s)*4px); }
+.trarrow{ width:calc(var(--s)*13px); height:calc(var(--s)*20px); padding:0; display:flex; align-items:center; justify-content:center; }
+.trarrow i{ width:0; height:0; border-top:calc(var(--s)*4.5px) solid transparent; border-bottom:calc(var(--s)*4.5px) solid transparent; }
+#trprev i{ border-right:calc(var(--s)*5px) solid var(--plum); margin-right:calc(var(--s)*1px); }
+#trnext i{ border-left:calc(var(--s)*5px) solid var(--plum); margin-left:calc(var(--s)*1px); }
+.trarrow:disabled{ visibility:hidden; }
+#trgrid{ display:grid; grid-template-columns:repeat(5, calc(var(--s)*38px)); grid-template-rows:repeat(3, calc(var(--s)*38px)); gap:calc(var(--s)*4px) calc(var(--s)*5px); }
+#trgrid.l{ animation:trl .3s ease-out both; } #trgrid.r{ animation:trr .3s ease-out both; }
+@keyframes trl{ from{ opacity:0; transform:translateX(calc(var(--s)*-24px)); } }
+@keyframes trr{ from{ opacity:0; transform:translateX(calc(var(--s)*24px)); } }
+.tr{ position:relative; display:flex; align-items:center; justify-content:center; padding:0; cursor:pointer;
+  background:#FFF4D6; border:calc(var(--s)*1.5px) solid var(--plum); border-radius:calc(var(--s)*3px);
+  box-shadow:inset 0 calc(var(--s)*-2.5px) 0 #EBD8A6, inset 0 calc(var(--s)*1.5px) 0 var(--white), 0 calc(var(--s)*2px) 0 rgba(0,0,0,.4); }
+.tr:active{ transform:translateY(calc(var(--s)*1px)); }
+.tr:focus-visible{ outline:calc(var(--s)*1px) dashed var(--yellow); outline-offset:calc(var(--s)*1.5px); }
+.tr canvas{ width:calc(var(--s)*32px); height:calc(var(--s)*32px); image-rendering:pixelated; image-rendering:crisp-edges; }
+.tr.lock{ cursor:default; background:#43234A; box-shadow:inset 0 calc(var(--s)*-2.5px) 0 #351A3A, 0 calc(var(--s)*2px) 0 rgba(0,0,0,.4); }
+.tr.lock:active{ transform:none; }
+.tr.lock canvas{ filter:grayscale(1) brightness(.62) contrast(.85); opacity:.6; }
+.tr.on{ background:var(--yellow-l); }
+.tr .trstar{ top:calc(var(--s)*-5px); right:calc(var(--s)*-5px); width:calc(var(--s)*11px); height:calc(var(--s)*11px); animation:twinkle 1.4s ease-in-out infinite; }
+.tr .trstar polygon{ fill:var(--yellow); }
+@keyframes twinkle{ 50%{ transform:scale(1.18) rotate(18deg); } }
+#trdots{ display:flex; gap:calc(var(--s)*3px); }
+#trdots i{ width:calc(var(--s)*4px); height:calc(var(--s)*4px); border-radius:50%; background:#5C3D63; border:calc(var(--s)*.8px) solid var(--plum); }
+#trdots i.on{ background:var(--yellow); }
+#trbub{ position:absolute; z-index:2; max-width:calc(var(--s)*130px); padding:calc(var(--s)*3px) calc(var(--s)*5px) calc(var(--s)*3.5px); pointer-events:none;
+  background:var(--white); color:var(--plum); border:calc(var(--s)*1.5px) solid var(--plum); border-radius:calc(var(--s)*3px);
+  box-shadow:0 calc(var(--s)*2px) 0 rgba(0,0,0,.35); animation:bub .25s cubic-bezier(.3,1.6,.5,1) both; text-align:center; }
+#trbub b{ display:block; font-weight:700; font-size:max(calc(var(--s)*7px),12px); line-height:1.1; color:var(--purple-d,#4A2679); }
+#trbub span{ display:block; margin-top:calc(var(--s)*1px); font-weight:500; font-size:max(calc(var(--s)*5.5px),10px); line-height:1.2; }
+#trbub::after{ content:''; position:absolute; left:var(--tx,50%); width:calc(var(--s)*5px); height:calc(var(--s)*5px); background:var(--white);
+  border:calc(var(--s)*1.5px) solid var(--plum); border-width:0 calc(var(--s)*1.5px) calc(var(--s)*1.5px) 0; transform:translateX(-50%) rotate(45deg); }
+#trbub.up::after{ bottom:calc(var(--s)*-3.7px); }
+#trbub.down::after{ top:calc(var(--s)*-3.7px); transform:translateX(-50%) rotate(-135deg); }
+@keyframes bub{ from{ opacity:0; transform:scale(.6); } }
+@media (prefers-reduced-motion: reduce){ #trophies, #trophies.open{ transition-duration:.01s; } #trgrid.l, #trgrid.r, .tr .trstar, #trbub, #trbadge{ animation:none; } }
+
 @media (prefers-reduced-motion: reduce){
   #title *, .panel, #toast.show{ animation-duration:.01s; animation-delay:0s; }
 }
@@ -218,6 +281,7 @@ body{
         <span><canvas id="icoCone"></canvas>À sauter</span>
         <span class="rec" id="trec" hidden></span>
       </div></div>
+      <button id="trobtn" aria-label="Trophées"><canvas id="icoTrophy"></canvas><span id="trbadge" class="trstar" hidden><svg viewBox="0 0 24 24"><polygon points="12,1.5 14.9,8.6 22.5,9.2 16.7,14.2 18.5,21.6 12,17.6 5.5,21.6 7.3,14.2 1.5,9.2 9.1,8.6"/></svg><b></b></span></button>
       <button id="install" hidden>Installer l’appli</button>
     <p class="ver" id="ver"></p>
     <p class="copy">© Lutèce Games</p>
@@ -244,6 +308,17 @@ body{
     <div id="soundmenu" hidden role="group" aria-label="Réglages du son">
       <button id="tgMusic" class="tg" aria-pressed="true"><span>Musique</span><b></b></button>
       <button id="tgSfx" class="tg" aria-pressed="true"><span>Effets</span><b></b></button>
+    </div>
+    <div id="trophies" hidden role="dialog" aria-modal="true" aria-label="Trophées">
+      <div class="trhead"><h2>Trophées</h2><span id="trcount"></span></div>
+      <button id="trclose" class="btn alt">Fermer</button>
+      <div class="trbody">
+        <button id="trprev" class="btn trarrow" aria-label="Page précédente"><i></i></button>
+        <div id="trgrid"></div>
+        <button id="trnext" class="btn trarrow" aria-label="Page suivante"><i></i></button>
+      </div>
+      <div id="trdots"></div>
+      <div id="trbub" hidden><b></b><span></span></div>
     </div>
     <button id="pausebtn" hidden aria-label="Mettre en pause"><i></i><i></i></button>
     <div id="zone" hidden aria-live="polite"></div>
@@ -1280,7 +1355,7 @@ let flyers = [], flyIn = 6;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.20';
+const APP_VERSION = '5.21';
 // le record repart de zéro à chaque nouvelle version déployée
 try { if (localStorage.getItem('stellyrun_best_ver') !== APP_VERSION){ localStorage.setItem('stellyrun_best_ver', APP_VERSION); localStorage.setItem('stellyrun_best', '0'); best = 0; } } catch(e){}
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
@@ -1300,7 +1375,7 @@ function reset(){
   Object.assign(P, { y:GY, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, land:0, sink:false, stomps:0 });
 }
 function startGame(){
-  ensureAudio(); sfx.start(); reset(); state = 'play'; MUSIC.tempo = MUSIC.target = 1; MUSIC.fire = false; MUSIC.play(0, true);
+  trUI.close(); ensureAudio(); sfx.start(); reset(); TR.start(); state = 'play'; MUSIC.tempo = MUSIC.target = 1; MUSIC.fire = false; MUSIC.play(0, true);
   ui.title.hidden = true; ui.over.hidden = true; ui.pause.hidden = true; ui.hud.hidden = false;
   ui.hi.textContent = 'Record ' + pad(best); ui.firebar.hidden = true; ui.sockbar.hidden = true; ui.dcount.hidden = false; $('pausebtn').hidden = false; clearTimeout(zoneTimer); $('zone').hidden = true;
   if (document.activeElement) document.activeElement.blur();
@@ -1308,7 +1383,7 @@ function startGame(){
 function goHome(){
   state = 'title'; titleT = 0; titleSlammed = false; titleCaught = false; MUSIC.tempo = 1; MUSIC.fire = false; MUSIC.play('title', true); ui.dcount.hidden = true; $('pausebtn').hidden = true; $('zone').hidden = true; theme = 0; prevTheme = 0; transT = 0; confetti = [];
   obs = []; discs = []; items = []; debris = []; parts = []; pops = []; fireT = 0; boost = 1;
-  ui.over.hidden = true; ui.hud.hidden = true; ui.title.hidden = false; showTitleRecord();
+  ui.over.hidden = true; ui.hud.hidden = true; ui.title.hidden = false; showTitleRecord(); refreshTrophyBadge();
   // relance les animations CSS de l'accueil
   ui.title.querySelectorAll('.at, h1, #start').forEach(el => { el.style.animation = 'none'; void el.offsetWidth; el.style.animation = ''; });
   if (document.activeElement) document.activeElement.blur();
@@ -1317,6 +1392,227 @@ function iceToast(){
   const el = $('icetoast'); el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
 }
 function toast(msg, big){ ui.toast.textContent = msg; ui.toast.classList.toggle('big', !!big); ui.toast.classList.remove('show'); void ui.toast.offsetWidth; ui.toast.classList.add('show'); }
+
+/* ================= Trophées ================= */
+const TROPHIES = [
+  ['crampons', 'Chausser les crampons', 'Jouer une première partie'],
+  ['pasdebol', 'Pas de bol', 'Perdre dans les 5 premières secondes'],
+  ['taupe', 'Taupe niveau', 'Tomber dans un trou de taupe'],
+  ['amateur', 'Amateur', 'Jouer 5 parties'],
+  ['combo5', 'Combo', 'Attraper 5 disques d’affilée'],
+  ['gym', 'Lippman', 'Atteindre le gymnase'],
+  ['beach', 'It’s Britney Beach', 'Atteindre la plage'],
+  ['city', 'Catch in the city', 'Atteindre la ville'],
+  ['fields', 'L’étoile est dans le pré', 'Atteindre la campagne'],
+  ['forest', 'Promenons-nous dans les bois', 'Atteindre la forêt'],
+  ['peuf', 'Catch la Peuf', 'Atteindre la montagne'],
+  ['junior', 'Junior', 'Jouer 10 parties'],
+  ['force', 'Tour de force', 'Franchir un obstacle à 3 niveaux'],
+  ['crabe', 'J’en pince pour toi', 'Se faire pincer par un crabe'],
+  ['combo10', 'Super Combo', 'Attraper 10 disques d’affilée'],
+  ['plumes', 'Voler dans les plumes', 'Assommer 5 oiseaux en 1 partie'],
+  ['mains', 'Sans les mains', 'Faire 1 000 points sans attraper de disque'],
+  ['requin', 'Les dents de la mer', 'Voir le requin sauter 10 fois'],
+  ['globe', 'Globe Trotter', 'Avoir vu tous les terrains'],
+  ['bronze', 'Handler de bronze', '1 000 frisbees catchés'],
+  ['senior', 'Sénior', 'Jouer 50 parties'],
+  ['heros', 'Super héros', 'Avoir les deux pouvoirs en même temps'],
+  ['combo50', 'Méga Combo', 'Attraper 50 disques d’affilée'],
+  ['master', 'Master', 'Jouer 100 parties'],
+  ['huck', 'Huck', 'Attraper 150 disques en une partie'],
+  ['elfe', 'Un elfe libre', 'Attraper 4 chaussettes en 1 partie'],
+  ['bulldozer', 'Bulldozer', 'Renverser 20 obstacles en 1 partie'],
+  ['hydrate', 'Bien hydraté', 'Boire 3 gourdes en 1 partie'],
+  ['argent', 'Handler d’argent', '5 000 frisbees catchés'],
+  ['gmaster', 'Grand Master', 'Jouer 250 parties'],
+  ['combo100', 'Giga Combo', 'Attraper 100 disques d’affilée'],
+  ['or', 'Handler d’or', '10 000 frisbees catchés'],
+  ['intouchable', 'Intouchable', 'Faire 10 000 points sans utiliser l’invincibilité'],
+  ['legende', 'Légende', 'Jouer 500 parties'],
+  ['accro', 'Accro aux disques', 'Jouer 1 000 parties'],
+  ['greatest', 'Greatest', 'Débloquer tous les autres trophées']
+];
+// u : débloqués (date), s : déjà consultés ; compteurs cumulés sur toutes les parties. Jamais remis à zéro par une nouvelle version.
+const TR = (() => {
+  const KEY = 'stellyrun_trophies';
+  const d = { u:{}, s:{}, games:0, discs:0, sharks:0, th:0 };
+  try { const j = JSON.parse(localStorage.getItem(KEY)); if (j && typeof j === 'object') Object.assign(d, j); } catch(e){}
+  let g = { socks:0, fires:0, smash:0, stomps:0, fire:false };
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch(e){} };
+  function unlock(id){
+    if (d.u[id]) return; d.u[id] = Date.now();
+    if (!d.u.greatest && TROPHIES.every(([k]) => k === 'greatest' || d.u[k])) d.u.greatest = Date.now();
+    save(); refreshTrophyBadge();
+  }
+  const GAMES = [[1,'crampons'],[5,'amateur'],[10,'junior'],[50,'senior'],[100,'master'],[250,'gmaster'],[500,'legende'],[1000,'accro']];
+  const ZONES = { 1:'gym', 2:'beach', 3:'peuf', 4:'city', 5:'forest', 6:'fields' };
+  return {
+    d, save, unlock,
+    fresh: () => TROPHIES.filter(([id]) => d.u[id] && !d.s[id]).length,
+    seen(id){ if (!d.u[id] || d.s[id]) return; d.s[id] = 1; save(); refreshTrophyBadge(); },
+    start(){ g = { socks:0, fires:0, smash:0, stomps:0, fire:false }; d.games++; d.th |= 1; for (const [n, id] of GAMES) if (d.games >= n) unlock(id); save(); },
+    zone(n){ d.th |= 1 << n; if (ZONES[n]) unlock(ZONES[n]); if ((d.th & 127) === 127) unlock('globe'); },
+    disc(){
+      d.discs++;
+      if (streak >= 5) unlock('combo5'); if (streak >= 10) unlock('combo10'); if (streak >= 50) unlock('combo50'); if (streak >= 100) unlock('combo100');
+      if (discCount >= 150) unlock('huck');
+      if (d.discs >= 1000) unlock('bronze'); if (d.discs >= 5000) unlock('argent'); if (d.discs >= 10000) unlock('or');
+    },
+    die(kind){ if (t < 5) unlock('pasdebol'); if (kind === 'mole' || kind === 'hole') unlock('taupe'); if (kind === 'crab') unlock('crabe'); save(); },
+    tick(){ if (fireT > 0 && P.sockT > 0) unlock('heros'); if (score >= 1000 && discCount === 0) unlock('mains'); if (score >= 10000 && !g.fire) unlock('intouchable'); },
+    sock(){ if (++g.socks >= 4) unlock('elfe'); },
+    fire(){ g.fire = true; if (++g.fires >= 3) unlock('hydrate'); },
+    smash(){ if (++g.smash >= 20) unlock('bulldozer'); },
+    stomp(){ if (++g.stomps >= 5) unlock('plumes'); },
+    shark(){ if (++d.sharks >= 10) unlock('requin'); }
+  };
+})();
+
+/* ----- Icônes des trophées (32 x 32, dessinées à la première ouverture pour profiter des sprites de la planche) ----- */
+const CUP_MAP = ['...ooooooooo...','oooyYyyyyyyDooo','o.oyYyyyyyyDo.o','o.oyYyyyyyyDo.o','.ooyYyyyyyyDoo.','...oyYyyyyDo...',
+  '....oyYyyDo....','.....oyyDo.....','......oDo......','......oyo......','....ooyyDoo....','...oyYyyyyDo...','...ooooooooo...'];
+const CUP_PAL = { o:C.plum, y:C.yellow, Y:C.yellowL, D:C.orange };
+function buildTrophyIcons(){
+  const I = {};
+  const ic = (id, fn) => { I[id] = mk(32, 32, fn); };
+  const put = (g, img, cx, cy, sc, rot) => { sc = sc || 1; const w = img.width*sc, h = img.height*sc;
+    if (rot){ g.save(); g.translate(Math.round(cx), Math.round(cy)); g.rotate(rot); g.drawImage(img, -Math.round(w/2), -Math.round(h/2), w, h); g.restore(); }
+    else g.drawImage(img, Math.round(cx - w/2), Math.round(cy - h/2), w, h); };
+  const map = (m, pal) => mk(m[0].length, m.length, g => pm(g, m, 0, 0, false, Object.assign({}, PAL, pal)));
+  const lbl = (g, s, col, x, y, center) => { const w = s.length*4 - 1; x = Math.round(center ? x - w/2 : x - w);
+    const offs = [[-1,-1],[0,-1],[1,-1],[-1,0],[1,0],[-1,1],[0,1],[1,1],[0,2],[1,2],[-1,2]];
+    for (const [c, list] of [[C.plum, offs],[col, [[0,0]]]]){ g.fillStyle = c;
+      for (const [ox, oy] of list) for (let k=0;k<s.length;k++){ const gl = FONT[s[k]]; if (!gl) continue;
+        for (let j=0;j<5;j++) for (let i=0;i<3;i++) if (gl[j][i] === '1') g.fillRect(x+k*4+i+ox, y+j+oy, 1, 1); } } };
+  const num = (g, s) => lbl(g, s, C.white, 30, 25);
+  const starMask = (cx, cy, R, r) => { const p = []; for (let i=0;i<10;i++){ const a = -Math.PI/2 + i*Math.PI/5, rr = i % 2 ? r : R; p.push([cx + Math.cos(a)*rr, cy + Math.sin(a)*rr]); } return (x, y) => inPoly(p, x+.5, y+.5); };
+  const star = (g, ko) => {
+    shade(g, 32, 32, starMask(16, 17, 15.5, 6.8), { base:C.yellow, out:C.plum, dark:C.orange, light:C.yellowL });
+    g.fillStyle = C.plum;
+    if (ko){ for (const ex of [11, 18]) for (let k=0;k<3;k++){ g.fillRect(ex+k, 13+k, 1, 1); g.fillRect(ex+2-k, 13+k, 1, 1); }
+      g.fillRect(13, 20, 1, 1); g.fillRect(14, 19, 1, 1); g.fillRect(15, 20, 1, 1); g.fillRect(16, 19, 1, 1); g.fillRect(17, 20, 1, 1); g.fillRect(18, 19, 1, 1); }
+    else { g.fillRect(13, 13, 1, 3); g.fillRect(18, 13, 1, 3); g.fillRect(12, 18, 1, 1); g.fillRect(19, 18, 1, 1); g.fillRect(13, 19, 6, 1);
+      g.fillStyle = C.tongue; g.fillRect(14, 20, 4, 1); g.fillStyle = C.plum; g.fillRect(14, 21, 4, 1); g.fillRect(13, 20, 1, 1); g.fillRect(18, 20, 1, 1); }
+  };
+  const forbid = (g) => { const cx = 16, cy = 16, r = 14;
+    shade(g, 32, 32, (x, y) => { const dd = Math.hypot(x+.5-cx, y+.5-cy); if (dd > r + .4) return false; if (dd > r - 2.4) return true;
+      return Math.abs((x+.5-cx) - (y+.5-cy)) < 1.9; }, { base:C.red, out:C.plum, dark:C.redD, light:C.redL }); };
+  const stars3 = (g, cx, cy) => { g.fillStyle = C.yellow; for (const [x, y] of [[cx-7, cy],[cx, cy-3],[cx+7, cy]]){ g.fillRect(x, y-1, 1, 3); g.fillRect(x-1, y, 3, 1); } };
+  const medal = (g, label, base, dark, light) => {
+    shade(g, 32, 32, (x, y) => inPoly([[18,0],[24,0],[19.5,13],[13.5,13]], x+.5, y+.5), { base:'#3F6FC6', out:C.plum, dark:'#2A4F96', light:'#7AA0E6' });
+    shade(g, 32, 32, (x, y) => inPoly([[8,0],[14,0],[18.5,13],[12.5,13]], x+.5, y+.5), { base:C.red, out:C.plum, dark:C.redD, light:C.redL });
+    shade(g, 32, 32, (x, y) => Math.hypot(x+.5-16, y+.5-20.5) <= 10.5, { base, out:C.plum, dark, light });
+    g.fillStyle = dark; for (let y=0;y<32;y++) for (let x=0;x<32;x++){ const dd = Math.hypot(x+.5-16, y+.5-20.5); if (dd > 7.2 && dd <= 8.1) g.fillRect(x, y, 1, 1); }
+    const sm = starMask(16, 21, 5.6, 2.4); for (let y=0;y<32;y++) for (let x=0;x<32;x++) if (sm(x, y)){ g.fillStyle = sm(x-1, y-1) ? dark : light; g.fillRect(x, y, 1, 1); }
+  };
+  const MINI = map(['....o....','...oMo...','...oWo...','..oMMMo..','..oWWWo..','.oMMMMMo.','oMMMMMMMo','ooooooooo'], { M:C.red, W:C.white });
+  const CRAB = map(['....ow...wo....','....ok...ko....','.oo..o...o..oo.','orro.o...o.orro','.oroooooooooro.','..orrrrrrrrro..','.orrrrrrrrrrro.','..orrrrrrrrro..','...ooooooooo...'], { r:C.red, w:C.white, k:C.plum });
+  const MOLE = map(['...oooo...','.oohhhhoo.','ohhhhhhhho','ohkhhhhkho','ohhhrrhhho','oghhrrhhgo','occggggcco','occggggcco','oggggggggo'], { h:'#8E8794', g:'#6B6470', k:C.plum, r:C.tongue, c:'#F2C6CF' });
+  const SHOE_C = mk(13, 8, g => pm(g, SHOE, 0, 0));
+  const CUP = map(CUP_MAP, CUP_PAL);
+
+  ic('crampons', g => { put(g, SHOE_C, 16, 14, 2); g.fillStyle = C.plum; for (const x of [5, 11, 17, 23]) g.fillRect(x, 22, 3, 3); g.fillStyle = '#C9CED6'; for (const x of [5, 11, 17, 23]) g.fillRect(x+1, 22, 1, 2); });
+  ic('pasdebol', g => star(g, true));
+  ic('taupe', g => { shade(g, 32, 32, (x, y) => ((x+.5-16)/14)**2 + ((y+.5-27)/5)**2 <= 1, { base:'#8A5A2B', out:C.plum, dark:'#6B4424', light:'#B07A44' }); put(g, MOLE, 16, 14, 2); });
+  ic('crabe', g => { put(g, CRAB, 16, 19, 2); g.fillStyle = C.plum; pm(g, ['.oo.oo.','orroLro','orrrrro','.orrro.','..oro..','...o...'], 23, 0, false, Object.assign({}, PAL, { r:'#F2708A', L:C.white })); });
+  for (const [id, n] of [['amateur','5'],['junior','10'],['senior','50'],['master','100'],['gmaster','250'],['legende','500'],['accro','1000']]) ic(id, g => { star(g); num(g, n); });
+  for (const [id, n] of [['combo5','x5'],['combo10','x10'],['combo50','x50'],['combo100','x100']]) ic(id, g => { put(g, DISC, 16, 13); num(g, n); });
+  ic('huck', g => { put(g, DISC, 16, 13); num(g, '150'); });
+  ic('mains', g => { put(g, DISC, 16, 16); forbid(g); });
+  ic('gym', g => put(g, SHUTTLE, 16, 16, 2));
+  ic('beach', g => { g.fillStyle = C.plum; g.fillRect(2, 27, 28, 1); shade(g, 32, 32, (x, y) => ((x+.5-26)**2 + (y+.5-6)**2) <= 18, { base:C.yellow, out:C.plum, dark:C.orange, light:C.yellowL }); put(g, CASTLE, 12, 17); });
+  ic('city', g => put(g, CHANTIER, 16, 16));
+  ic('fields', g => put(g, BALEPYR, 16, 17));
+  ic('forest', g => put(g, FLY_FR.owl[1], 16, 16));
+  ic('peuf', g => put(g, BIGSNOW, 16, 17));
+  ic('force', g => { for (const [x, y] of [[2,23],[11,23],[20,23],[6,16],[15,16],[11,9]]) g.drawImage(MINI, x, y); });
+  ic('plumes', g => { put(g, FLY_FR.pigeon[1], 16, 17, 1, Math.PI); stars3(g, 16, 5); num(g, '5'); });
+  ic('requin', g => { put(g, SHARK, 16, 13, 1, -.35); g.fillStyle = '#3FA3E0'; g.fillRect(1, 21, 30, 2); g.fillStyle = '#8ADAF5'; for (let x=2;x<30;x+=6) g.fillRect(x, 20, 3, 1); num(g, '10'); });
+  ic('globe', g => { shade(g, 32, 32, (x, y) => Math.hypot(x+.5-16, y+.5-16) <= 14, { base:'#3FA3E0', out:C.plum, dark:'#1E6FA8', light:'#8ADAF5' });
+    for (let y=4;y<28;y++) for (let x=4;x<28;x++){ if (Math.hypot(x+.5-16, y+.5-16) > 12.4) continue; const v = Math.sin(x*.55 + 1) + Math.cos(y*.62 + x*.25);
+      if (v > .75){ g.fillStyle = v > 1.35 ? '#3E8F47' : '#5DBB63'; g.fillRect(x, y, 1, 1); } } });
+  ic('bronze', g => medal(g, null, '#D08A4E', '#9A5A2A', '#F0B88A'));
+  ic('argent', g => medal(g, null, '#D7DCE3', '#8E97A4', C.white));
+  ic('or', g => medal(g, null, C.yellow, C.orange, C.yellowL));
+  ic('heros', g => { put(g, SOCK[0], 12, 15); put(g, BOTTLE, 24, 17); });
+  ic('elfe', g => { put(g, SOCK[0], 15, 15); num(g, '4'); });
+  ic('bulldozer', g => { put(g, CONES[0], 15, 18, 1, Math.PI/2); g.fillStyle = C.yellow; for (const [x, y] of [[4,6],[9,3],[25,6]]){ g.fillRect(x, y-1, 1, 3); g.fillRect(x-1, y, 3, 1); } num(g, '20'); });
+  ic('hydrate', g => { put(g, BOTTLE, 14, 15); num(g, '3'); });
+  ic('intouchable', g => { put(g, BOTTLE, 16, 16); forbid(g); });
+  ic('greatest', g => { put(g, CUP, 16, 17, 2); g.fillStyle = C.white; for (const [x, y] of [[3,4],[28,8],[5,26]]){ g.fillRect(x, y-1, 1, 3); g.fillRect(x-1, y, 3, 1); } });
+  return I;
+}
+{ const c = $('icoTrophy'), m = CUP_MAP; c.width = m[0].length; c.height = m.length; pm(c.getContext('2d'), m, 0, 0, false, Object.assign({}, PAL, CUP_PAL)); }
+
+/* ----- Bouton, pastille et page des trophées ----- */
+function refreshTrophyBadge(){
+  const n = TR.fresh(), b = $('trbadge');
+  b.hidden = n <= 0; b.querySelector('b').textContent = n > 99 ? '99' : n;
+}
+const trUI = (() => {
+  const page = $('trophies'), grid = $('trgrid'), bub = $('trbub'), dots = $('trdots'), cnt = $('trcount');
+  const prev = $('trprev'), next = $('trnext'), PER = 15, NP = Math.ceil(TROPHIES.length / PER);
+  const STAR = '<svg viewBox="0 0 24 24"><polygon points="12,1.5 14.9,8.6 22.5,9.2 16.7,14.2 18.5,21.6 12,17.6 5.5,21.6 7.3,14.2 1.5,9.2 9.1,8.6"/></svg>';
+  let pg = 0, icons = null, isOpen = false, curEl = null, hideT = 0;
+  function render(dir){
+    const d = TR.d; grid.textContent = ''; hideBubble();
+    TROPHIES.slice(pg*PER, pg*PER + PER).forEach(([id, name]) => {
+      const el = document.createElement('button'), on = !!d.u[id];
+      el.className = 'tr' + (on ? '' : ' lock'); el.dataset.id = id;
+      el.setAttribute('aria-label', on ? name : 'Trophée verrouillé');
+      if (!on){ el.disabled = true; el.tabIndex = -1; }
+      const c = document.createElement('canvas'); c.width = 32; c.height = 32; c.getContext('2d').drawImage(icons[id], 0, 0); el.appendChild(c);
+      if (on && !d.s[id]){ const s = document.createElement('span'); s.className = 'trstar'; s.innerHTML = STAR; el.appendChild(s); }
+      grid.appendChild(el);
+    });
+    dots.innerHTML = Array.from({ length: NP }, (_, i) => '<i' + (i === pg ? ' class="on"' : '') + '></i>').join('');
+    cnt.textContent = TROPHIES.filter(([id]) => d.u[id]).length + ' / ' + TROPHIES.length;
+    prev.disabled = pg === 0; next.disabled = pg === NP - 1;
+    grid.classList.remove('l', 'r'); if (dir){ void grid.offsetWidth; grid.classList.add(dir > 0 ? 'r' : 'l'); }
+  }
+  function go(dir){ const n = Math.max(0, Math.min(NP - 1, pg + dir)); if (n === pg) return; pg = n; sfx.jump(); render(dir); }
+  function hideBubble(){ bub.hidden = true; if (curEl) curEl.classList.remove('on'); curEl = null; }
+  function showBubble(el){
+    const id = el.dataset.id, t = TROPHIES.find(x => x[0] === id);
+    if (curEl === el){ hideBubble(); return; }
+    hideBubble(); curEl = el; el.classList.add('on');
+    bub.querySelector('b').textContent = t[1]; bub.querySelector('span').textContent = t[2];
+    bub.hidden = false; bub.style.animation = 'none'; void bub.offsetWidth; bub.style.animation = '';
+    const pr = page.getBoundingClientRect(), r = el.getBoundingClientRect(), bw = bub.offsetWidth, bh = bub.offsetHeight, gap = r.height*.18;
+    const cx = r.left + r.width/2 - pr.left, left = Math.max(6, Math.min(pr.width - bw - 6, cx - bw/2));
+    const up = r.top - pr.top - bh - gap > 4;
+    bub.className = up ? 'up' : 'down';
+    bub.style.left = left + 'px'; bub.style.top = (up ? r.top - pr.top - bh - gap : r.bottom - pr.top + gap) + 'px';
+    bub.style.setProperty('--tx', (cx - left) + 'px');
+    if (TR.d.u[id] && !TR.d.s[id]){ TR.seen(id); const s = el.querySelector('.trstar'); if (s) s.remove(); }
+    sfx.disc(1);
+  }
+  function open(){
+    if (isOpen || state !== 'title') return;
+    if (!icons) icons = buildTrophyIcons();
+    const firstNew = TROPHIES.findIndex(([id]) => TR.d.u[id] && !TR.d.s[id]);
+    pg = firstNew >= 0 ? Math.floor(firstNew / PER) : 0;
+    render(0); clearTimeout(hideT); page.hidden = false; void page.offsetWidth; page.classList.add('open'); isOpen = true;
+    $('soundmenu').hidden = true; sfx.start();
+  }
+  function close(){
+    if (!isOpen) return; isOpen = false; hideBubble(); page.classList.remove('open'); refreshTrophyBadge();
+    clearTimeout(hideT); hideT = setTimeout(() => { if (!isOpen) page.hidden = true; }, 500);
+    if (document.activeElement) document.activeElement.blur();
+  }
+  grid.addEventListener('click', e => { const el = e.target.closest('.tr'); if (el && !el.disabled){ e.stopPropagation(); showBubble(el); } });
+  prev.addEventListener('click', e => { e.stopPropagation(); go(-1); });
+  next.addEventListener('click', e => { e.stopPropagation(); go(1); });
+  $('trclose').addEventListener('click', e => { e.stopPropagation(); close(); });
+  $('trobtn').addEventListener('click', e => { e.stopPropagation(); ensureAudio(); open(); });
+  // balayage gauche / droite pour changer de page ; un appui hors d'un trophée ferme la bulle
+  let sx = null, sy = 0;
+  page.addEventListener('pointerdown', e => { sx = e.clientX; sy = e.clientY; if (!e.target.closest('.tr')) hideBubble(); });
+  page.addEventListener('pointerup', e => { if (sx === null) return; const dx = e.clientX - sx, dy = e.clientY - sy; sx = null;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)*1.5) go(dx < 0 ? 1 : -1); });
+  return { open, close, go, isOpen: () => isOpen };
+})();
+refreshTrophyBadge();
 
 /* ================= Génération ================= */
 const lvl = () => 1 - Math.exp(-t/28);
@@ -1408,6 +1704,7 @@ function die(kind){
   state = 'over'; overT = 0; deathKind = kind; flash = .12; fireT = 0; graceT = 0; MUSIC.stop(); MUSIC.fire = false; MUSIC.jingle();
   if (kind === 'hole' || kind === 'sewer'){ P.sink = true; P.vy = 30; P.ground = false; sfx.fall(); dust(P.x, GY, 10); shake = .15; }
   else { P.vy = -180; P.ground = false; shake = .35; sfx.hit(); burst(P.x, P.y-28, 16, kind === 'slip' ? ['#3FA3E0', '#BFE8FF', C.white] : (kind === 'ski' ? [C.white, '#DCE9F5', C.purple] : [C.yellow, C.orange, C.white]), 95, 300); }
+  TR.die(kind);
   P.newBest = score > best;
   if (P.newBest){ best = score; try { localStorage.setItem('stellyrun_best', best); } catch(e){} }
 }
@@ -1417,7 +1714,7 @@ function smash(o){
   if (o.th === 3) burst(o.x + o.w/2, GY-12, 14, [C.white, '#DCE9F5', '#BFD3E6'], 90, 240);
   if (o.th === 5) burst(o.x + o.w/2, GY-12, 14, ['#B5844A', '#D9B27A', '#5A3A1C'], 90, 240);
   if (o.th === 6) burst(o.x + o.w/2, GY-12, 18, ['#EDCD68', '#F7DD85', '#C9A23A'], 90, 200);
-  sfx.smash(); shake = Math.max(shake, .08);
+  sfx.smash(); shake = Math.max(shake, .08); TR.smash();
 }
 // Stelly retombe sur la tête d'un animal volant : il est assommé, elle rebondit ; enchaîner sans toucher le sol multiplie les points
 function stomp(f, fy){
@@ -1427,7 +1724,7 @@ function stomp(f, fy){
   const pts = 100*P.stomps; bonus += pts;
   pops.push({ x:f.x, y:fy - 14, s: P.stomps > 1 ? '+'+pts+' x'+P.stomps : '+'+pts, t:0, col: C.yellow });
   if (P.stomps === 3) toast('Triple rebond !'); else if (P.stomps === 5) toast('Rebond infernal !', true);
-  sfx.stomp(P.stomps); shake = Math.max(shake, .06);
+  TR.stomp(); sfx.stomp(P.stomps); shake = Math.max(shake, .06);
   burst(f.x, fy - 4, 10, [C.white, C.yellow, '#E6DCF0'], 70, 160);
 }
 function catchDisc(o){
@@ -1438,7 +1735,7 @@ function catchDisc(o){
   if (streak === 10){ bonus += 1000; toast('Super Combo !', true); sfx.mile(); }
   else if (streak === 50){ bonus += 5000; toast('Méga Combo !', true); sfx.world(); }
   else if (streak % 100 === 0){ bonus += 10000; toast('Giga Combo !', true); sfx.world(); flash = .15; }
-  discCount++; $('dcn').textContent = discCount;
+  discCount++; $('dcn').textContent = discCount; TR.disc();
   const pts = 10*combo; bonus += pts; sfx.disc(combo);
   pops.push({ x:o.x, y:o.y-10, s: combo > 1 ? '+'+pts+' x'+combo : '+'+pts, t:0, col: C.white });
   burst(o.x, o.y, 9, [C.yellow, C.white, C.disc], 65, 120);
@@ -1503,6 +1800,7 @@ function update(dt){
         }
         continue;
       }
+      if (o.k === 'pyr3' && !o.cleared && o.x + o.w < P.x - 6){ o.cleared = true; TR.unlock('force'); }
       for (const [x0, x1, top] of hitboxes(o)){
         if (P.x+6 > x0 && P.x-6 < x1 && P.y > top){ if (fireT > 0 || graceT > 0){ o.smashed = true; smash(o); } else die(o.th === 5 ? 'stump' : (o.th === 6 ? 'bale' : 'hit')); break; }
       }
@@ -1526,17 +1824,17 @@ function update(dt){
     }
     for (const s of items){
       if (s.k === 'sock' && Math.abs(s.x+9 - P.x) < 17 && s.y+14 > P.y-56 && s.y+6 < P.y+2){
-        s.got = true; P.sockT = 7; sfx.sock(); toast('Super saut !'); burst(s.x+9, s.y+12, 16, [C.purpleL, C.white, C.purple], 85, 100);
+        s.got = true; P.sockT = 7; TR.sock(); sfx.sock(); toast('Super saut !'); burst(s.x+9, s.y+12, 16, [C.purpleL, C.white, C.purple], 85, 100);
       }
       if (s.k === 'fire'){ if (Math.random() < .35) flame(s.x, s.y-6, 1, 16, ['#FFE34A', '#F6C65C', '#E9A21C', C.white]);
-        if (Math.abs(s.x - P.x) < 18 && s.y > P.y-58 && s.y < P.y+2){ s.got = true; fireT = 7; sfx.fire(); toast('Invincible !'); flash = .1; flame(P.x, P.y-28, 30, 40); } }
+        if (Math.abs(s.x - P.x) < 18 && s.y > P.y-58 && s.y < P.y+2){ s.got = true; fireT = 7; TR.fire(); sfx.fire(); toast('Invincible !'); flash = .1; flame(P.x, P.y-28, 30, 40); } }
     }
-    score = Math.floor(dist/12) + bonus;
+    score = Math.floor(dist/12) + bonus; TR.tick();
     if (score >= milestone){ milestone += 500; sfx.mile(); ui.score.classList.add('pulse'); setTimeout(() => ui.score.classList.remove('pulse'), 220); }
     if (score !== shownScore){ ui.score.textContent = pad(score); shownScore = score; }
     let nt = theme; zoneT -= dt;
     if (zoneT <= 0){ zoneT = 12 + Math.random()*6; do { nt = Math.floor(Math.random()*THEME_NAMES.length); } while (nt === theme); }
-    if (nt !== theme){ prevTheme = theme; theme = nt; setZone(nt); transT = .8; flash = .25; sfx.world(); }
+    if (nt !== theme){ prevTheme = theme; theme = nt; setZone(nt); TR.zone(nt); transT = .8; flash = .25; sfx.world(); }
     ui.sockbar.hidden = P.sockT <= 0; if (P.sockT > 0) ui.sockfill.style.transform = 'scaleX(' + (P.sockT/7).toFixed(3) + ')';
     ui.firebar.hidden = fireT <= 0; if (fireT > 0) ui.firefill.style.transform = 'scaleX(' + (fireT/7).toFixed(3) + ')';
   }
@@ -1553,7 +1851,7 @@ function update(dt){
 
   // requin (plage)
   if (theme === 2 && state !== 'title'){
-    if (!shark){ sharkIn -= dt; if (sharkIn <= 0){ shark = { x: W*(.3 + Math.random()*.55), t:0 }; sharkIn = 6 + Math.random()*7; } }
+    if (!shark){ sharkIn -= dt; if (sharkIn <= 0){ shark = { x: W*(.3 + Math.random()*.55), t:0 }; if (state === 'play') TR.shark(); sharkIn = 6 + Math.random()*7; } }
     else { shark.t += dt; if (shark.t > 1.3) shark = null; }
   }
 
@@ -1950,10 +2248,13 @@ function resize(){
   const rs = document.documentElement.style;
   rs.setProperty('--s', s.toFixed(3)); rs.setProperty('--gy', GY);
   rs.setProperty('--py', lay.py); rs.setProperty('--ry', lay.ry); rs.setProperty('--by', lay.by); rs.setProperty('--ly', lay.ly);
-  buildThemes(); RAYS = null;
+  buildThemes(); RAYS = null; placeTrophyBtn();
   if (state === 'title' || P.ground) P.y = GY;
   obs.length = 0; discs.length = 0; items.length = 0;
 }
+
+function placeTrophyBtn(){ const s = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--s')) || 1; $('trobtn').style.right = (9*s + ui.mute.offsetWidth + 3*s) + 'px'; }
+if (document.fonts) document.fonts.ready.then(placeTrophyBtn);
 
 /* ================= Icônes ================= */
 function icon(id, img){ const c = $(id); c.width = img.width; c.height = img.height; c.getContext('2d').drawImage(img, 0, 0); }
@@ -1963,6 +2264,7 @@ icon('icoFire', BOTTLE);
 /* ================= Contrôles ================= */
 function press(){
   ensureAudio();
+  if (trUI.isOpen()) return;
   if (state === 'title'){ startGame(); return; }
   if (state === 'over'){ if (overT > .7) startGame(); return; }
   if (state === 'pause'){ resume(); return; }
@@ -1977,10 +2279,11 @@ $('pausebtn').addEventListener('click', e => { e.stopPropagation(); pause(); });
 
 addEventListener('keydown', e => {
   if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW'){ e.preventDefault(); if (!e.repeat) press(); }
+  else if (trUI.isOpen()){ if (e.code === 'Escape') trUI.close(); else if (e.code === 'ArrowLeft') trUI.go(-1); else if (e.code === 'ArrowRight') trUI.go(1); }
   else if (e.code === 'Escape' || e.code === 'KeyP'){ state === 'pause' ? resume() : pause(); }
 });
 addEventListener('keyup', e => { if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') release(); });
-wrap.addEventListener('pointerdown', e => { if (e.target.closest('button') || e.target.closest('#soundmenu')) return; if (!smenu.hidden){ smenu.hidden = true; return; } e.preventDefault(); press(); });
+wrap.addEventListener('pointerdown', e => { if (e.target.closest('button') || e.target.closest('#soundmenu') || e.target.closest('#trophies')) return; if (!smenu.hidden){ smenu.hidden = true; return; } e.preventDefault(); press(); });
 addEventListener('pointerup', release); addEventListener('pointercancel', release);
 $('start').addEventListener('click', e => { e.stopPropagation(); startGame(); });
 $('again').addEventListener('click', e => { e.stopPropagation(); startGame(); });
@@ -1998,7 +2301,7 @@ ui.mute.addEventListener('click', e => { e.stopPropagation(); ensureAudio(); sme
 $('tgMusic').addEventListener('click', e => { e.stopPropagation(); ensureAudio(); musicOn = !musicOn; refreshSound(); });
 $('tgSfx').addEventListener('click', e => { e.stopPropagation(); ensureAudio(); sfxOn = !sfxOn; refreshSound(); });
 refreshSound(); showTitleRecord(); $('ver').textContent = 'v' + APP_VERSION;
-document.addEventListener('visibilitychange', () => { if (document.hidden){ pause(); if (actx) actx.suspend(); } else if (actx) actx.resume(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden){ TR.save(); pause(); if (actx) actx.suspend(); } else if (actx) actx.resume(); });
 addEventListener('blur', pause);
 addEventListener('resize', resize);
 
