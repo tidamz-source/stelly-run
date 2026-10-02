@@ -1265,11 +1265,11 @@ let flyers = [], flyIn = 6;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.13';
+const APP_VERSION = '5.14';
 // le record repart de zéro à chaque nouvelle version déployée
 try { if (localStorage.getItem('stellyrun_best_ver') !== APP_VERSION){ localStorage.setItem('stellyrun_best_ver', APP_VERSION); localStorage.setItem('stellyrun_best', '0'); best = 0; } } catch(e){}
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
-let zoneIdx = 0;
+let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
 
 const $ = id => document.getElementById(id);
@@ -1279,7 +1279,7 @@ const pad = n => String(n).padStart(5,'0');
 function showTitleRecord(){ ui.trec.hidden = best <= 0; ui.trec.textContent = 'Record ' + pad(best); }
 
 function reset(){
-  t = 0; dist = 0; bonus = 0; zoneIdx = 0; deer = null; flyers = []; flyIn = 4 + Math.random()*3; groups = {}; discCount = 0; streak = 0; $('dcn').textContent = '0'; speed = 235; spEff = 190; obs = []; discs = []; items = []; parts = []; pops = []; debris = []; lines = [];
+  t = 0; dist = 0; bonus = 0; zoneIdx = 0; zoneT = 12 + Math.random()*6; deer = null; flyers = []; flyIn = 4 + Math.random()*3; groups = {}; discCount = 0; streak = 0; $('dcn').textContent = '0'; speed = 235; spEff = 190; obs = []; discs = []; items = []; parts = []; pops = []; debris = []; lines = [];
   nextObs = 170; sockIn = 11 + Math.random()*6; fireIn = 26 + Math.random()*10; lastCatch = -9; combo = 0; milestone = 500; shownScore = -1;
   theme = 0; prevTheme = 0; transT = 0; fireT = 0; graceT = 0; boost = 1; shark = null;
   Object.assign(P, { y:GY, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, land:0, sink:false });
@@ -1353,16 +1353,16 @@ const ROUND = { 3:[SNOWMAN, BIGSNOW, SNOW3], 5:[STUMP, LOGPYR, LOG3], 6:[BALE1, 
 const coneImg = o => o.th === 4 ? CHANTIER : CONES[o.c];
 function hitboxes(o){
   if (o.k === 'pyr3') return o.th === 2 ? [[o.x+2, o.x+36, GY-11],[o.x+8, o.x+30, GY-23],[o.x+14, o.x+24, GY-35]]
-    : (ROUND[o.th] ? [[o.x+2, o.x+36, GY-11],[o.x+8, o.x+30, GY-21],[o.x+14, o.x+24, GY-31]].map(h => o.th === 5 ? [h[0], h[1], h[2] + 2] : h) : [[o.x+3, o.x+36, GY-12],[o.x+9, o.x+30, GY-24],[o.x+16, o.x+23, GY-36]]);
+    : (ROUND[o.th] ? [[o.x+2, o.x+36, GY-11],[o.x+8, o.x+30, GY-21],[o.x+14, o.x+24, GY-31]].map(h => o.th === 5 ? [h[0], h[1], h[2] + 5] : h) : [[o.x+3, o.x+36, GY-12],[o.x+9, o.x+30, GY-24],[o.x+16, o.x+23, GY-36]]);
   if (o.k === 'cone'){ const pw = o.th === 2 ? 14 : (ROUND[o.th] ? 16 : 12), out = []; for (let i=0;i<o.n;i++) out.push(o.th === 2 ? [o.x+i*pw+2, o.x+i*pw+12, GY-13] : (ROUND[o.th] ? [o.x+i*pw+3, o.x+i*pw+13, GY-11] : [o.x+i*pw+3, o.x+i*pw+10, GY-12])); return out; }
-  if (o.k === 'pyr') return o.th === 2 ? [[o.x+2, o.x+34, GY-22]] : (ROUND[o.th] ? [[o.x+2, o.x+24, GY-11],[o.x+8, o.x+18, GY-19]].map(h => o.th === 5 ? [h[0], h[1], h[2] + 2] : h) : [[o.x+3, o.x+10, GY-12],[o.x+16, o.x+23, GY-12],[o.x+9, o.x+17, GY-24]]);
+  if (o.k === 'pyr') return o.th === 2 ? [[o.x+2, o.x+34, GY-22]] : (ROUND[o.th] ? [[o.x+2, o.x+24, GY-11],[o.x+8, o.x+18, GY-19]].map(h => o.th === 5 ? [h[0], h[1], h[2] + 5] : h) : [[o.x+3, o.x+10, GY-12],[o.x+16, o.x+23, GY-12],[o.x+9, o.x+17, GY-24]]);
   return [];
 }
 function pieces(o){
-  if (o.k === 'pyr3'){ if (o.th === 2) return [[CASTLE3, o.x, GY-46]]; if (ROUND[o.th]) return [[ROUND[o.th][2], o.x, GY-41 + (o.th === 5 ? 2 : 0)]];
+  if (o.k === 'pyr3'){ if (o.th === 2) return [[CASTLE3, o.x, GY-46]]; if (ROUND[o.th]) return [[ROUND[o.th][2], o.x, GY-41 + (o.th === 5 ? 5 : 0)]];
     const cn = coneImg(o); return [[cn, o.x, GY-16],[cn, o.x+13, GY-16],[cn, o.x+26, GY-16],[cn, o.x+6, GY-28],[cn, o.x+19, GY-28],[cn, o.x+13, GY-40]]; }
   if (o.k === 'cone') return Array.from({length:o.n}, (_,i) => o.th === 2 ? [CASTLE, o.x+i*14, GY-20] : (ROUND[o.th] ? [ROUND[o.th][0], o.x+i*16, GY-15] : [coneImg(o), o.x+i*12, GY-16]));
-  if (o.k === 'pyr') return o.th === 2 ? [[FORT, o.x, GY-32]] : (ROUND[o.th] ? [[ROUND[o.th][1], o.x, GY-22 + (o.th === 5 ? 2 : 0)]] : [[coneImg(o), o.x, GY-16],[coneImg(o), o.x+13, GY-16],[coneImg(o), o.x+6, GY-28]]);
+  if (o.k === 'pyr') return o.th === 2 ? [[FORT, o.x, GY-32]] : (ROUND[o.th] ? [[ROUND[o.th][1], o.x, GY-22 + (o.th === 5 ? 5 : 0)]] : [[coneImg(o), o.x, GY-16],[coneImg(o), o.x+13, GY-16],[coneImg(o), o.x+6, GY-28]]);
   return [];
 }
 
@@ -1421,7 +1421,7 @@ function update(dt){
   clock += dt;
   if (state === 'title') titleT += dt;
   if (state === 'play'){
-    t += dt; speed = 235 * Math.pow(1.004, t);
+    t += dt; { const target = 235 * Math.pow(1.05, Math.floor(t/5)); speed = speed < target ? Math.min(target, speed + target*.125*dt) : target; }
     boost = lerp(boost, fireT > 0 ? 1.6 : 1, Math.min(1, dt*4));
     spEff = speed * boost; sockIn -= dt; if (t > 20) fireIn -= dt;
   } else if (state === 'over'){ spEff *= Math.pow(.004, dt); overT += dt; }
@@ -1503,8 +1503,8 @@ function update(dt){
     score = Math.floor(dist/12) + bonus;
     if (score >= milestone){ milestone += 500; sfx.mile(); ui.score.classList.add('pulse'); setTimeout(() => ui.score.classList.remove('pulse'), 220); }
     if (score !== shownScore){ ui.score.textContent = pad(score); shownScore = score; }
-    const zi = Math.floor(score/5000); let nt = theme;
-    if (zi !== zoneIdx){ zoneIdx = zi; do { nt = Math.floor(Math.random()*THEME_NAMES.length); } while (nt === theme); }
+    let nt = theme; zoneT -= dt;
+    if (zoneT <= 0){ zoneT = 12 + Math.random()*6; do { nt = Math.floor(Math.random()*THEME_NAMES.length); } while (nt === theme); }
     if (nt !== theme){ prevTheme = theme; theme = nt; setZone(nt); MUSIC.play(nt); transT = .8; flash = .25; sfx.world(); }
     ui.sockbar.hidden = P.sockT <= 0; if (P.sockT > 0) ui.sockfill.style.transform = 'scaleX(' + (P.sockT/7).toFixed(3) + ')';
     ui.firebar.hidden = fireT <= 0; if (fireT > 0) ui.firefill.style.transform = 'scaleX(' + (fireT/7).toFixed(3) + ')';
@@ -1715,10 +1715,11 @@ const DEER = (() => {
   return { doe: kitDoe, stag:[make(true, false), make(true, true)] };
 })();
 function drawDeer(){
-  if (!deer){ deerIn -= 1/60; if (deerIn <= 0 && state !== 'title'){ deer = { kind: 'doe', x: W + 30, t: 0 }; deerIn = 8 + Math.random()*8; } return; }
-  deer.t += 1/60; deer.x -= (spEff*.1 + 5)/60;
+  const live = state === 'play';
+  if (!deer){ if (live) deerIn -= 1/60; if (deerIn <= 0 && live){ deer = { kind: 'doe', x: W + 30, t: 0 }; deerIn = 8 + Math.random()*8; } return; }
+  if (live){ deer.t += 1/60; deer.x -= (spEff*.1 + 5)/60; }
   const graze = Math.sin(deer.t*.8) > .3 ? 1 : 0;
-  ctx.drawImage(DEER[deer.kind][graze], Math.round(deer.x), FT - 26);
+  ctx.drawImage(DEER[deer.kind][graze], Math.round(deer.x), FT - 20);
   if (deer.x < -40) deer = null;
 }
 function drawBack(th){
