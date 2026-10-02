@@ -298,7 +298,7 @@ body{
     <div id="pause" class="screen" hidden>
       <div class="panel">
         <h2>Pause</h2>
-        <button id="resume" class="btn">Reprendre</button>
+        <div class="row"><button id="quit" class="btn alt">Accueil</button><button id="resume" class="btn">Reprendre</button></div>
       </div>
     </div>
 
@@ -1353,7 +1353,7 @@ let flyers = [], flyIn = 6;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.23';
+const APP_VERSION = '5.24';
 // le record repart de zéro à chaque nouvelle version déployée
 try { if (localStorage.getItem('stellyrun_best_ver') !== APP_VERSION){ localStorage.setItem('stellyrun_best_ver', APP_VERSION); localStorage.setItem('stellyrun_best', '0'); best = 0; } } catch(e){}
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
@@ -2274,7 +2274,9 @@ function press(){
   P.hold = true; P.buf = .13;
 }
 function release(){ P.hold = false; }
-function pause(){ if (state !== 'play') return; MUSIC.pause(); state = 'pause'; ui.pause.hidden = false; $('pausebtn').hidden = true; P.hold = false; }
+function pause(){ if (state !== 'play') return; MUSIC.pause(); state = 'pause'; ui.pause.hidden = false; $('pausebtn').hidden = true; P.hold = false; $('resume').focus({ preventScroll:true }); }
+// abandon depuis la pause : la partie s'arrête, les points comptent pour le record, aucun trophée de mort
+function quitToHome(){ if (state !== 'pause') return; if (score > best){ best = score; try { localStorage.setItem('stellyrun_best', best); } catch(e){} } TR.save(); ui.pause.hidden = true; goHome(); }
 function resume(){ MUSIC.resume(); state = 'play'; ui.pause.hidden = true; $('pausebtn').hidden = false; last = 0; }
 let zoneTimer = 0;
 function setZone(n){ const z = $('zone'); z.textContent = THEME_NAMES[n]; z.hidden = false; z.classList.toggle('ice', n === 3); z.classList.remove('pop'); void z.offsetWidth; z.classList.add('pop'); clearTimeout(zoneTimer); zoneTimer = setTimeout(() => { z.hidden = true; }, 3000); }
@@ -2292,6 +2294,7 @@ $('start').addEventListener('click', e => { e.stopPropagation(); startGame(); })
 $('again').addEventListener('click', e => { e.stopPropagation(); startGame(); });
 $('home').addEventListener('click', e => { e.stopPropagation(); goHome(); });
 $('resume').addEventListener('click', e => { e.stopPropagation(); resume(); });
+$('quit').addEventListener('click', e => { e.stopPropagation(); quitToHome(); });
 const smenu = $('soundmenu');
 function refreshSound(){
   $('tgMusic').setAttribute('aria-pressed', musicOn); $('tgSfx').setAttribute('aria-pressed', sfxOn);
