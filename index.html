@@ -1265,7 +1265,7 @@ let flyers = [], flyIn = 6;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.14';
+const APP_VERSION = '5.15';
 // le record repart de zéro à chaque nouvelle version déployée
 try { if (localStorage.getItem('stellyrun_best_ver') !== APP_VERSION){ localStorage.setItem('stellyrun_best_ver', APP_VERSION); localStorage.setItem('stellyrun_best', '0'); best = 0; } } catch(e){}
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
@@ -1354,14 +1354,14 @@ const coneImg = o => o.th === 4 ? CHANTIER : CONES[o.c];
 function hitboxes(o){
   if (o.k === 'pyr3') return o.th === 2 ? [[o.x+2, o.x+36, GY-11],[o.x+8, o.x+30, GY-23],[o.x+14, o.x+24, GY-35]]
     : (ROUND[o.th] ? [[o.x+2, o.x+36, GY-11],[o.x+8, o.x+30, GY-21],[o.x+14, o.x+24, GY-31]].map(h => o.th === 5 ? [h[0], h[1], h[2] + 5] : h) : [[o.x+3, o.x+36, GY-12],[o.x+9, o.x+30, GY-24],[o.x+16, o.x+23, GY-36]]);
-  if (o.k === 'cone'){ const pw = o.th === 2 ? 14 : (ROUND[o.th] ? 16 : 12), out = []; for (let i=0;i<o.n;i++) out.push(o.th === 2 ? [o.x+i*pw+2, o.x+i*pw+12, GY-13] : (ROUND[o.th] ? [o.x+i*pw+3, o.x+i*pw+13, GY-11] : [o.x+i*pw+3, o.x+i*pw+10, GY-12])); return out; }
+  if (o.k === 'cone'){ const pw = o.th === 2 ? 14 : (ROUND[o.th] ? 16 : 12), out = []; for (let i=0;i<o.n;i++) out.push(o.th === 2 ? [o.x+i*pw+2, o.x+i*pw+12, GY-13] : (ROUND[o.th] ? [o.x+i*pw+3, o.x+i*pw+13, GY-11 + (o.th === 5 ? 2 : 0)] : [o.x+i*pw+3, o.x+i*pw+10, GY-12])); return out; }
   if (o.k === 'pyr') return o.th === 2 ? [[o.x+2, o.x+34, GY-22]] : (ROUND[o.th] ? [[o.x+2, o.x+24, GY-11],[o.x+8, o.x+18, GY-19]].map(h => o.th === 5 ? [h[0], h[1], h[2] + 5] : h) : [[o.x+3, o.x+10, GY-12],[o.x+16, o.x+23, GY-12],[o.x+9, o.x+17, GY-24]]);
   return [];
 }
 function pieces(o){
   if (o.k === 'pyr3'){ if (o.th === 2) return [[CASTLE3, o.x, GY-46]]; if (ROUND[o.th]) return [[ROUND[o.th][2], o.x, GY-41 + (o.th === 5 ? 5 : 0)]];
     const cn = coneImg(o); return [[cn, o.x, GY-16],[cn, o.x+13, GY-16],[cn, o.x+26, GY-16],[cn, o.x+6, GY-28],[cn, o.x+19, GY-28],[cn, o.x+13, GY-40]]; }
-  if (o.k === 'cone') return Array.from({length:o.n}, (_,i) => o.th === 2 ? [CASTLE, o.x+i*14, GY-20] : (ROUND[o.th] ? [ROUND[o.th][0], o.x+i*16, GY-15] : [coneImg(o), o.x+i*12, GY-16]));
+  if (o.k === 'cone') return Array.from({length:o.n}, (_,i) => o.th === 2 ? [CASTLE, o.x+i*14, GY-20] : (ROUND[o.th] ? [ROUND[o.th][0], o.x+i*16, GY-15 + (o.th === 5 ? 2 : 0)] : [coneImg(o), o.x+i*12, GY-16]));
   if (o.k === 'pyr') return o.th === 2 ? [[FORT, o.x, GY-32]] : (ROUND[o.th] ? [[ROUND[o.th][1], o.x, GY-22 + (o.th === 5 ? 5 : 0)]] : [[coneImg(o), o.x, GY-16],[coneImg(o), o.x+13, GY-16],[coneImg(o), o.x+6, GY-28]]);
   return [];
 }
