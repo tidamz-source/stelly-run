@@ -1366,7 +1366,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.29';
+const APP_VERSION = '5.30';
 // le record repart de zéro à chaque nouvelle version déployée
 try { if (localStorage.getItem('stellyrun_best_ver') !== APP_VERSION){ localStorage.setItem('stellyrun_best_ver', APP_VERSION); localStorage.setItem('stellyrun_best', '0'); best = 0; } } catch(e){}
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
@@ -1420,15 +1420,18 @@ const TROPHIES = [
   ['junior', 'Junior', 'Jouer 10 parties'],
   ['force', 'Tour de force', 'Franchir un obstacle à 3 niveaux'],
   ['crabe', 'J’en pince pour toi', 'Se faire pincer par un crabe'],
+  ['marmotte', 'Ça va la marmotte ?', 'Se faire mordre par une marmotte'],
   ['combo10', 'Super Combo', 'Attraper 10 disques d’affilée'],
   ['plumes', 'Voler dans les plumes', 'Assommer 5 oiseaux en 1 partie'],
   ['mains', 'Sans les mains', 'Faire 1 000 points sans attraper de disque'],
   ['requin', 'Les dents de la mer', 'Voir le requin sauter 10 fois'],
+  ['deer', 'Oh my deer', 'Croiser la biche et le cerf'],
   ['globe', 'Globe Trotter', 'Avoir vu tous les terrains'],
   ['angry', 'Angry Birds', 'Assommer toutes les espèces d’oiseaux'],
   ['bronze', 'Handler de bronze', '1 000 frisbees catchés'],
   ['senior', 'Sénior', 'Jouer 50 parties'],
   ['heros', 'Super héros', 'Avoir les deux pouvoirs en même temps'],
+  ['voltige', 'Haute voltige', 'Assommer un oiseau en position haute'],
   ['combo50', 'Méga Combo', 'Attraper 50 disques d’affilée'],
   ['master', 'Master', 'Jouer 100 parties'],
   ['huck', 'Huck', 'Attraper 150 disques en une partie'],
@@ -1440,6 +1443,7 @@ const TROPHIES = [
   ['combo100', 'Giga Combo', 'Attraper 100 disques d’affilée'],
   ['or', 'Handler d’or', '10 000 frisbees catchés'],
   ['intouchable', 'Intouchable', 'Faire 10 000 points sans utiliser l’invincibilité'],
+  ['cascadeuse', 'Cascadeuse', 'Mourir de toutes les façons possibles'],
   ['legende', 'Légende', 'Jouer 500 parties'],
   ['accro', 'Accro aux disques', 'Jouer 1 000 parties'],
   ['rainbow', 'Over the Rainbow', 'Attraper le frisbee arc-en-ciel'],
@@ -1447,9 +1451,11 @@ const TROPHIES = [
 ];
 // u : débloqués (date), s : déjà consultés ; compteurs cumulés sur toutes les parties. Jamais remis à zéro par une nouvelle version.
 const BIRD_KINDS = ['pigeon', 'gull', 'eagle', 'owl', 'crow'];
+// toutes les morts possibles dans le jeu (Cascadeuse) : obstacles, pièges des trous et volants
+const DEATH_KINDS = ['hit', 'slip', 'hole', 'mole', 'crab', 'marmot', 'sewer', 'stump', 'bale', 'pigeon', 'gull', 'eagle', 'owl', 'crow', 'shuttle'];
 const TR = (() => {
   const KEY = 'stellyrun_trophies';
-  const d = { u:{}, s:{}, games:0, discs:0, sharks:0, th:0, birds:0, rbMiss:0, rb:0 };
+  const d = { u:{}, s:{}, games:0, discs:0, sharks:0, th:0, birds:0, rbMiss:0, rb:0, deer:0, deaths:0 };
   try { const j = JSON.parse(localStorage.getItem(KEY)); if (j && typeof j === 'object') Object.assign(d, j); } catch(e){}
   let g = { socks:0, fires:0, smash:0, stomps:0, fire:false };
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch(e){} };
@@ -1475,12 +1481,14 @@ const TR = (() => {
       if (discCount >= 150) unlock('huck');
       if (d.discs >= 1000) unlock('bronze'); if (d.discs >= 5000) unlock('argent'); if (d.discs >= 10000) unlock('or');
     },
-    die(kind){ if (t < 5) unlock('pasdebol'); if (kind === 'mole' || kind === 'hole') unlock('taupe'); if (kind === 'crab') unlock('crabe'); save(); },
+    die(kind){ if (t < 5) unlock('pasdebol'); if (kind === 'mole' || kind === 'hole') unlock('taupe'); if (kind === 'crab') unlock('crabe'); if (kind === 'marmot') unlock('marmotte');
+      const i = DEATH_KINDS.indexOf(kind); if (i >= 0){ d.deaths |= 1 << i; if (d.deaths === (1 << DEATH_KINDS.length) - 1) unlock('cascadeuse'); } save(); },
+    deer(kind){ d.deer |= kind === 'stag' ? 2 : 1; if (d.deer === 3) unlock('deer'); },
     tick(){ if (fireT > 0 && P.sockT > 0) unlock('heros'); if (score >= 1000 && discCount === 0) unlock('mains'); if (score >= 10000 && !g.fire) unlock('intouchable'); },
     sock(){ if (++g.socks >= 4) unlock('elfe'); },
     fire(){ g.fire = true; if (++g.fires >= 3) unlock('hydrate'); },
     smash(){ if (++g.smash >= 20) unlock('bulldozer'); },
-    stomp(sp){ if (++g.stomps >= 5) unlock('plumes');
+    stomp(sp, tier){ if (++g.stomps >= 5) unlock('plumes'); if (tier === 2) unlock('voltige');
       const i = BIRD_KINDS.indexOf(sp); if (i >= 0){ d.birds |= 1 << i; if ((d.birds & 31) === 31) unlock('angry'); save(); } },
     shark(){ if (++d.sharks >= 10) unlock('requin'); }
   };
@@ -1548,6 +1556,13 @@ function buildTrophyIcons(){
   ic('requin', g => { put(g, SHARK, 16, 13, 1, -.35); g.fillStyle = '#3FA3E0'; g.fillRect(1, 21, 30, 2); g.fillStyle = '#8ADAF5'; for (let x=2;x<30;x+=6) g.fillRect(x, 20, 3, 1); num(g, '10'); });
   ic('angry', g => { put(g, FLY_FR.gull[0], 13, 9); put(g, FLY_FR.crow[0], 18, 22);
     g.fillStyle = C.red; for (const [x, y] of [[25,1],[25,2],[28,1],[28,2],[26,3],[27,3],[24,4],[29,4],[26,6],[27,6],[25,7],[28,7],[25,8],[28,8]]) g.fillRect(x, y, 1, 1); });
+  ic('marmotte', g => { shade(g, 32, 32, (x, y) => ((x+.5-16)/14)**2 + ((y+.5-27)/5)**2 <= 1, { base:'#E9D9A6', out:C.plum, dark:'#C9B37A', light:C.white });
+    put(g, map(MARMOT, { R:C.red, S:C.white, b:'#8A5A2B', B:'#6B4424', k:C.plum, c:'#E9C9A0', w:C.white }), 16, 15, 2); });
+  ic('deer', g => { put(g, DEER.stag[0], 16, 18); g.fillStyle = C.plum; pm(g, ['.oo.oo.','orroLro','orrrrro','.orrro.','..oro..','...o...'], 0, 1, false, Object.assign({}, PAL, { r:'#F2708A', L:C.white })); });
+  ic('voltige', g => { put(g, FLY_FR.pigeon[1], 16, 8, 1, Math.PI); stars3(g, 16, 17);
+    const ch = map(['..o..','.oPo.','oPoPo','Po.oP'], { P:C.purpleL }); for (const y of [21, 25]) g.drawImage(ch, 13, y); });
+  ic('cascadeuse', g => { star(g, true); for (const [x0, y0, dx] of [[19, 3, 1], [27, 3, -1]]) for (let k=0;k<8;k++){ const x = x0 + k*dx, y = y0 + k;
+      g.fillStyle = C.plum; g.fillRect(x-1, y-1, 4, 4); } for (const [x0, y0, dx] of [[19, 3, 1], [27, 3, -1]]) for (let k=0;k<8;k++){ const x = x0 + k*dx, y = y0 + k; g.fillStyle = k === 3 || k === 4 ? '#F2C6CF' : '#F6D9A8'; g.fillRect(x, y, 2, 2); } });
   ic('globe', g => { shade(g, 32, 32, (x, y) => Math.hypot(x+.5-16, y+.5-16) <= 14, { base:'#3FA3E0', out:C.plum, dark:'#1E6FA8', light:'#8ADAF5' });
     for (let y=4;y<28;y++) for (let x=4;x<28;x++){ if (Math.hypot(x+.5-16, y+.5-16) > 12.4) continue; const v = Math.sin(x*.55 + 1) + Math.cos(y*.62 + x*.25);
       if (v > .75){ g.fillStyle = v > 1.35 ? '#3E8F47' : '#5DBB63'; g.fillRect(x, y, 1, 1); } } });
@@ -1752,7 +1767,7 @@ function stomp(f, fy){
   const pts = 100*P.stomps; bonus += pts;
   pops.push({ x:f.x, y:fy - 14, s: P.stomps > 1 ? '+'+pts+' x'+P.stomps : '+'+pts, t:0, col: C.yellow });
   if (P.stomps === 3) toast('Triple rebond !'); else if (P.stomps === 5) toast('Rebond infernal !', true);
-  TR.stomp(f.sp); sfx.stomp(P.stomps); shake = Math.max(shake, .06);
+  TR.stomp(f.sp, f.tier); sfx.stomp(P.stomps); shake = Math.max(shake, .06);
   burst(f.x, fy - 4, 10, [C.white, C.yellow, '#E6DCF0'], 70, 160);
 }
 function catchDisc(o){
@@ -2084,7 +2099,7 @@ const DEER = (() => {
 })();
 function drawDeer(){
   const live = state === 'play';
-  if (!deer){ if (live) deerIn -= 1/60; if (deerIn <= 0 && live){ deer = { kind: 'doe', x: W + 30, t: 0 }; deerIn = 8 + Math.random()*8; } return; }
+  if (!deer){ if (live) deerIn -= 1/60; if (deerIn <= 0 && live){ deer = { kind: Math.random() < .4 ? 'stag' : 'doe', x: W + 30, t: 0 }; TR.deer(deer.kind); deerIn = 8 + Math.random()*8; } return; }
   if (live){ deer.t += 1/60; deer.x -= (spEff*.1 + 5)/60; }
   const graze = Math.sin(deer.t*.8) > .3 ? 1 : 0;
   ctx.drawImage(DEER[deer.kind][graze], Math.round(deer.x), FT - 20);
