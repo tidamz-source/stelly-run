@@ -226,10 +226,10 @@ body{
 .tr:active{ transform:translateY(calc(var(--s)*1px)); }
 .tr:focus-visible{ outline:calc(var(--s)*1px) dashed var(--yellow); outline-offset:calc(var(--s)*1.5px); }
 .tr canvas{ width:calc(var(--s)*32px); height:calc(var(--s)*32px); image-rendering:pixelated; image-rendering:crisp-edges; }
-.tr.lock{ cursor:default; background:#43234A; box-shadow:inset 0 calc(var(--s)*-2.5px) 0 #351A3A, 0 calc(var(--s)*2px) 0 rgba(0,0,0,.4); }
-.tr.lock:active{ transform:none; }
+.tr.lock{ background:#43234A; box-shadow:inset 0 calc(var(--s)*-2.5px) 0 #351A3A, 0 calc(var(--s)*2px) 0 rgba(0,0,0,.4); }
 .tr.lock canvas{ filter:grayscale(1) brightness(.62) contrast(.85); opacity:.6; }
 .tr.on{ background:var(--yellow-l); }
+.tr.lock.on{ background:#5C3463; }
 .tr .trstar{ top:calc(var(--s)*-5px); right:calc(var(--s)*-5px); width:calc(var(--s)*11px); height:calc(var(--s)*11px); animation:twinkle 1.4s ease-in-out infinite; }
 .tr .trstar polygon{ fill:var(--yellow); }
 @keyframes twinkle{ 50%{ transform:scale(1.18) rotate(18deg); } }
@@ -240,6 +240,8 @@ body{
   background:var(--white); color:var(--plum); border:calc(var(--s)*1.5px) solid var(--plum); border-radius:calc(var(--s)*3px);
   box-shadow:0 calc(var(--s)*2px) 0 rgba(0,0,0,.35); animation:bub .25s cubic-bezier(.3,1.6,.5,1) both; text-align:center; }
 #trbub b{ display:block; font-weight:700; font-size:max(calc(var(--s)*7px),12px); line-height:1.1; color:var(--purple-d,#4A2679); }
+#trbub i{ display:block; margin-top:calc(var(--s)*1.5px); font-style:normal; font-weight:700; font-size:max(calc(var(--s)*4.5px),9px); color:#8E7C93; }
+#trbub i[hidden]{ display:none; }
 #trbub span{ display:block; margin-top:calc(var(--s)*1px); font-weight:500; font-size:max(calc(var(--s)*5.5px),10px); line-height:1.2; }
 #trbub::after{ content:''; position:absolute; left:var(--tx,50%); width:calc(var(--s)*5px); height:calc(var(--s)*5px); background:var(--white);
   border:calc(var(--s)*1.5px) solid var(--plum); border-width:0 calc(var(--s)*1.5px) calc(var(--s)*1.5px) 0; transform:translateX(-50%) rotate(45deg); }
@@ -316,7 +318,7 @@ body{
         <button id="trnext" class="btn trarrow" aria-label="Page suivante"><i></i></button>
       </div>
       <div id="trdots"></div>
-      <div id="trbub" hidden><b></b><span></span></div>
+      <div id="trbub" hidden><b></b><span></span><i>Pas encore débloqué</i></div>
     </div>
     <button id="pausebtn" hidden aria-label="Mettre en pause"><i></i><i></i></button>
     <div id="zone" hidden aria-live="polite"></div>
@@ -1366,7 +1368,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.31';
+const APP_VERSION = '5.32';
 // le record repart de zéro à chaque nouvelle version déployée
 try { if (localStorage.getItem('stellyrun_best_ver') !== APP_VERSION){ localStorage.setItem('stellyrun_best_ver', APP_VERSION); localStorage.setItem('stellyrun_best', '0'); best = 0; } } catch(e){}
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
@@ -1595,8 +1597,7 @@ const trUI = (() => {
     TROPHIES.slice(pg*PER, pg*PER + PER).forEach(([id, name]) => {
       const el = document.createElement('button'), on = !!d.u[id];
       el.className = 'tr' + (on ? '' : ' lock'); el.dataset.id = id;
-      el.setAttribute('aria-label', on ? name : 'Trophée verrouillé');
-      if (!on){ el.disabled = true; el.tabIndex = -1; }
+      el.setAttribute('aria-label', on ? name : name + ' (verrouillé)');
       const c = document.createElement('canvas'); c.width = 32; c.height = 32; c.getContext('2d').drawImage(icons[id], 0, 0); el.appendChild(c);
       if (on && !d.s[id]){ const s = document.createElement('span'); s.className = 'trstar'; s.innerHTML = STAR; el.appendChild(s); }
       grid.appendChild(el);
@@ -1613,6 +1614,7 @@ const trUI = (() => {
     if (curEl === el){ hideBubble(); return; }
     hideBubble(); curEl = el; el.classList.add('on');
     bub.querySelector('b').textContent = t[1]; bub.querySelector('span').textContent = t[2];
+    bub.querySelector('i').hidden = !!TR.d.u[id];
     bub.hidden = false; bub.style.animation = 'none'; void bub.offsetWidth; bub.style.animation = '';
     const pr = page.getBoundingClientRect(), r = el.getBoundingClientRect(), bw = bub.offsetWidth, bh = bub.offsetHeight, gap = r.height*.18;
     const cx = r.left + r.width/2 - pr.left, left = Math.max(6, Math.min(pr.width - bw - 6, cx - bw/2));
@@ -1636,7 +1638,7 @@ const trUI = (() => {
     clearTimeout(hideT); hideT = setTimeout(() => { if (!isOpen) page.hidden = true; }, 500);
     if (document.activeElement) document.activeElement.blur();
   }
-  grid.addEventListener('click', e => { const el = e.target.closest('.tr'); if (el && !el.disabled){ e.stopPropagation(); showBubble(el); } });
+  grid.addEventListener('click', e => { const el = e.target.closest('.tr'); if (el){ e.stopPropagation(); showBubble(el); } });
   prev.addEventListener('click', e => { e.stopPropagation(); go(-1); });
   next.addEventListener('click', e => { e.stopPropagation(); go(1); });
   $('trclose').addEventListener('click', e => { e.stopPropagation(); close(); });
