@@ -510,7 +510,7 @@ const DISC_MAP = [
   '............................'
 ];
 const DISC = mk(28, 13, g => pm(g, DISC_MAP, 0, 0, false, { o:'#E08A2C', w:'#FFFFFF', r:'#EEDFCB', c:'#F4E6D2', b:'#5A3A10', y:'#FDB60D' }));
-// Frisbee arc-en-ciel (ultra rare) : les 6 bandes du drapeau sur le dessus, tranche violette, contour prune, reflets blancs
+// Frisbee arc-en-ciel (ultra rare) : les 6 couleurs du drapeau en cercles concentriques sur le dessus (rouge à l'extérieur, violet au centre), tranche violette, contour prune
 const RB_COLS = ['#E40303', '#FF8C00', '#FFED00', '#008026', '#004DFF', '#750787'];
 const RBDISC = mk(28, 13, g => DISC_MAP.forEach((row, y) => [...row].forEach((ch, x) => {
   if (ch === '.') return;
@@ -518,7 +518,7 @@ const RBDISC = mk(28, 13, g => DISC_MAP.forEach((row, y) => [...row].forEach((ch
   if (ch === 'o') col = C.plum;
   else if (y >= 8) col = y === 8 ? '#5A1470' : '#3E0C4E';
   else if (ch === 'w' && x <= 2) col = C.white;
-  else col = RB_COLS[Math.min(5, Math.max(0, y - 2))];
+  else { const d = Math.hypot((x + .5 - 14.5)/13, (y + .5 - 5.3)/3.6); col = RB_COLS[d >= 1 ? 0 : Math.min(5, Math.floor((1 - d)*6))]; }
   g.fillStyle = col; g.fillRect(x, y, 1, 1);
 })));
 const FDISC = frisbee('#4FC25A', '#1F7A3A', C.plum, [C.discB, '#F5A81C', '#3E9E4A']);
@@ -1366,7 +1366,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.28';
+const APP_VERSION = '5.29';
 // le record repart de zéro à chaque nouvelle version déployée
 try { if (localStorage.getItem('stellyrun_best_ver') !== APP_VERSION){ localStorage.setItem('stellyrun_best_ver', APP_VERSION); localStorage.setItem('stellyrun_best', '0'); best = 0; } } catch(e){}
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
