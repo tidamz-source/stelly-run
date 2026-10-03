@@ -518,7 +518,6 @@ const RBDISC = mk(28, 13, g => DISC_MAP.forEach((row, y) => [...row].forEach((ch
   if (ch === 'o') col = C.plum;
   else if (y >= 8) col = y === 8 ? '#5A1470' : '#3E0C4E';
   else if (ch === 'w' && x <= 2) col = C.white;
-  else if (ch === 'b' || ch === 'y') col = ch === 'y' ? C.white : RB_COLS[Math.min(5, Math.max(0, y - 2))];
   else col = RB_COLS[Math.min(5, Math.max(0, y - 2))];
   g.fillStyle = col; g.fillRect(x, y, 1, 1);
 })));
