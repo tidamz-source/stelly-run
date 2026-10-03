@@ -1353,7 +1353,7 @@ let flyers = [], flyIn = 6;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.24';
+const APP_VERSION = '5.25';
 // le record repart de zéro à chaque nouvelle version déployée
 try { if (localStorage.getItem('stellyrun_best_ver') !== APP_VERSION){ localStorage.setItem('stellyrun_best_ver', APP_VERSION); localStorage.setItem('stellyrun_best', '0'); best = 0; } } catch(e){}
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
@@ -1367,7 +1367,7 @@ const pad = n => String(n).padStart(5,'0');
 function showTitleRecord(){ ui.trec.hidden = best <= 0; ui.trec.textContent = 'Record ' + pad(best); }
 
 function reset(){
-  t = 0; dist = 0; bonus = 0; zoneIdx = 0; zoneT = 12 + Math.random()*6; deer = null; flyers = []; flyIn = 4 + Math.random()*3; groups = {}; discCount = 0; streak = 0; $('dcn').textContent = '0'; speed = 235; spEff = 190; obs = []; discs = []; items = []; parts = []; pops = []; debris = []; lines = [];
+  t = 0; dist = 0; bonus = 0; zoneIdx = 0; zoneT = 12 + Math.random()*6; deer = null; flyers = []; flyIn = 4 + Math.random()*3; birdWait = false; groups = {}; discCount = 0; streak = 0; $('dcn').textContent = '0'; speed = 235; spEff = 190; obs = []; discs = []; items = []; parts = []; pops = []; debris = []; lines = [];
   nextObs = 170; sockIn = 11 + Math.random()*6; fireIn = 17 + Math.random()*7; lastCatch = -9; combo = 0; milestone = 500; shownScore = -1;
   theme = 0; prevTheme = 0; transT = 0; fireT = 0; graceT = 0; boost = 1; shark = null;
   Object.assign(P, { y:GY, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, land:0, sink:false, stomps:0 });
@@ -1647,24 +1647,23 @@ function spawnObstacle(){
   }
 }
 // altitude du centre de l'oiseau au-dessus du sol : [minimum, écart aléatoire]
-// saut court ≈ 22 px, saut appuyé ≈ 54 px, chaussette ailée appuyée ≈ 105 px (pieds)
-const FLY_ALT = [[12, 4], [38, 6], [76, 10]];
-// test : les oiseaux gardent la vitesse du début de partie au lieu de suivre l'accélération du jeu
-const BIRDS_FIXED_SPEED = true;
-const flySpeed = k => (BIRDS_FIXED_SPEED ? 235 : Math.max(spEff, 60)) * k;
+// saut court ≈ 22 px, saut appuyé ≈ 54 px, chaussette ailée appuyée ≈ 105 px (pieds) ; Stelly mesure 46 px
+// mi-hauteur entre 53,5 et 55 : passe au-dessus de sa tête au sol, assommable d'un saut appuyé
+// les collisions utilisent l'altitude nominale (y0) : l'ondulation reste purement visuelle
+const FLY_ALT = [[12, 4], [53.5, 1.5], [76, 10]];
+// les oiseaux avancent à la vitesse du sol (comme les obstacles)
+const flySpeed = () => Math.max(spEff, 60);
+let birdWait = false;   // un oiseau attend son tour : plus aucun obstacle ne sort tant que l'écran n'est pas dégagé
 function flyerY(f){ return f.y0 + Math.sin(f.t*f.fs + f.ph)*f.amp + Math.sin(f.t*.8 + f.ph*2)*f.drift; }
 function spawnFlyer(){
   const sp = FLY_BY_THEME[theme]; if (!sp){ flyIn = 2; return; }
-  const S = FLY_SPECS[sp], k = S.k[0] + Math.random()*(S.k[1] - S.k[0]);
-  const vf = flySpeed(k), T = (W + 30 - P.x)/vf;
+  const k = 1, T = (W + 30 - P.x)/flySpeed();
   // 3 altitudes : rase-mottes (petit saut), mi-hauteur (saut appuyé), haut (chaussette ailée, seulement si elle dure jusqu'à l'arrivée de l'oiseau)
   const sockOk = P.sockT > T + .4, r = Math.random();
   const tier = sockOk ? (r < .3 ? 0 : (r < .62 ? 1 : 2)) : (r < .5 ? 0 : 1);
-  const conflict = obs.some(o => Math.abs(o.x + o.w/2 - P.x - spEff*T) < spEff*.75 + 30) || flyers.some(f => !f.ko && Math.abs((f.x - P.x)/flySpeed(f.k) - T) < .45);
-  if (conflict){ flyIn = .3; return; }
   const y0 = GY - FLY_ALT[tier][0] - Math.random()*FLY_ALT[tier][1];
   flyers.push({ sp, tier, x: W + 30, y0, k, t: 0, ph: Math.random()*6.28, fs: 2 + Math.random()*1.6, amp: [1.5, 2, 2.5][tier], drift: [.8, 1.2, 1.5][tier], flap: sp === 'eagle' ? 7 : 11 + Math.random()*4 });
-  flyIn = Math.max(.9, 3.6 - 2.6*lvl()) + Math.random()*1.8;
+  flyIn = Math.max(2.5, 5 - 2.5*lvl()) + Math.random()*3;
 }
 const ROUND = { 3:[SNOWMAN, BIGSNOW, SNOW3], 5:[STUMP, LOGPYR, LOG3], 6:[BALE1, BALEPYR, BALE3] };
 const coneImg = o => o.th === 4 ? CHANTIER : CONES[o.c];
@@ -1724,7 +1723,7 @@ function smash(o){
 }
 // Stelly retombe sur la tête d'un animal volant : il est assommé, elle rebondit ; enchaîner sans toucher le sol multiplie les points
 function stomp(f, fy){
-  f.ko = true; f.ky = fy; f.kvy = -60; f.kr = 0;
+  f.ko = true; f.ky = flyerY(f); f.kvy = -60; f.kr = 0;
   P.stomps = Math.min((P.stomps || 0) + 1, 5);
   P.vy = -(P.sockT > 0 ? 420 : (P.hold ? 340 : 290)); P.y = Math.min(P.y, fy - FLY_SPECS[f.sp].hh);
   const pts = 100*P.stomps; bonus += pts;
@@ -1765,15 +1764,19 @@ function update(dt){
     discs = discs.filter(o => o.x > -30 && !o.got); items = items.filter(o => o.x > -30 && !o.got);
   }
 
-  if (state === 'play' && t > 3){ flyIn -= dt; if (flyIn <= 0) spawnFlyer(); }
+  if (state === 'play' && t > 3){
+    if (!birdWait){ flyIn -= dt; if (flyIn <= 0){ if (FLY_BY_THEME[theme]) birdWait = true; else flyIn = 2; } }
+    // l'oiseau sort quand plus aucun obstacle n'est devant Stelly
+    else if (!obs.some(o => o.x + o.w > P.x - 6)){ birdWait = false; spawnFlyer(); }
+  }
   if (state !== 'title'){
     for (const f of flyers){ f.t += dt;
-      if (f.ko){ f.x -= Math.max(spEff, 60)*.55*dt; f.kvy += 900*dt; f.ky += f.kvy*dt; f.kr = Math.min(Math.PI, f.kr + dt*9); }
-      else f.x -= flySpeed(f.k)*dt; }
+      if (f.ko){ f.x -= flySpeed()*dt; f.kvy += 900*dt; f.ky += f.kvy*dt; f.kr = Math.min(Math.PI, f.kr + dt*9); }
+      else f.x -= flySpeed()*dt; }
     flyers = flyers.filter(f => f.x > -50 && !f.gone && !(f.ko && f.ky > H + 30));
   }
   if (state === 'play'){
-    nextObs -= dx; if (nextObs <= 0) spawnObstacle();
+    nextObs -= dx; if (nextObs <= 0){ if (birdWait || flyers.some(f => !f.ko && f.x > P.x - 24)) nextObs = 4; else spawnObstacle(); }
     P.buf -= dt; P.land -= dt;
     if (P.buf > 0 && P.ground){
       P.vy = -(P.sockT > 0 ? 460 : 330); P.ground = false; P.buf = 0; sfx.jump(); dust(P.x-2, GY-1, 6);
@@ -1815,7 +1818,7 @@ function update(dt){
     obs = obs.filter(o => !o.smashed);
     for (const f of flyers){
       if (f.ko) continue;
-      const S = FLY_SPECS[f.sp], fy = flyerY(f);
+      const S = FLY_SPECS[f.sp], fy = f.y0;
       if (Math.abs(f.x - P.x) < S.hw + 7 && fy + S.hh > P.y - 46 && fy - S.hh < P.y - 2){
         if (f.sp !== 'shuttle' && !P.ground && P.vy > 40 && P.y < fy + 3){ stomp(f, fy); continue; }
         if (fireT > 0 || graceT > 0){ f.gone = true; debris.push({ img: f.sp === 'shuttle' ? SHUTTLE : FLY_FR[f.sp][1], x: f.x - S.w/2, y: fy - S.h/2, vx: 220, vy: -260, rot: 0, vr: 14 }); sfx.smash(); }
