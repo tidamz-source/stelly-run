@@ -1368,7 +1368,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.32';
+const APP_VERSION = '5.33';
 // le record repart de zéro à chaque nouvelle version déployée
 try { if (localStorage.getItem('stellyrun_best_ver') !== APP_VERSION){ localStorage.setItem('stellyrun_best_ver', APP_VERSION); localStorage.setItem('stellyrun_best', '0'); best = 0; } } catch(e){}
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
@@ -1425,7 +1425,7 @@ const TROPHIES = [
   ['marmotte', 'Ça va la marmotte ?', 'Se faire mordre par une marmotte'],
   ['combo10', 'Super Combo', 'Attraper 10 disques d’affilée'],
   ['plumes', 'Voler dans les plumes', 'Assommer 5 oiseaux en 1 partie'],
-  ['mains', 'Sans les mains', 'Faire 1 000 points sans attraper de disque'],
+  ['mains', 'Turn Over', 'Laisser filer 25 frisbees en une partie'],
   ['requin', 'Les dents de la mer', 'Voir le requin sauter 10 fois'],
   ['deer', 'Oh my deer', 'Croiser la biche et le cerf'],
   ['globe', 'Globe Trotter', 'Avoir vu tous les terrains'],
@@ -1459,7 +1459,7 @@ const TR = (() => {
   const KEY = 'stellyrun_trophies';
   const d = { u:{}, s:{}, games:0, discs:0, sharks:0, th:0, birds:0, rbMiss:0, rb:0, deer:0, deaths:0 };
   try { const j = JSON.parse(localStorage.getItem(KEY)); if (j && typeof j === 'object') Object.assign(d, j); } catch(e){}
-  let g = { socks:0, fires:0, smash:0, stomps:0, fire:false };
+  let g = { socks:0, fires:0, smash:0, stomps:0, fire:false, miss:0 };
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch(e){} };
   function unlock(id){
     if (d.u[id]) return; d.u[id] = Date.now();
@@ -1475,7 +1475,7 @@ const TR = (() => {
     // frisbee arc-en-ciel : une seule chance par partie (1/300), la probabilité grimpe à chaque partie sans l'attraper (pitié), plafonnée à 5 %
     rainbowAt(){ const p = Math.min(.05, (1/300)*(1 + d.rbMiss/100)); d.rbMiss++; return Math.random() < p ? 8 + Math.random()*30 : -1; },
     rainbow(){ d.rb++; d.rbMiss = 0; unlock('rainbow'); save(); },
-    start(){ g = { socks:0, fires:0, smash:0, stomps:0, fire:false }; d.games++; d.th |= 1; for (const [n, id] of GAMES) if (d.games >= n) unlock(id); save(); },
+    start(){ g = { socks:0, fires:0, smash:0, stomps:0, fire:false, miss:0 }; d.games++; d.th |= 1; for (const [n, id] of GAMES) if (d.games >= n) unlock(id); save(); },
     zone(n){ d.th |= 1 << n; if (ZONES[n]) unlock(ZONES[n]); if ((d.th & 127) === 127) unlock('globe'); },
     disc(){
       d.discs++;
@@ -1486,8 +1486,9 @@ const TR = (() => {
     die(kind){ if (t < 5) unlock('pasdebol'); if (kind === 'mole' || kind === 'hole') unlock('taupe'); if (kind === 'crab') unlock('crabe'); if (kind === 'marmot') unlock('marmotte');
       const i = DEATH_KINDS.indexOf(kind); if (i >= 0){ d.deaths |= 1 << i; if (d.deaths === (1 << DEATH_KINDS.length) - 1) unlock('cascadeuse'); } save(); },
     deer(kind){ d.deer |= kind === 'stag' ? 2 : 1; if (d.deer === 3) unlock('deer'); },
-    tick(){ if (fireT > 0 && P.sockT > 0) unlock('heros'); if (score >= 1000 && discCount === 0) unlock('mains'); if (score >= 10000 && !g.fire) unlock('intouchable'); },
+    tick(){ if (fireT > 0 && P.sockT > 0) unlock('heros'); if (score >= 10000 && !g.fire) unlock('intouchable'); },
     sock(){ if (++g.socks >= 4) unlock('elfe'); },
+    miss(){ if (++g.miss >= 25) unlock('mains'); },
     fire(){ g.fire = true; if (++g.fires >= 3) unlock('hydrate'); },
     smash(){ if (++g.smash >= 20) unlock('bulldozer'); },
     stomp(sp, tier){ if (++g.stomps >= 5) unlock('plumes'); if (tier === 2) unlock('voltige');
@@ -1546,7 +1547,7 @@ function buildTrophyIcons(){
   for (const [id, n] of [['amateur','5'],['junior','10'],['senior','50'],['master','100'],['gmaster','250'],['legende','500'],['accro','1000']]) ic(id, g => { star(g); num(g, n); });
   for (const [id, n] of [['combo5','x5'],['combo10','x10'],['combo50','x50'],['combo100','x100']]) ic(id, g => { put(g, DISC, 16, 13); num(g, n); });
   ic('huck', g => { put(g, DISC, 16, 13); num(g, '150'); });
-  ic('mains', g => { put(g, DISC, 16, 16); forbid(g); });
+  ic('mains', g => { put(g, DISC, 18, 11); g.fillStyle = C.purpleL; for (const [x, y, w] of [[0,8,4],[1,11,3],[0,14,4]]) g.fillRect(x, y, w, 1); num(g, '25'); });
   ic('gym', g => put(g, SHUTTLE, 16, 16, 2));
   ic('beach', g => { g.fillStyle = C.plum; g.fillRect(2, 27, 28, 1); shade(g, 32, 32, (x, y) => ((x+.5-26)**2 + (y+.5-6)**2) <= 18, { base:C.yellow, out:C.plum, dark:C.orange, light:C.yellowL }); put(g, CASTLE, 12, 17); });
   ic('city', g => put(g, CHANTIER, 16, 16));
@@ -1804,7 +1805,7 @@ function update(dt){
   if (state !== 'title'){
     if (state === 'play') dist += dx;
     for (const o of obs){ o.x -= dx; if (o.leapT !== undefined) o.leapT += dt; } for (const o of discs) o.x -= dx; for (const o of items) o.x -= dx;
-    obs = obs.filter(o => o.x + o.w > -30); for (const o of discs) if (!o.got && !o.missed && o.x < P.x - 20 && state === 'play'){ o.missed = true; streak = 0; }
+    obs = obs.filter(o => o.x + o.w > -30); for (const o of discs) if (!o.got && !o.missed && o.x < P.x - 20 && state === 'play'){ o.missed = true; streak = 0; TR.miss(); }
     discs = discs.filter(o => o.x > -30 && !o.got); items = items.filter(o => o.x > -30 && !o.got);
   }
 
