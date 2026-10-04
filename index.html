@@ -1436,7 +1436,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.35';
+const APP_VERSION = '5.36';
 // le record repart de zéro à chaque nouvelle version déployée
 try { if (localStorage.getItem('stellyrun_best_ver') !== APP_VERSION){ localStorage.setItem('stellyrun_best_ver', APP_VERSION); localStorage.setItem('stellyrun_best', '0'); best = 0; } } catch(e){}
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
@@ -1743,9 +1743,9 @@ function applyEquip(){
 }
 function shopIcon(it){
   if (it.iconImg) return it.iconImg;
-  const c = mk(SW, SH + PAD); paintStelly(Object.assign(c, { opt: RUN[0].opt }), { [it.slot]: it });
-  const [ax, ay] = SHOP_ANCHOR[it.slot];
-  return mk(32, 32, g => g.drawImage(c, 16 - ax, 16 - ay - PAD));
+  // vignette : l'objet seul, centré, agrandi d'un facteur entier s'il est petit
+  const im = it.img, k = Math.max(1, Math.floor(28 / Math.max(im.width, im.height))), w = im.width*k, h = im.height*k;
+  return mk(32, 32, g => g.drawImage(im, (32 - w) >> 1, (32 - h) >> 1, w, h));
 }
 // chargement des images puis application de l'équipement sauvegardé
 Promise.all(SHOP.map(it => new Promise(res => {
