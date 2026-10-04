@@ -1443,7 +1443,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.39';
+const APP_VERSION = '5.40';
 // le record repart de zéro à chaque nouvelle version déployée
 try { if (localStorage.getItem('stellyrun_best_ver') !== APP_VERSION){ localStorage.setItem('stellyrun_best_ver', APP_VERSION); localStorage.setItem('stellyrun_best', '0'); best = 0; } } catch(e){}
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
@@ -1488,6 +1488,8 @@ const TROPHIES = [
   ['taupe', 'Taupe niveau', 'Tomber dans un trou de taupe'],
   ['amateur', 'Amateur', 'Jouer 5 parties'],
   ['combo5', 'Combo', 'Attraper 5 disques d’affilée'],
+  ['soldes', 'C’est les soldes !', 'Acheter 1 accessoire dans la boutique'],
+  ['vitrine', 'Lèche-vitrine', 'Essayer 10 articles sans les acheter'],
   ['gym', 'Lippman', 'Atteindre le gymnase'],
   ['beach', 'It’s Britney Beach', 'Atteindre la plage'],
   ['city', 'Catch in the city', 'Atteindre la ville'],
@@ -1509,6 +1511,9 @@ const TROPHIES = [
   ['senior', 'Sénior', 'Jouer 50 parties'],
   ['heros', 'Super héros', 'Avoir les deux pouvoirs en même temps'],
   ['voltige', 'Haute voltige', 'Assommer un oiseau en position haute'],
+  ['fashion', 'Fashion victim', 'Porter 4 accessoires en même temps'],
+  ['cendrillon', 'Cendrillon', 'Faire 3 000 points en talons'],
+  ['tetedure', 'Tête dure', 'Assommer 10 oiseaux en portant le casque'],
   ['combo50', 'Méga Combo', 'Attraper 50 disques d’affilée'],
   ['master', 'Master', 'Jouer 100 parties'],
   ['huck', 'Huck', 'Attraper 150 disques en une partie'],
@@ -1516,9 +1521,13 @@ const TROPHIES = [
   ['bulldozer', 'Bulldozer', 'Renverser 20 obstacles en 1 partie'],
   ['hydrate', 'Bien hydraté', 'Boire 3 gourdes en 1 partie'],
   ['argent', 'Handler d’argent', '5 000 frisbees catchés'],
+  ['picsou', 'Picsou', 'Avoir 5 000 disques de côté'],
+  ['chapelier', 'Chapelier fou', 'Posséder tous les chapeaux'],
   ['gmaster', 'Grand Master', 'Jouer 250 parties'],
   ['combo100', 'Giga Combo', 'Attraper 100 disques d’affilée'],
   ['or', 'Handler d’or', '10 000 frisbees catchés'],
+  ['prada', 'Stelly s’habille en Prada', 'Dépenser 10 000 disques dans la boutique'],
+  ['dressing', 'Vide-Dressing', 'Posséder tous les articles de la boutique'],
   ['intouchable', 'Intouchable', 'Faire 10 000 points sans utiliser l’invincibilité'],
   ['cascadeuse', 'Cascadeuse', 'Mourir de toutes les façons possibles'],
   ['legende', 'Légende', 'Jouer 500 parties'],
@@ -1532,7 +1541,7 @@ const BIRD_KINDS = ['pigeon', 'gull', 'eagle', 'owl', 'crow'];
 const DEATH_KINDS = ['hit', 'slip', 'hole', 'mole', 'crab', 'marmot', 'sewer', 'stump', 'bale', 'pigeon', 'gull', 'eagle', 'owl', 'crow', 'shuttle'];
 const TR = (() => {
   const KEY = 'stellyrun_trophies';
-  const d = { u:{}, s:{}, games:0, discs:0, sharks:0, th:0, birds:0, rbMiss:0, rb:0, deer:0, deaths:0, own:{}, eq:{} };
+  const d = { u:{}, s:{}, games:0, discs:0, sharks:0, th:0, birds:0, rbMiss:0, rb:0, deer:0, deaths:0, own:{}, eq:{}, spent:0, tried:{}, helmet:0 };
   try { const j = JSON.parse(localStorage.getItem(KEY)); if (j && typeof j === 'object') Object.assign(d, j); } catch(e){}
   if (typeof d.coins !== 'number') d.coins = d.discs;   // monnaie de la boutique : frisbees attrapés (rétroactif)
   let g = { socks:0, fires:0, smash:0, stomps:0, fire:false, miss:0 };
@@ -1550,11 +1559,11 @@ const TR = (() => {
     seen(id){ if (!d.u[id] || d.s[id]) return; d.s[id] = 1; save(); refreshTrophyBadge(); },
     // frisbee arc-en-ciel : une seule chance par partie (1/300), la probabilité grimpe à chaque partie sans l'attraper (pitié), plafonnée à 5 %
     rainbowAt(){ const p = Math.min(.05, (1/300)*(1 + d.rbMiss/100)); d.rbMiss++; return Math.random() < p ? 8 + Math.random()*30 : -1; },
-    rainbow(){ d.rb++; d.coins += 100; d.rbMiss = 0; unlock('rainbow'); save(); },
+    rainbow(){ d.rb++; d.coins += 100; if (d.coins >= 5000) unlock('picsou'); d.rbMiss = 0; unlock('rainbow'); save(); },
     start(){ g = { socks:0, fires:0, smash:0, stomps:0, fire:false, miss:0 }; d.games++; d.th |= 1; for (const [n, id] of GAMES) if (d.games >= n) unlock(id); save(); },
     zone(n){ d.th |= 1 << n; if (ZONES[n]) unlock(ZONES[n]); if ((d.th & 127) === 127) unlock('globe'); },
     disc(){
-      d.discs++; d.coins++;
+      d.discs++; d.coins++; if (d.coins >= 5000) unlock('picsou');
       if (streak >= 5) unlock('combo5'); if (streak >= 10) unlock('combo10'); if (streak >= 50) unlock('combo50'); if (streak >= 100) unlock('combo100');
       if (discCount >= 150) unlock('huck');
       if (d.discs >= 1000) unlock('bronze'); if (d.discs >= 5000) unlock('argent'); if (d.discs >= 10000) unlock('or');
@@ -1562,13 +1571,18 @@ const TR = (() => {
     die(kind){ if (t < 5) unlock('pasdebol'); if (kind === 'mole' || kind === 'hole') unlock('taupe'); if (kind === 'crab') unlock('crabe'); if (kind === 'marmot') unlock('marmotte');
       const i = DEATH_KINDS.indexOf(kind); if (i >= 0){ d.deaths |= 1 << i; if (d.deaths === (1 << DEATH_KINDS.length) - 1) unlock('cascadeuse'); } save(); },
     deer(kind){ d.deer |= kind === 'stag' ? 2 : 1; if (d.deer === 3) unlock('deer'); },
-    tick(){ if (fireT > 0 && P.sockT > 0) unlock('heros'); if (score >= 10000 && !g.fire) unlock('intouchable'); },
+    tick(){ if (score >= 3000 && EQUIPPED.shoes && EQUIPPED.shoes.id === 'shoes-heels') unlock('cendrillon'); if (fireT > 0 && P.sockT > 0) unlock('heros'); if (score >= 10000 && !g.fire) unlock('intouchable'); },
     sock(){ if (++g.socks >= 4) unlock('elfe'); },
     miss(){ if (++g.miss >= 25) unlock('mains'); },
     fire(){ g.fire = true; if (++g.fires >= 3) unlock('hydrate'); },
     smash(){ if (++g.smash >= 20) unlock('bulldozer'); },
-    stomp(sp, tier){ if (++g.stomps >= 5) unlock('plumes'); if (tier === 2) unlock('voltige');
+    stomp(sp, tier){ if (++g.stomps >= 5) unlock('plumes'); if (EQUIPPED.hat && EQUIPPED.hat.id === 'hat-casque' && ++d.helmet >= 10) unlock('tetedure'); if (tier === 2) unlock('voltige');
       const i = BIRD_KINDS.indexOf(sp); if (i >= 0){ d.birds |= 1 << i; if ((d.birds & 31) === 31) unlock('angry'); save(); } },
+    // boutique
+    bought(it){ d.spent += it.price; unlock('soldes'); if (d.spent >= 10000) unlock('prada');
+      const all = SHOP.filter(x => x.img); if (all.filter(x => x.slot === 'hat').every(x => d.own[x.id])) unlock('chapelier'); if (all.every(x => d.own[x.id])) unlock('dressing'); save(); },
+    tried(it){ if (d.own[it.id] || d.tried[it.id]) return; d.tried[it.id] = 1; if (Object.keys(d.tried).length >= 10) unlock('vitrine'); save(); },
+    worn(){ if (SHOP_SLOTS.every(sl => EQUIPPED[sl])) unlock('fashion'); },
     shark(){ if (++d.sharks >= 10) unlock('requin'); }
   };
 })();
@@ -1654,6 +1668,23 @@ function buildTrophyIcons(){
   ic('hydrate', g => { put(g, BOTTLE, 14, 15); num(g, '3'); });
   ic('intouchable', g => { put(g, BOTTLE, 16, 16); forbid(g); });
   ic('rainbow', g => { put(g, RBDISC, 16, 17); g.fillStyle = C.white; for (const [x, y] of [[4,5],[27,6],[25,27],[7,26],[16,4]]){ g.fillRect(x, y-1, 1, 3); g.fillRect(x-1, y, 3, 1); } });
+  const SI = id => { const it = SHOP.find(x => x.id === id); return it && it.img ? it : null; };
+  const BAG = ['....ooooo....','...oo...oo...','...o.....o...','ooooooooooooo','oLppppppppPdo','oLppppppppPdo','oLppYYYYppPdo','oLpYoooYYpPdo','oLppYYYYppPdo','oLppppppppPdo','oddddddddddddo'.slice(0,13),'ooooooooooooo'];
+  const BAGC = map(BAG, { L:C.purpleL, p:C.purple, P:C.purpleD, d:C.purpleD, Y:C.yellow });
+  const sparkle = (g, pts, col) => { g.fillStyle = col || C.white; for (const [x, y] of pts){ g.fillRect(x, y-1, 1, 3); g.fillRect(x-1, y, 3, 1); } };
+  ic('soldes', g => { put(g, BAGC, 14, 19, 2); g.fillStyle = C.plum; g.fillRect(19, 0, 13, 9); g.fillStyle = C.red; g.fillRect(20, 1, 11, 7); g.fillStyle = C.white; ['oo..o','oo.o.','..o..','.o.oo','o..oo'].forEach((r, y) => [...r].forEach((ch, x) => { if (ch === 'o') g.fillRect(23 + x, 2 + y, 1, 1); })); });
+  ic('vitrine', g => { g.fillStyle = C.plum; g.fillRect(2, 5, 28, 22); g.fillStyle = '#BFE6F5'; g.fillRect(4, 7, 24, 18); g.fillStyle = C.white; for (let k=0;k<5;k++) g.fillRect(6+k, 9+k, 1, 1);
+    const it = SI('glasses-coeur'); if (it) put(g, it.img, 16, 17); });
+  ic('fashion', g => { const eq = {}; for (const id of ['hat-casquette_bleue','glasses-sun1','shirt-violet','shoes-basket_bleu']){ const it = SI(id); if (it) eq[it.slot] = it; }
+    const c = mk(SW, SH + PAD); paintStelly(Object.assign(c, { opt: RUN[0].opt }), eq); drawHat(c.getContext('2d'), c, 0, 0, eq.hat, 0);
+    g.drawImage(c, 16 - 33, 16 - 14 - PAD); num(g, '4'); });
+  ic('cendrillon', g => { const it = SI('shoes-heels'); if (it) put(g, it.img, 16, 17, it.img.width <= 16 ? 2 : 1); sparkle(g, [[6,7],[25,6],[27,25],[6,25]]); });
+  ic('tetedure', g => { const it = SI('hat-casque'); if (it) put(g, it.img, 15, 13); stars3(g, 15, 27); num(g, '10'); });
+  ic('picsou', g => { for (const [x, y] of [[2,26],[11,26],[20,26],[6,21],[15,21],[10,16],[10,11]]) g.drawImage(COIN, x, y); put(g, COIN, 23, 10, 2); sparkle(g, [[4,6],[29,22]], C.yellow); });
+  ic('chapelier', g => { const a = SI('hat-sorcier'), b = SI('hat-bonnet'); if (b) put(g, b.img, 9, 25); if (a) put(g, a.img, 18, 13); });
+  ic('prada', g => { const it = SI('shoes-heels'); if (it) put(g, it.img, 16, 11); for (const [x, y] of [[3,24],[11,26],[19,24],[7,20],[15,21]]) g.drawImage(COIN, x, y); sparkle(g, [[27,22],[27,4]], C.yellow); });
+  ic('dressing', g => { g.fillStyle = C.plum; g.fillRect(15, 0, 2, 3); for (let k=0;k<6;k++){ g.fillRect(15-k*2, 3+k, 2, 1); g.fillRect(15+k*2, 3+k, 2, 1); } g.fillRect(4, 9, 24, 1);
+    const it = SI('shirt-collector'); if (it && it.iconImg) g.drawImage(it.iconImg, 4, 7, 24, 24); });
   ic('greatest', g => { put(g, CUP, 16, 17, 2); g.fillStyle = C.white; for (const [x, y] of [[3,4],[28,8],[5,26]]){ g.fillRect(x, y-1, 1, 3); g.fillRect(x-1, y, 3, 1); } });
   return I;
 }
@@ -1755,7 +1786,7 @@ const SHOP = SHOP_DATA.filter(it => !it.pose).map(it => {
 const shopItem = id => SHOP.find(it => it.id === id);
 function applyEquip(){
   const eq = {}; for (const sl of SHOP_SLOTS){ const it = shopItem(TR.d.eq[sl]); if (it && it.img) eq[sl] = it; }
-  EQUIPPED = eq; repaintStelly();
+  EQUIPPED = eq; repaintStelly(); TR.worn();
 }
 function shopIcon(it){
   if (it.iconImg) return it.iconImg;
@@ -1776,7 +1807,7 @@ Promise.all(SHOP.map(it => new Promise(res => {
     if (it.iconSrc) load(it.iconSrc, x => { const k = Math.max(1, Math.floor(28 / Math.max(x.width, x.height))); it.iconImg = mk(32, 32, g => g.drawImage(x, (32 - x.width*k) >> 1, (32 - x.height*k) >> 1, x.width*k, x.height*k)); });
     Promise.all(extra).then(res);
   }; im.onerror = res; im.src = it.src;
-}))).then(() => { for (const it of SHOP) if (it.img) it.ico = shopIcon(it); applyEquip(); });
+}))).then(() => { for (const it of SHOP) if (it.img) it.ico = shopIcon(it); applyEquip(); if (TR.d.coins >= 5000) TR.unlock('picsou'); });
 
 const shopUI = (() => {
   const page = $('shop'), grid = $('shgrid'), bub = $('shbub'), buy = $('shbuy'), prev = $('shprev'), pctx = prev.getContext('2d');
@@ -1807,7 +1838,7 @@ const shopUI = (() => {
   }
   function hideBubble(){ bub.hidden = true; cur = null; if (tryId){ tryId = null; setPreview(); } }
   function showBubble(el, it){
-    cur = it; tryId = it.id; setPreview(); const miss = it.price - coins();
+    cur = it; tryId = it.id; setPreview(); TR.tried(it); const miss = it.price - coins();
     bub.querySelector('b').textContent = it.name;
     bub.querySelector('span').textContent = miss > 0 ? 'Il te manque ' + miss + ' frisbees' : it.price + ' frisbees';
     buy.disabled = miss > 0; buy.textContent = 'Acheter';
@@ -1821,7 +1852,7 @@ const shopUI = (() => {
   function wear(it){ if (TR.d.eq[it.slot] === it.id) delete TR.d.eq[it.slot]; else TR.d.eq[it.slot] = it.id; TR.save(); applyEquip(); tryId = null; setPreview(); sfx.jump(); render(); }
   function purchase(){
     const it = cur; if (!it || coins() < it.price || TR.d.own[it.id]) return;
-    TR.d.coins -= it.price; TR.d.own[it.id] = 1; TR.d.eq[it.slot] = it.id; TR.save(); applyEquip(); tryId = null; setPreview(); sfx.sock(); render();
+    TR.d.coins -= it.price; TR.d.own[it.id] = 1; TR.d.eq[it.slot] = it.id; TR.save(); applyEquip(); TR.bought(it); tryId = null; setPreview(); sfx.sock(); render();
   }
   function loop(){ if (!isOpen) return; const f = PFR[Math.floor(performance.now()/62) % RUN_N]; pctx.clearRect(0, 0, prev.width, prev.height); pctx.drawImage(f, 0, prev.height - f.height); drawHat(pctx, f, 0, prev.height - f.height, pHat, performance.now()/1000); raf = requestAnimationFrame(loop); }
   function open(){
