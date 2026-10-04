@@ -250,6 +250,50 @@ body{
 @keyframes bub{ from{ opacity:0; transform:scale(.6); } }
 @media (prefers-reduced-motion: reduce){ #trophies, #trophies.open{ transition-duration:.01s; } #trgrid.l, #trgrid.r, .tr .trstar, #trbub, #trbadge{ animation:none; } }
 
+/* ----- Boutique ----- */
+#shopbtn{ position:absolute; top:0; height:100%; right:calc(100% + var(--s)*7px); aspect-ratio:1; padding:0; display:flex; align-items:center; justify-content:center; }
+#shopbtn canvas{ height:calc(var(--s)*12px); width:auto; image-rendering:pixelated; display:block; margin-top:calc(var(--s)*-.5px); }
+#shop{ position:absolute; inset:0; z-index:30; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:calc(var(--s)*5px);
+  background:repeating-linear-gradient(135deg, rgba(255,255,255,.035) 0 calc(var(--s)*6px), transparent 0 calc(var(--s)*12px)), var(--plum);
+  border-bottom:calc(var(--s)*2px) solid var(--yellow); box-shadow:0 calc(var(--s)*3px) 0 rgba(0,0,0,.35);
+  transform:translateY(calc(-100% - var(--s)*6px)); transition:transform .45s cubic-bezier(.6,0,.4,1); touch-action:none; }
+#shop.open{ transform:none; transition:transform .55s cubic-bezier(.25,1.25,.45,1); }
+#shcoins{ display:flex; align-items:center; gap:calc(var(--s)*2px); font-family:var(--num); font-size:max(calc(var(--s)*5px),9px); color:var(--white); }
+#shcoins canvas{ height:calc(var(--s)*5px); width:auto; image-rendering:pixelated; }
+#shclose{ position:absolute; top:calc(var(--s)*7px); right:calc(var(--s)*9px); font-size:max(calc(var(--s)*7px),12px); padding:calc(var(--s)*1.5px) calc(var(--s)*5px) calc(var(--s)*2px); }
+.shbody{ display:flex; align-items:center; gap:calc(var(--s)*9px); }
+.shprev{ width:calc(var(--s)*70px); height:calc(var(--s)*92px); display:flex; align-items:flex-end; justify-content:center; padding-bottom:calc(var(--s)*3px); box-sizing:border-box;
+  background:linear-gradient(#FFF4D6 0 78%, #EBD8A6 78%); border:calc(var(--s)*1.5px) solid var(--plum); border-radius:calc(var(--s)*3px); box-shadow:0 calc(var(--s)*2px) 0 rgba(0,0,0,.4); }
+.shprev canvas{ width:calc(var(--s)*64px); height:calc(var(--s)*80px); image-rendering:pixelated; }
+.shright{ display:flex; flex-direction:column; gap:calc(var(--s)*5px); }
+.shtabs{ display:flex; gap:calc(var(--s)*3px); }
+.shtab{ font-family:inherit; font-weight:700; font-size:max(calc(var(--s)*5.5px),10px); padding:calc(var(--s)*1.5px) calc(var(--s)*4px); cursor:pointer;
+  background:#5C3D63; color:var(--purple-l); border:calc(var(--s)*1px) solid var(--plum); border-radius:calc(var(--s)*2px); }
+.shtab.on{ background:var(--yellow); color:var(--plum); }
+.shtab:focus-visible{ outline:calc(var(--s)*1px) dashed var(--yellow); outline-offset:1px; }
+#shgrid{ display:grid; grid-template-columns:repeat(5, calc(var(--s)*38px)); grid-template-rows:repeat(2, calc(var(--s)*38px)); gap:calc(var(--s)*7px) calc(var(--s)*5px); }
+#shgrid .empty{ grid-column:1 / -1; grid-row:1 / -1; align-self:center; text-align:center; color:var(--purple-l); font-weight:700; font-size:max(calc(var(--s)*6px),11px); }
+.tr .price{ position:absolute; bottom:calc(var(--s)*-5px); left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:calc(var(--s)*1px); white-space:nowrap;
+  padding:calc(var(--s)*.6px) calc(var(--s)*2px); background:var(--plum); border-radius:calc(var(--s)*2px); font-family:var(--num); font-size:max(calc(var(--s)*3.6px),7px); color:var(--yellow); }
+.tr .price.no{ color:#FF8A8A; }
+.tr .price canvas{ width:auto; height:calc(var(--s)*3.5px); image-rendering:pixelated; }
+.tr.worn{ background:var(--yellow-l); box-shadow:inset 0 0 0 calc(var(--s)*1px) var(--orange), 0 calc(var(--s)*2px) 0 rgba(0,0,0,.4); }
+.tr .check{ position:absolute; top:calc(var(--s)*-4px); right:calc(var(--s)*-4px); width:calc(var(--s)*9px); height:calc(var(--s)*9px); border-radius:50%;
+  background:#3FB950; border:calc(var(--s)*1px) solid var(--plum); display:flex; align-items:center; justify-content:center; }
+.tr .check::after{ content:''; width:calc(var(--s)*2.2px); height:calc(var(--s)*4px); border:solid var(--white); border-width:0 calc(var(--s)*1px) calc(var(--s)*1px) 0; transform:translateY(calc(var(--s)*-.5px)) rotate(45deg); }
+#shbub{ position:absolute; z-index:2; max-width:calc(var(--s)*130px); padding:calc(var(--s)*3px) calc(var(--s)*5px) calc(var(--s)*4px);
+  background:var(--white); color:var(--plum); border:calc(var(--s)*1.5px) solid var(--plum); border-radius:calc(var(--s)*3px);
+  box-shadow:0 calc(var(--s)*2px) 0 rgba(0,0,0,.35); animation:bub .25s cubic-bezier(.3,1.6,.5,1) both; text-align:center; }
+#shbub b{ display:block; font-weight:700; font-size:max(calc(var(--s)*7px),12px); line-height:1.1; }
+#shbub span{ display:block; margin:calc(var(--s)*1.5px) 0 calc(var(--s)*2.5px); font-weight:500; font-size:max(calc(var(--s)*5px),10px); }
+#shbub .btn{ font-size:max(calc(var(--s)*6.5px),11px); padding:calc(var(--s)*1.5px) calc(var(--s)*6px) calc(var(--s)*2px); animation:none; }
+#shbub .btn:disabled{ filter:grayscale(1); opacity:.6; cursor:default; }
+#shbub::after{ content:''; position:absolute; left:var(--tx,50%); width:calc(var(--s)*5px); height:calc(var(--s)*5px); background:var(--white);
+  border:calc(var(--s)*1.5px) solid var(--plum); border-width:0 calc(var(--s)*1.5px) calc(var(--s)*1.5px) 0; transform:translateX(-50%) rotate(45deg); }
+#shbub.up::after{ bottom:calc(var(--s)*-3.7px); }
+#shbub.down::after{ top:calc(var(--s)*-3.7px); transform:translateX(-50%) rotate(-135deg); }
+@media (prefers-reduced-motion: reduce){ #shop, #shop.open{ transition-duration:.01s; } #shbub{ animation:none; } }
+
 @media (prefers-reduced-motion: reduce){
   #title *, .panel, #toast.show{ animation-duration:.01s; animation-delay:0s; }
 }
@@ -273,7 +317,7 @@ body{
     <div id="title" class="screen">
       <p class="at presents">Lutèce Games presents</p>
       <div class="at ribbon"><h1>Stelly Run</h1></div>
-      <div class="at cta"><div class="ctarow"><button id="start" class="btn">Start</button>
+      <div class="at cta"><div class="ctarow"><button id="shopbtn" class="btn alt" aria-label="Boutique"><canvas id="icoShop"></canvas></button><button id="start" class="btn">Start</button>
 <button id="trobtn" class="btn alt" aria-label="Trophées"><canvas id="icoTrophy"></canvas><span id="trbadge" class="trstar" hidden><svg viewBox="0 0 24 24"><polygon points="12,1.5 14.9,8.6 22.5,9.2 16.7,14.2 18.5,21.6 12,17.6 5.5,21.6 7.3,14.2 1.5,9.2 9.1,8.6"/></svg><b></b></span></button></div></div>
       <div class="at legend"><div>
         <span><canvas id="icoDisc"></canvas>Points</span>
@@ -308,6 +352,20 @@ body{
     <div id="soundmenu" hidden role="group" aria-label="Réglages du son">
       <button id="tgMusic" class="tg" aria-pressed="true"><span>Musique</span><b></b></button>
       <button id="tgSfx" class="tg" aria-pressed="true"><span>Effets</span><b></b></button>
+    </div>
+    <div id="shop" hidden role="dialog" aria-modal="true" aria-label="Boutique">
+      <div class="trhead"><h2>Boutique</h2><span id="shcoins"><canvas class="icoCoin"></canvas><b>0</b></span></div>
+      <button id="shclose" class="btn alt">Fermer</button>
+      <div class="shbody">
+        <div class="shprev"><canvas id="shprev" width="64" height="80"></canvas></div>
+        <div class="shright">
+          <div class="shtabs">
+            <button class="shtab" data-slot="hat">Chapeaux</button><button class="shtab" data-slot="glasses">Lunettes</button><button class="shtab" data-slot="shirt">T-shirts</button><button class="shtab" data-slot="shoes">Chaussures</button>
+          </div>
+          <div id="shgrid"></div>
+        </div>
+      </div>
+      <div id="shbub" hidden><b></b><span></span><button id="shbuy" class="btn">Acheter</button></div>
     </div>
     <div id="trophies" hidden role="dialog" aria-modal="true" aria-label="Trophées">
       <div class="trhead"><h2>Trophées</h2><span id="trcount"></span></div>
@@ -402,7 +460,7 @@ const WING2 = ['............','............','......oooo..','..oooowwwwo.','.oww
 const SW = 64, SH = 56, CX = 32, CY = 18, GROUND_Y = 45, FB = 52; // FB : bas des baskets
 
 function drawStelly(g, o){
-  const oy = o.oy || 0, cx = CX, cy = CY + (o.bob || 0) + oy, tilt = o.tilt || 0;
+  const eq = o.eq || {}, oy = o.oy || 0, cx = CX, cy = CY + (o.bob || 0) + oy, tilt = o.tilt || 0;
   const pts = []; for (let i=0;i<10;i++){ const a = -Math.PI/2 + i*Math.PI/5 + tilt, rad = i%2 ? 8.2 : 15; pts.push([cx + Math.cos(a)*rad, cy + Math.sin(a)*rad]); }
   const Wd = g.canvas.width, Hd = g.canvas.height, grid = new Uint8Array(Wd*Hd);
   for (let y=0;y<Hd;y++) for (let x=0;x<Wd;x++){ const px = x+.5, py = y+.5;
@@ -422,7 +480,7 @@ function drawStelly(g, o){
   const leg = (i, L, far) => {
     const a = [Math.round(L[0]), Math.round(L[1] + oy)], hp = hips[i], kn = ik(hp[0], hp[1], a[0], a[1], 9, 9, 1);
     thick(g, hp[0], hp[1], kn[0], kn[1], C.plum); thick(g, kn[0], kn[1], a[0], a[1], C.plum);
-    pm(g, SHOE, a[0]-3, a[1]-1, false, far ? PAL_FAR : PAL); ank[i] = a;
+    const sh = eq.shoes; if (sh) g.drawImage(far ? sh.far : sh.img, a[0] + sh.dx, a[1] + sh.dy); else pm(g, SHOE, a[0]-3, a[1]-1, false, far ? PAL_FAR : PAL); ank[i] = a;
   };
   arm(o.swap ? 1 : 0, o.arms[o.swap ? 1 : 0]);
   leg(0, o.legs[0], true); leg(1, o.legs[1], false);
@@ -437,17 +495,26 @@ function drawStelly(g, o){
     g.fillStyle = col; g.fillRect(x,y,1,1); }
   // petits reflets brillants sur les pointes hautes
   g.fillStyle = C.white; [[pts[0][0]+1, pts[0][1]+3],[pts[2][0]-3, pts[2][1]+1]].forEach(([a,b]) => { if (In(Math.round(a),Math.round(b))) g.fillRect(Math.round(a), Math.round(b), 1, 1); });
-  // visage
+  // t-shirt : sur le corps, sous le visage
+  if (eq.shirt) g.drawImage(eq.shirt.img, cx + eq.shirt.dx, cy + eq.shirt.dy);
+  // visage (les lunettes masquent les yeux)
   const e = o.eyes || EYE_HAPPY, ex = cx-5 + Math.round(tilt*6), ey = cy-7;
-  if (e === EYE_KO){ pm(g, e, ex, ey+1); pm(g, e, ex+6, ey+1); } else { pm(g, e, ex, ey); pm(g, e, ex+6, ey); }
+  if (!eq.glasses){ if (e === EYE_KO){ pm(g, e, ex, ey+1); pm(g, e, ex+6, ey+1); } else { pm(g, e, ex, ey); pm(g, e, ex+6, ey); } }
   g.fillStyle = C.orange; [[-3,8],[-4,9],[-2,9],[12,8],[11,9],[13,9]].forEach(([a,b]) => g.fillRect(ex+a, ey+b, 1, 1));
   g.fillStyle = '#F7A94A'; g.fillRect(ex-3, ey+9, 1, 1); g.fillRect(ex+12, ey+9, 1, 1);
   const m = o.mouth || M_GRIN; pm(g, m, ex + 6 - (m[0].length>>1), ey + 8);
+  if (eq.glasses) g.drawImage(eq.glasses.img, ex + 6 + eq.glasses.dx, ey + 3 + eq.glasses.dy);
+  if (eq.hat){ const a0 = -Math.PI/2 + tilt; g.drawImage(eq.hat.img, Math.round(cx + Math.cos(a0)*15) + eq.hat.dx, Math.round(cy + Math.sin(a0)*15) + eq.hat.dy); }
   arm(o.swap ? 0 : 1, o.arms[o.swap ? 0 : 1]);
   if (o.disc) g.drawImage(o.disc, o.arms[1].h[0] - (o.disc.width>>1), o.arms[1].h[1] + oy - o.disc.height - 1);
   return ank;
 }
-function stellyCanvas(o, h){ let ank; const c = mk(SW, h || SH, g => { ank = drawStelly(g, o); }); c.ank = ank; return c; }
+// PAD : marge au-dessus de Stelly pour les chapeaux ; tous ses canevas sont mémorisés pour être redessinés avec l'équipement porté
+const PAD = 24, STELLY_CANVASES = [];
+let EQUIPPED = {};
+function paintStelly(c, eq){ const g = c.getContext('2d'); g.clearRect(0, 0, c.width, c.height); c.ank = drawStelly(g, Object.assign({}, c.opt, { oy:(c.opt.oy || 0) + PAD, eq: eq || EQUIPPED })); }
+function stellyCanvas(o, h){ const c = mk(SW, (h || SH) + PAD); c.opt = o; paintStelly(c); STELLY_CANVASES.push(c); return c; }
+function repaintStelly(){ STELLY_CANVASES.forEach(c => paintStelly(c)); }
 const SHL = [CX-11, CY-2], SHR = [CX+11, CY-2];
 const rel = (s, dx, dy, bob) => [s[0]+dx, s[1]+dy+(bob||0)];
 
@@ -1368,7 +1435,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.33';
+const APP_VERSION = '5.34';
 // le record repart de zéro à chaque nouvelle version déployée
 try { if (localStorage.getItem('stellyrun_best_ver') !== APP_VERSION){ localStorage.setItem('stellyrun_best_ver', APP_VERSION); localStorage.setItem('stellyrun_best', '0'); best = 0; } } catch(e){}
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
@@ -1388,7 +1455,7 @@ function reset(){
   Object.assign(P, { y:GY, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, land:0, sink:false, stomps:0 });
 }
 function startGame(){
-  trUI.close(); ensureAudio(); sfx.start(); reset(); TR.start(); rbAt = TR.rainbowAt(); state = 'play'; MUSIC.tempo = MUSIC.target = 1; MUSIC.fire = false; MUSIC.play(0, true);
+  trUI.close(); shopUI.close(); ensureAudio(); sfx.start(); reset(); TR.start(); rbAt = TR.rainbowAt(); state = 'play'; MUSIC.tempo = MUSIC.target = 1; MUSIC.fire = false; MUSIC.play(0, true);
   ui.title.hidden = true; ui.over.hidden = true; ui.pause.hidden = true; ui.hud.hidden = false;
   ui.hi.textContent = 'Record ' + pad(best); ui.firebar.hidden = true; ui.sockbar.hidden = true; ui.dcount.hidden = false; $('pausebtn').hidden = false; clearTimeout(zoneTimer); $('zone').hidden = true;
   if (document.activeElement) document.activeElement.blur();
@@ -1457,8 +1524,9 @@ const BIRD_KINDS = ['pigeon', 'gull', 'eagle', 'owl', 'crow'];
 const DEATH_KINDS = ['hit', 'slip', 'hole', 'mole', 'crab', 'marmot', 'sewer', 'stump', 'bale', 'pigeon', 'gull', 'eagle', 'owl', 'crow', 'shuttle'];
 const TR = (() => {
   const KEY = 'stellyrun_trophies';
-  const d = { u:{}, s:{}, games:0, discs:0, sharks:0, th:0, birds:0, rbMiss:0, rb:0, deer:0, deaths:0 };
+  const d = { u:{}, s:{}, games:0, discs:0, sharks:0, th:0, birds:0, rbMiss:0, rb:0, deer:0, deaths:0, own:{}, eq:{} };
   try { const j = JSON.parse(localStorage.getItem(KEY)); if (j && typeof j === 'object') Object.assign(d, j); } catch(e){}
+  if (typeof d.coins !== 'number') d.coins = d.discs;   // monnaie de la boutique : frisbees attrapés (rétroactif)
   let g = { socks:0, fires:0, smash:0, stomps:0, fire:false, miss:0 };
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch(e){} };
   function unlock(id){
@@ -1474,11 +1542,11 @@ const TR = (() => {
     seen(id){ if (!d.u[id] || d.s[id]) return; d.s[id] = 1; save(); refreshTrophyBadge(); },
     // frisbee arc-en-ciel : une seule chance par partie (1/300), la probabilité grimpe à chaque partie sans l'attraper (pitié), plafonnée à 5 %
     rainbowAt(){ const p = Math.min(.05, (1/300)*(1 + d.rbMiss/100)); d.rbMiss++; return Math.random() < p ? 8 + Math.random()*30 : -1; },
-    rainbow(){ d.rb++; d.rbMiss = 0; unlock('rainbow'); save(); },
+    rainbow(){ d.rb++; d.coins += 100; d.rbMiss = 0; unlock('rainbow'); save(); },
     start(){ g = { socks:0, fires:0, smash:0, stomps:0, fire:false, miss:0 }; d.games++; d.th |= 1; for (const [n, id] of GAMES) if (d.games >= n) unlock(id); save(); },
     zone(n){ d.th |= 1 << n; if (ZONES[n]) unlock(ZONES[n]); if ((d.th & 127) === 127) unlock('globe'); },
     disc(){
-      d.discs++;
+      d.discs++; d.coins++;
       if (streak >= 5) unlock('combo5'); if (streak >= 10) unlock('combo10'); if (streak >= 50) unlock('combo50'); if (streak >= 100) unlock('combo100');
       if (discCount >= 150) unlock('huck');
       if (d.discs >= 1000) unlock('bronze'); if (d.discs >= 5000) unlock('argent'); if (d.discs >= 10000) unlock('or');
@@ -1652,6 +1720,99 @@ const trUI = (() => {
   return { open, close, go, isOpen: () => isOpen };
 })();
 refreshTrophyBadge();
+
+/* ================= Boutique ================= */
+// accessoires extraits du PSD de la boutique (calques type_nom) ; dx, dy : décalage par rapport au point d'accroche
+const SHOP_DATA = [{"id": "glasses-sun1", "slot": "glasses", "key": "sun1", "pose": null, "dx": -14, "dy": -3, "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAGCAYAAADdXo4uAAAAU0lEQVR42q2RyxIAERADtf//5zisRxR22ZJTZqpJCiSFIqANlxU9RBJl9gLubXfExllI3tVD7mfaYXkChxB5Q6Dzzu+yrJq+XMAflo8n0epfTtkE4nBd73bJNOAAAAAASUVORK5CYII=", "icon": null}, {"id": "glasses-rainbow", "slot": "glasses", "key": "rainbow", "pose": null, "dx": -11, "dy": -4, "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAICAYAAADjoT9jAAAB7UlEQVR42n2SPUhVcRjGf+//f85RSyuuRkRWt6WipY8hEkttiNCGCsKiFgfbmsJar4GrYy2uLYHRVpDRtYiGEFrEoKUhomummdeL9+Oc8zSckCtED7zD+8nzvO9r5hACMKSA0DcASAlRGoCCv37ZaIJZ1kXUgo8bxJZmcTlIs5QzwzkckQ4S6QB3T67yLD/FWu488YRIZlooqZ2xQgQOYcizSyF5dbcPc/t0lfWOIcqDR1h6DF/nQ9biLrw68eoklXAAogrA2coTLnQ8JLr6kY3egPqZ7Wywj5vj1zN2GKn9JqHEie47XFyZxl97R2PoE5XjDtvtNxWKTFGQpKklblEAg333iPYvUz8WspQ3fjVKwGU+V28Aj5BkAHJVTT+Yo/FtL7V8F7Wjy7QcamPe1/kRr5C4VkKfENdTC5r36nvWIZ8jOpejnH7nS+LYFvdQfJWAmG2iN/t+6cPAwK0FGjt+0kYnb/wq877Beq0fszmcacvFijhUS/aonOS0mLZqKnGaqAzp1FhBOJqrMzhUGO1VRaYF7dR4tU+jyy81MhkrCiKZUZT+tkkCZ5p5nQ1/LtP9tYIuPS0KhyTxL8OhF0X0Vmi4VNPIZKwrh4vyzgnol8Tm60kiDEPFabyFqBIZ/4F526ouDZHqli3G+AOh5P4xuOb/lwAAAABJRU5ErkJggg==", "icon": null}];
+const SHOP_INFO = { 'glasses-sun1': ['Lunettes de soleil', 150], 'glasses-rainbow': ['Lunettes arc-en-ciel', 500] };
+const SHOP_SLOTS = ['hat', 'glasses', 'shirt', 'shoes'];
+const SHOP_ANCHOR = { hat:[33, -4], glasses:[33, 13], shirt:[32, 19], shoes:[42, 43] };   // centre des vignettes (course-01)
+const COIN = mk(9, 5, g => pm(g, ['..ooooo..','.oWWWWWo.','oWWWyWWWo','.oOOOOOo.','..ooooo..'], 0, 0, false, Object.assign({}, PAL, { W:C.white, y:C.yellow, O:C.orange })));
+document.querySelectorAll('.icoCoin').forEach(c => { c.width = 9; c.height = 5; c.getContext('2d').drawImage(COIN, 0, 0); });
+{ const c = $('icoShop'), m = ['....ooooo....','...oo...oo...','...o.....o...','ooooooooooooo','oLppppppppPdo','oLppppppppPdo','oLppYYYYppPdo','oLpYoooYYpPdo','oLppYYYYppPdo','oLppppppppPdo','oddddddddddddo'.slice(0,13),'ooooooooooooo'];
+  c.width = 13; c.height = m.length; pm(c.getContext('2d'), m, 0, 0, false, Object.assign({}, PAL, { L:C.purpleL, p:C.purple, P:C.purpleD, d:C.purpleD, Y:C.yellow })); }
+const SHOP = SHOP_DATA.filter(it => !it.pose).map(it => {
+  const [name, price] = SHOP_INFO[it.id] || [it.key.replace(/-/g, ' '), 200];
+  return Object.assign({}, it, { name, price, img: null, far: null, ico: null });
+});
+const shopItem = id => SHOP.find(it => it.id === id);
+function applyEquip(){
+  const eq = {}; for (const sl of SHOP_SLOTS){ const it = shopItem(TR.d.eq[sl]); if (it && it.img) eq[sl] = it; }
+  EQUIPPED = eq; repaintStelly();
+}
+function shopIcon(it){
+  if (it.iconImg) return it.iconImg;
+  const c = mk(SW, SH + PAD); paintStelly(Object.assign(c, { opt: RUN[0].opt }), { [it.slot]: it });
+  const [ax, ay] = SHOP_ANCHOR[it.slot];
+  return mk(32, 32, g => g.drawImage(c, 16 - ax, 16 - ay - PAD));
+}
+// chargement des images puis application de l'équipement sauvegardé
+Promise.all(SHOP.map(it => new Promise(res => {
+  const im = new Image(); im.onload = () => {
+    it.img = mk(im.width, im.height, g => g.drawImage(im, 0, 0));
+    it.far = mk(im.width, im.height, g => { g.filter = 'brightness(.72)'; g.drawImage(im, 0, 0); });
+    if (it.icon){ const ii = new Image(); ii.onload = () => { it.iconImg = mk(32, 32, g => g.drawImage(ii, 0, 0)); res(); }; ii.onerror = res; ii.src = it.icon; } else res();
+  }; im.onerror = res; im.src = it.src;
+}))).then(() => { for (const it of SHOP) if (it.img) it.ico = shopIcon(it); applyEquip(); });
+
+const shopUI = (() => {
+  const page = $('shop'), grid = $('shgrid'), bub = $('shbub'), buy = $('shbuy'), prev = $('shprev'), pctx = prev.getContext('2d');
+  let isOpen = false, slot = 'glasses', cur = null, hideT = 0, raf = 0;
+  const coins = () => TR.d.coins;
+  function render(){
+    $('shcoins').querySelector('b').textContent = coins();
+    page.querySelectorAll('.shtab').forEach(b => b.classList.toggle('on', b.dataset.slot === slot));
+    grid.textContent = ''; hideBubble();
+    const list = SHOP.filter(it => it.slot === slot && it.ico);
+    if (!list.length){ const e = document.createElement('div'); e.className = 'empty'; e.textContent = 'Bientôt de nouveaux articles !'; grid.appendChild(e); return; }
+    for (const it of list){
+      const own = !!TR.d.own[it.id], worn = TR.d.eq[slot] === it.id, el = document.createElement('button');
+      el.className = 'tr' + (worn ? ' worn' : ''); el.dataset.id = it.id; el.setAttribute('aria-label', it.name + (own ? (worn ? ', porté' : ', possédé') : ', ' + it.price + ' frisbees'));
+      const c = document.createElement('canvas'); c.width = 32; c.height = 32; c.getContext('2d').drawImage(it.ico, 0, 0); el.appendChild(c);
+      if (worn){ const k = document.createElement('span'); k.className = 'check'; el.appendChild(k); }
+      if (!own){ const p = document.createElement('span'); p.className = 'price' + (coins() < it.price ? ' no' : ''); const cc = document.createElement('canvas'); cc.width = 9; cc.height = 5; cc.getContext('2d').drawImage(COIN, 0, 0); p.appendChild(cc); p.appendChild(document.createTextNode(it.price)); el.appendChild(p); }
+      grid.appendChild(el);
+    }
+  }
+  function hideBubble(){ bub.hidden = true; cur = null; }
+  function showBubble(el, it){
+    cur = it; const miss = it.price - coins();
+    bub.querySelector('b').textContent = it.name;
+    bub.querySelector('span').textContent = miss > 0 ? 'Il te manque ' + miss + ' frisbees' : it.price + ' frisbees';
+    buy.disabled = miss > 0; buy.textContent = 'Acheter';
+    bub.hidden = false; bub.style.animation = 'none'; void bub.offsetWidth; bub.style.animation = '';
+    const pr = page.getBoundingClientRect(), r = el.getBoundingClientRect(), bw = bub.offsetWidth, bh = bub.offsetHeight, gap = r.height*.22;
+    const cx = r.left + r.width/2 - pr.left, left = Math.max(6, Math.min(pr.width - bw - 6, cx - bw/2)), up = r.top - pr.top - bh - gap > 4;
+    bub.className = up ? 'up' : 'down'; bub.style.left = left + 'px';
+    bub.style.top = (up ? r.top - pr.top - bh - gap : r.bottom - pr.top + gap) + 'px'; bub.style.setProperty('--tx', (cx - left) + 'px');
+    sfx.disc(1);
+  }
+  function wear(it){ if (TR.d.eq[it.slot] === it.id) delete TR.d.eq[it.slot]; else TR.d.eq[it.slot] = it.id; TR.save(); applyEquip(); sfx.jump(); render(); }
+  function purchase(){
+    const it = cur; if (!it || coins() < it.price || TR.d.own[it.id]) return;
+    TR.d.coins -= it.price; TR.d.own[it.id] = 1; TR.d.eq[it.slot] = it.id; TR.save(); applyEquip(); sfx.sock(); render();
+  }
+  function loop(){ if (!isOpen) return; const f = RUN[Math.floor(performance.now()/62) % RUN_N]; pctx.clearRect(0, 0, prev.width, prev.height); pctx.drawImage(f, 0, prev.height - f.height); raf = requestAnimationFrame(loop); }
+  function open(){
+    if (isOpen || state !== 'title') return;
+    if (!SHOP.some(it => it.slot === slot)) slot = SHOP_SLOTS.find(sl => SHOP.some(it => it.slot === sl)) || 'hat';
+    render(); clearTimeout(hideT); page.hidden = false; void page.offsetWidth; page.classList.add('open'); isOpen = true;
+    $('soundmenu').hidden = true; sfx.start(); loop();
+  }
+  function close(){
+    if (!isOpen) return; isOpen = false; hideBubble(); page.classList.remove('open'); cancelAnimationFrame(raf);
+    clearTimeout(hideT); hideT = setTimeout(() => { if (!isOpen) page.hidden = true; }, 500);
+    if (document.activeElement) document.activeElement.blur();
+  }
+  grid.addEventListener('click', e => { const el = e.target.closest('.tr'); if (!el) return; e.stopPropagation(); const it = shopItem(el.dataset.id);
+    if (TR.d.own[it.id]) wear(it); else if (cur === it) hideBubble(); else showBubble(el, it); });
+  page.querySelectorAll('.shtab').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); slot = b.dataset.slot; sfx.jump(); render(); }));
+  buy.addEventListener('click', e => { e.stopPropagation(); purchase(); });
+  $('shclose').addEventListener('click', e => { e.stopPropagation(); close(); });
+  $('shopbtn').addEventListener('click', e => { e.stopPropagation(); ensureAudio(); open(); });
+  page.addEventListener('pointerdown', e => { if (!e.target.closest('.tr') && !e.target.closest('#shbub')) hideBubble(); });
+  return { open, close, isOpen: () => isOpen };
+})();
 
 /* ================= Génération ================= */
 const lvl = () => 1 - Math.exp(-t/28);
@@ -2199,8 +2360,8 @@ function drawHole(o){
   }
 }
 
-const TMP = mk(SW, SH), tctx = TMP.getContext('2d');
-function tinted(spr, col){ tctx.globalCompositeOperation = 'source-over'; tctx.clearRect(0,0,SW,SH); tctx.drawImage(spr, 0, 0); tctx.globalCompositeOperation = 'source-atop'; tctx.fillStyle = col; tctx.fillRect(0,0,SW,SH); tctx.globalCompositeOperation = 'source-over'; return TMP; }
+const TMP = mk(SW, SH + PAD), tctx = TMP.getContext('2d');
+function tinted(spr, col){ tctx.globalCompositeOperation = 'source-over'; tctx.clearRect(0,0,TMP.width,TMP.height); tctx.drawImage(spr, 0, 0); tctx.globalCompositeOperation = 'source-atop'; tctx.fillStyle = col; tctx.fillRect(0,0,TMP.width,TMP.height); tctx.globalCompositeOperation = 'source-over'; return TMP; }
 
 function draw(){
   ctx.save();
@@ -2216,7 +2377,7 @@ function draw(){
       const soff = Math.round((1 - easeBack(clamp01((titleT - .5)/.4))) * 80);
       const blink = (clock % 3.2) > 3.05, f = blink ? 2 : (Math.floor(clock*2.5) % 2);
       ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, lay.ry - 4 + off); ctx.clip();
-      ctx.drawImage(HERO[f], ex - SW, ey - 70 + soff + off, SW*2, (SH+14)*2);
+      ctx.drawImage(HERO[f], ex - SW, ey - 70 - PAD*2 + soff + off, SW*2, (SH+14+PAD)*2);
       ctx.restore();
       // frisbee lancé depuis la droite, attrapé du bout des doigts puis tenu en pince
       const hx = ex - SW + (SHR[0] + 4)*2, hy = ey - 70 + soff + off + (SHR[1] - 15 + 14 + (f === 1 ? 1 : 0))*2;
@@ -2274,7 +2435,7 @@ function draw(){
 
     if (!P.sink){ const hgt = GY - P.y, sw = Math.max(6, Math.round(22 - hgt*.14)); ctx.globalAlpha = .3; ctx.fillStyle = C.plum; ctx.fillRect(Math.round(P.x - sw/2), GY+1, sw, 2); ctx.globalAlpha = 1; }
 
-    const px = Math.round(P.x - CX), py = Math.round(P.y - FB);
+    const px = Math.round(P.x - CX), py = Math.round(P.y - FB) - PAD;
     let spr;
     if (state === 'over') spr = DEAD;
     else if (!P.ground) spr = P.vy < -120 ? RISE : (P.vy < 120 ? APEX : FALL);
@@ -2334,7 +2495,7 @@ icon('icoFire', BOTTLE);
 /* ================= Contrôles ================= */
 function press(){
   ensureAudio();
-  if (trUI.isOpen()) return;
+  if (trUI.isOpen() || shopUI.isOpen()) return;
   if (state === 'title'){ startGame(); return; }
   if (state === 'over'){ if (overT > .7) startGame(); return; }
   if (state === 'pause'){ resume(); return; }
@@ -2351,11 +2512,12 @@ $('pausebtn').addEventListener('click', e => { e.stopPropagation(); pause(); });
 
 addEventListener('keydown', e => {
   if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW'){ e.preventDefault(); if (!e.repeat) press(); }
+  else if (shopUI.isOpen()){ if (e.code === 'Escape') shopUI.close(); }
   else if (trUI.isOpen()){ if (e.code === 'Escape') trUI.close(); else if (e.code === 'ArrowLeft') trUI.go(-1); else if (e.code === 'ArrowRight') trUI.go(1); }
   else if (e.code === 'Escape' || e.code === 'KeyP'){ state === 'pause' ? resume() : pause(); }
 });
 addEventListener('keyup', e => { if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') release(); });
-wrap.addEventListener('pointerdown', e => { if (e.target.closest('button') || e.target.closest('#soundmenu') || e.target.closest('#trophies')) return; if (!smenu.hidden){ smenu.hidden = true; return; } e.preventDefault(); press(); });
+wrap.addEventListener('pointerdown', e => { if (e.target.closest('button') || e.target.closest('#soundmenu') || e.target.closest('#trophies') || e.target.closest('#shop')) return; if (!smenu.hidden){ smenu.hidden = true; return; } e.preventDefault(); press(); });
 addEventListener('pointerup', release); addEventListener('pointercancel', release);
 $('start').addEventListener('click', e => { e.stopPropagation(); startGame(); });
 $('again').addEventListener('click', e => { e.stopPropagation(); startGame(); });
