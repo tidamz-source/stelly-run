@@ -1443,7 +1443,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.40';
+const APP_VERSION = '5.41';
 // le record repart de zéro à chaque nouvelle version déployée
 try { if (localStorage.getItem('stellyrun_best_ver') !== APP_VERSION){ localStorage.setItem('stellyrun_best_ver', APP_VERSION); localStorage.setItem('stellyrun_best', '0'); best = 0; } } catch(e){}
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
@@ -1581,7 +1581,7 @@ const TR = (() => {
     // boutique
     bought(it){ d.spent += it.price; unlock('soldes'); if (d.spent >= 10000) unlock('prada');
       const all = SHOP.filter(x => x.img); if (all.filter(x => x.slot === 'hat').every(x => d.own[x.id])) unlock('chapelier'); if (all.every(x => d.own[x.id])) unlock('dressing'); save(); },
-    tried(it){ if (d.own[it.id] || d.tried[it.id]) return; d.tried[it.id] = 1; if (Object.keys(d.tried).length >= 10) unlock('vitrine'); save(); },
+    tried(it){ if (d.own[it.id] || d.tried[it.id]) return; d.tried[it.id] = 1; if (Object.keys(d.tried).filter(k => !d.own[k]).length >= 10) unlock('vitrine'); save(); },
     worn(){ if (SHOP_SLOTS.every(sl => EQUIPPED[sl])) unlock('fashion'); },
     shark(){ if (++d.sharks >= 10) unlock('requin'); }
   };
