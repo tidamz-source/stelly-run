@@ -360,7 +360,7 @@ body{
         <div class="shprev"><canvas id="shprev" width="64" height="80"></canvas></div>
         <div class="shright">
           <div class="shtabs">
-            <button class="shtab" data-slot="hat">Chapeaux</button><button class="shtab" data-slot="glasses">Lunettes</button><button class="shtab" data-slot="shirt">T-shirts</button><button class="shtab" data-slot="shoes">Chaussures</button>
+            <button class="shtab" data-slot="hat">Chapeaux</button><button class="shtab" data-slot="glasses">Lunettes</button><button class="shtab" data-slot="shirt">Costumes</button><button class="shtab" data-slot="shoes">Chaussures</button>
           </div>
           <div id="shgrid"></div>
         </div>
@@ -512,7 +512,7 @@ function drawStelly(g, o){
 // PAD : marge au-dessus de Stelly pour les chapeaux ; tous ses canevas sont mémorisés pour être redessinés avec l'équipement porté
 const PAD = 24, STELLY_CANVASES = [];
 let EQUIPPED = {};
-function paintStelly(c, eq){ const g = c.getContext('2d'); g.clearRect(0, 0, c.width, c.height); c.ank = drawStelly(g, Object.assign({}, c.opt, { oy:(c.opt.oy || 0) + PAD, eq: eq || EQUIPPED })); }
+function paintStelly(c, eq){ const g = c.getContext('2d'); g.clearRect(0, 0, c.width, c.height); c.ank = drawStelly(g, Object.assign({}, c.opt, { oy:(c.opt.oy || 0) + PAD, eq: c.bare ? {} : (eq || EQUIPPED) })); }
 function stellyCanvas(o, h){ const c = mk(SW, (h || SH) + PAD); c.opt = o; paintStelly(c); STELLY_CANVASES.push(c); return c; }
 function repaintStelly(){ STELLY_CANVASES.forEach(c => paintStelly(c)); }
 const SHL = [CX-11, CY-2], SHR = [CX+11, CY-2];
@@ -1187,7 +1187,8 @@ const HERO = (() => {
   const base = { tilt:-.03, mouth:M_SMILE, legs:[[CX-6, GROUND_Y],[CX+8, GROUND_Y]], oy:14, swap:true };
   const make = (bob, eyes) => stellyCanvas(Object.assign({}, base, { bob, eyes,
     arms:[{h:rel(SHL,-7,11,bob),g:'fist',b:1},{h:rel(SHR,4,-15,bob),g:'none',b:1}] }), SH + 14);
-  return [make(0, EYE_HAPPY), make(1, EYE_HAPPY), make(0, EYE_BLINK)];
+  // Stelly de l'écran d'accueil : toujours sans accessoires
+  return [make(0, EYE_HAPPY), make(1, EYE_HAPPY), make(0, EYE_BLINK)].map(c => { c.bare = true; return c; });
 })();
 
 /* ================= Petits sprites d'ambiance ================= */
@@ -1435,7 +1436,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.34';
+const APP_VERSION = '5.35';
 // le record repart de zéro à chaque nouvelle version déployée
 try { if (localStorage.getItem('stellyrun_best_ver') !== APP_VERSION){ localStorage.setItem('stellyrun_best_ver', APP_VERSION); localStorage.setItem('stellyrun_best', '0'); best = 0; } } catch(e){}
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
@@ -1758,6 +1759,14 @@ Promise.all(SHOP.map(it => new Promise(res => {
 const shopUI = (() => {
   const page = $('shop'), grid = $('shgrid'), bub = $('shbub'), buy = $('shbuy'), prev = $('shprev'), pctx = prev.getContext('2d');
   let isOpen = false, slot = 'glasses', cur = null, hideT = 0, raf = 0;
+  // images de course dédiées à l'aperçu, redessinées avec l'équipement essayé
+  const PFR = RUN.map(r => Object.assign(mk(r.width, r.height), { opt: r.opt }));
+  let tryId = null;
+  function setPreview(){
+    const eq = Object.assign({}, EQUIPPED), it = tryId && shopItem(tryId);
+    if (it && it.img) eq[it.slot] = it;
+    PFR.forEach(c => paintStelly(c, eq));
+  }
   const coins = () => TR.d.coins;
   function render(){
     $('shcoins').querySelector('b').textContent = coins();
@@ -1774,9 +1783,9 @@ const shopUI = (() => {
       grid.appendChild(el);
     }
   }
-  function hideBubble(){ bub.hidden = true; cur = null; }
+  function hideBubble(){ bub.hidden = true; cur = null; if (tryId){ tryId = null; setPreview(); } }
   function showBubble(el, it){
-    cur = it; const miss = it.price - coins();
+    cur = it; tryId = it.id; setPreview(); const miss = it.price - coins();
     bub.querySelector('b').textContent = it.name;
     bub.querySelector('span').textContent = miss > 0 ? 'Il te manque ' + miss + ' frisbees' : it.price + ' frisbees';
     buy.disabled = miss > 0; buy.textContent = 'Acheter';
@@ -1787,16 +1796,16 @@ const shopUI = (() => {
     bub.style.top = (up ? r.top - pr.top - bh - gap : r.bottom - pr.top + gap) + 'px'; bub.style.setProperty('--tx', (cx - left) + 'px');
     sfx.disc(1);
   }
-  function wear(it){ if (TR.d.eq[it.slot] === it.id) delete TR.d.eq[it.slot]; else TR.d.eq[it.slot] = it.id; TR.save(); applyEquip(); sfx.jump(); render(); }
+  function wear(it){ if (TR.d.eq[it.slot] === it.id) delete TR.d.eq[it.slot]; else TR.d.eq[it.slot] = it.id; TR.save(); applyEquip(); tryId = null; setPreview(); sfx.jump(); render(); }
   function purchase(){
     const it = cur; if (!it || coins() < it.price || TR.d.own[it.id]) return;
-    TR.d.coins -= it.price; TR.d.own[it.id] = 1; TR.d.eq[it.slot] = it.id; TR.save(); applyEquip(); sfx.sock(); render();
+    TR.d.coins -= it.price; TR.d.own[it.id] = 1; TR.d.eq[it.slot] = it.id; TR.save(); applyEquip(); tryId = null; setPreview(); sfx.sock(); render();
   }
-  function loop(){ if (!isOpen) return; const f = RUN[Math.floor(performance.now()/62) % RUN_N]; pctx.clearRect(0, 0, prev.width, prev.height); pctx.drawImage(f, 0, prev.height - f.height); raf = requestAnimationFrame(loop); }
+  function loop(){ if (!isOpen) return; const f = PFR[Math.floor(performance.now()/62) % RUN_N]; pctx.clearRect(0, 0, prev.width, prev.height); pctx.drawImage(f, 0, prev.height - f.height); raf = requestAnimationFrame(loop); }
   function open(){
     if (isOpen || state !== 'title') return;
     if (!SHOP.some(it => it.slot === slot)) slot = SHOP_SLOTS.find(sl => SHOP.some(it => it.slot === sl)) || 'hat';
-    render(); clearTimeout(hideT); page.hidden = false; void page.offsetWidth; page.classList.add('open'); isOpen = true;
+    tryId = null; setPreview(); render(); clearTimeout(hideT); page.hidden = false; void page.offsetWidth; page.classList.add('open'); isOpen = true;
     $('soundmenu').hidden = true; sfx.start(); loop();
   }
   function close(){
