@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atelier Stelly Run</title>
+<link rel="icon" href="icons/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --plum:#2E0E30; --plum2:#3A1640; --plum3:#4A2050; --line:#5E3466;
+  --purple:#7A57A0; --lilac:#C3AEDB; --ink:#F7EFFA; --star:#FFCF00; --starD:#D9A400;
+  --cream:#F4E6D2; --red:#E0413A; --green:#3FB75A;
+  font-family:'Pixelify Sans','Trebuchet MS',system-ui,sans-serif;
+}
+*{ box-sizing:border-box; }
+html,body{ height:100%; margin:0; }
+body{ background:var(--plum); color:var(--ink); font-size:15px; line-height:1.35; display:flex; flex-direction:column; }
+button,input,select{ font:inherit; color:inherit; }
+canvas{ image-rendering:pixelated; }
+:focus-visible{ outline:2px solid var(--star); outline-offset:2px; }
+
+/* barre du haut */
+header{ display:flex; align-items:center; gap:14px; padding:10px 16px; border-bottom:2px solid var(--line); background:var(--plum2); }
+header h1{ margin:0; font-size:22px; font-weight:700; color:var(--star); letter-spacing:.5px; }
+header h1 small{ color:var(--lilac); font-weight:500; font-size:15px; margin-left:8px; }
+#state{ color:var(--lilac); margin-left:auto; }
+#state b{ color:var(--star); font-weight:500; }
+
+.btn{ background:var(--plum3); border:2px solid var(--line); border-radius:6px; padding:6px 12px; cursor:pointer; box-shadow:0 3px 0 #1C061E; }
+.btn:hover{ border-color:var(--purple); }
+.btn:active{ transform:translateY(2px); box-shadow:0 1px 0 #1C061E; }
+.btn.main{ background:var(--star); border-color:var(--starD); color:var(--plum); font-weight:700; }
+.btn.danger:hover{ border-color:var(--red); color:#FFB3AE; }
+.btn:disabled{ opacity:.45; cursor:default; transform:none; }
+.btn.on{ background:var(--purple); border-color:var(--lilac); }
+
+#banner{ display:none; padding:8px 16px; background:#5A3A10; color:#FFE7B3; gap:12px; align-items:center; }
+#banner.show{ display:flex; }
+
+/* colonnes */
+main{ flex:1; display:grid; grid-template-columns:270px minmax(420px,1fr) 400px; min-height:0; }
+main > section{ min-height:0; overflow:auto; padding:14px; }
+#left{ border-right:2px solid var(--line); }
+#right{ border-left:2px solid var(--line); background:var(--plum2); }
+h2{ font-size:16px; font-weight:700; margin:0 0 8px; color:var(--lilac); }
+.block{ margin-bottom:20px; }
+
+/* liste des articles */
+#slots{ display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:10px; }
+#items{ display:flex; flex-direction:column; gap:4px; }
+.item{ display:grid; grid-template-columns:40px 1fr auto; align-items:center; gap:8px; padding:4px 6px; border:2px solid transparent; border-radius:6px; cursor:pointer; text-align:left; background:none; width:100%; }
+.item:hover{ background:var(--plum3); }
+.item.sel{ border-color:var(--star); background:var(--plum3); }
+.item canvas{ width:40px; height:40px; background:var(--cream); border-radius:4px; }
+.item .price{ color:var(--star); font-size:13px; }
+.item .mod{ color:var(--star); }
+#newItem{ margin-top:8px; width:100%; }
+
+/* fiche article */
+.field{ display:grid; grid-template-columns:72px 1fr; align-items:center; gap:6px; margin-bottom:6px; }
+.field label{ color:var(--lilac); font-size:14px; }
+.field input{ background:var(--plum); border:2px solid var(--line); border-radius:5px; padding:4px 7px; width:100%; min-width:0; }
+.field input:disabled{ color:var(--lilac); border-style:dashed; }
+.pal{ display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin:6px 0; }
+.pal label{ display:flex; flex-direction:column; gap:3px; font-size:13px; color:var(--lilac); }
+input[type=color]{ width:100%; height:28px; border:2px solid var(--line); border-radius:5px; background:var(--plum); padding:1px; cursor:pointer; }
+.row{ display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
+#checks{ list-style:none; margin:0; padding:0; font-size:14px; }
+#checks li{ padding:3px 0; color:#FFB3AE; cursor:pointer; }
+#checks li.ok{ color:#9AE8A6; cursor:default; }
+
+/* éditeur */
+#center{ display:flex; flex-direction:column; gap:10px; }
+#layers{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+#tools{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+#tools .sep{ width:2px; height:24px; background:var(--line); margin:0 2px; }
+#tools .btn{ padding:6px 10px; }
+#tools label{ color:var(--lilac); font-size:14px; display:flex; align-items:center; gap:6px; }
+#stage{ flex:1; min-height:300px; display:flex; align-items:center; justify-content:center; overflow:auto; background:repeating-conic-gradient(#3A1640 0 25%, #341339 0 50%) 0 0/16px 16px; border:2px solid var(--line); border-radius:8px; }
+#ed{ cursor:crosshair; touch-action:none; box-shadow:0 0 0 2px var(--line); }
+#colors{ display:flex; flex-wrap:wrap; gap:4px; align-items:center; }
+.sw{ width:24px; height:24px; border:2px solid var(--line); border-radius:4px; cursor:pointer; padding:0; }
+.sw.sel{ outline:2px solid var(--star); outline-offset:1px; }
+#cur{ width:40px; height:40px; border:2px solid var(--lilac); border-radius:6px; }
+#picker{ width:40px; height:40px; }
+#hint{ color:var(--lilac); font-size:13px; min-height:18px; }
+
+/* aperçu */
+#big{ display:block; margin:0 auto 10px; background:var(--cream); border-radius:8px; }
+#poses{ display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+#poses figure{ margin:0; background:var(--cream); border-radius:6px; text-align:center; padding:2px 0 4px; }
+#poses figcaption{ color:var(--plum); font-size:12px; }
+#poses canvas{ display:block; margin:0 auto; }
+#iconBox{ display:flex; gap:12px; align-items:center; }
+#icon{ background:var(--cream); border-radius:8px; }
+
+@media (max-width:1100px){
+  main{ grid-template-columns:1fr; }
+  main > section{ overflow:visible; }
+  #left,#right{ border:0; }
+}
+@media (prefers-reduced-motion:reduce){ .btn:active{ transform:none; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Atelier<small>accessoires de Stelly Run</small></h1>
+  <span id="state">Chargement…</span>
+  <button class="btn main" id="download" disabled>Télécharger boutique.json</button>
+</header>
+<div id="banner"><span id="bannerTxt"></span><button class="btn" id="revert">Revenir à la version en ligne</button></div>
+
+<main>
+  <section id="left">
+    <div class="block">
+      <div id="slots"></div>
+      <div id="items"></div>
+      <button class="btn" id="newItem">Nouvel article</button>
+    </div>
+    <div class="block" id="props"></div>
+    <div class="block">
+      <h2>Contrôles</h2>
+      <ul id="checks"></ul>
+    </div>
+  </section>
+
+  <section id="center">
+    <div id="layers"></div>
+    <div id="tools">
+      <button class="btn" data-tool="pen" title="Crayon (B)">Crayon</button>
+      <button class="btn" data-tool="eraser" title="Gomme (E), ou clic droit">Gomme</button>
+      <button class="btn" data-tool="fill" title="Remplissage (G)">Remplir</button>
+      <button class="btn" data-tool="pick" title="Pipette (I), ou Alt + clic">Pipette</button>
+      <button class="btn" data-tool="move" title="Déplacer le calque (M), ou flèches du clavier">Déplacer</button>
+      <span class="sep"></span>
+      <button class="btn" id="undo" title="Annuler (Ctrl+Z)">Annuler</button>
+      <button class="btn" id="redo" title="Rétablir (Ctrl+Y)">Rétablir</button>
+      <span class="sep"></span>
+      <button class="btn" id="zoomOut" title="Zoom arrière">−</button>
+      <button class="btn" id="zoomIn" title="Zoom avant">+</button>
+      <label>Stelly <input type="range" id="onion" min="0" max="100" value="55"></label>
+      <label><input type="checkbox" id="grid" checked> Grille</label>
+    </div>
+    <div id="stage"><canvas id="ed"></canvas></div>
+    <div id="colors"><canvas id="cur" width="1" height="1"></canvas><input type="color" id="picker" value="#2e0e30" title="Autre couleur"></div>
+    <div id="hint"></div>
+  </section>
+
+  <section id="right">
+    <div class="block">
+      <h2>Course</h2>
+      <canvas id="big"></canvas>
+    </div>
+    <div class="block">
+      <h2>Toutes les poses</h2>
+      <div id="poses"></div>
+    </div>
+    <div class="block">
+      <h2>Vignette de la boutique</h2>
+      <div id="iconBox"><canvas id="icon" width="96" height="96"></canvas><span id="iconTxt"></span></div>
+    </div>
+  </section>
+</main>
+
+<script src="stelly.js?v=5.64"></script>
+<script>
+(() => {
+'use strict';
+const { C, mk, drawStelly, drawHat, POSES, PAD, SW, SH, CX, CY, BODY_PAL } = StellyArt;
+const $ = id => document.getElementById(id);
+const DRAFT_KEY = 'stellyrun_atelier_brouillon';
+
+/* ================= Repères ================= */
+// zone de dessin : 96 × 96 pixels, Stelly (canevas 64 × 80, marge PAD comprise) posé en (16, 8)
+const EW = 96, EH = 96, OX = 16, OY = 8;
+const SLOTS = ['hat', 'glasses', 'shirt', 'shoes'];
+const SLOT_NAME = { hat:'Chapeaux', glasses:'Lunettes', shirt:'Costumes', shoes:'Chaussures' };
+const SLOT_ONE = { hat:'chapeau', glasses:'lunettes', shirt:'costume', shoes:'chaussures' };
+const POSE0 = POSES.run[0];   // course-01 : pose de dessin
+const POSE_LIST = [['Course', null], ['Élan', POSES.rise], ['Sommet', POSES.apex], ['Chute', POSES.fall], ['Réception', POSES.land], ['K.O.', POSES.dead]];
+
+// points d'accroche sur course-01, en coordonnées de la zone de dessin
+const ANCH = (() => {
+  const ank = drawStelly(mk(SW, SH + PAD).getContext('2d'), Object.assign({}, POSE0, { oy:PAD, eq:{} }));
+  const tilt = POSE0.tilt || 0, cy = CY + (POSE0.bob || 0) + PAD, P = (x, y) => ({ x:x + OX, y:y + OY });
+  return { hat:P(ank.head[0], ank.head[1]), glasses:P(CX - 5 + Math.round(tilt*6) + 6, cy - 7 + 3),
+           shirt:P(CX, cy), front:P(ank[1][0], ank[1][1]), back:P(ank[0][0], ank[0][1]) };
+})();
+
+/* ================= Outils d'image ================= */
+const EMPTY = mk(1, 1);
+const layerCanvas = () => { const c = document.createElement('canvas'); c.width = EW; c.height = EH; c.g = c.getContext('2d', { willReadFrequently:true }); return c; };
+const loadImg = src => new Promise(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; });
+const darkOf = x => mk(x.width, x.height, g => { g.filter = 'brightness(.72)'; g.drawImage(x, 0, 0); });
+// recadre un calque sur ses pixels ; décalage (dx, dy) par rapport au point d'accroche
+function crop(c, an){
+  const d = c.g.getImageData(0, 0, EW, EH).data; let x0 = EW, y0 = EH, x1 = -1, y1 = -1;
+  for (let y = 0; y < EH; y++) for (let x = 0; x < EW; x++) if (d[(y*EW + x)*4 + 3]){ if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+  if (x1 < 0) return null;
+  const w = x1 - x0 + 1, h = y1 - y0 + 1;
+  return { img:mk(w, h, g => g.drawImage(c, x0, y0, w, h, 0, 0, w, h)), dx:x0 - ANCH[an].x, dy:y0 - ANCH[an].y };
+}
+// vignette comme dans le jeu : l'objet seul, centré, agrandi d'un facteur entier
+function iconOf(im){
+  const k = Math.max(1, Math.floor(28 / Math.max(im.width, im.height))), w = im.width*k, h = im.height*k;
+  return mk(32, 32, g => g.drawImage(im, (32 - w) >> 1, (32 - h) >> 1, w, h));
+}
+const hex = c => '#' + [0, 1, 2].map(i => c[i].toString(16).padStart(2, '0')).join('').toUpperCase();
+
+/* ================= Données ================= */
+let DATA = { items:[] }, ONLINE = { items:[] }, ONLINE_IDS = new Set();
+let slot = 'hat', SES = null, ACTIVE = null, tool = 'pen', color = C.plum, Z = 6;
+const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+const onlineOf = id => ONLINE.items.find(x => x.id === id);
+
+/* ================= Session d'édition (calques d'un article) ================= */
+const layerKeys = s => s.item.slot === 'hat' ? s.frames : s.item.slot === 'glasses' ? ['main'] : s.item.slot === 'shirt' ? ['motif'] : ['front', 'back'];
+const anchorOf = (s, k) => s.item.slot === 'hat' ? 'hat' : { main:'glasses', motif:'shirt', front:'front', back:'back' }[k];
+const labelOf = (s, k) => s.item.slot === 'hat' ? 'Image ' + (s.frames.indexOf(k) + 1) : { main:'Lunettes', motif:'Motif', front:'Pied avant', back:'Pied arrière' }[k];
+
+async function openSession(it){
+  const s = { item:it, L:{}, dirty:new Set(), frames:[], nextF:0, hist:[], redo:[], pal:null };
+  const put = async (k, src, an, dx, dy) => { const c = layerCanvas(); s.L[k] = c;
+    if (src){ const im = await loadImg(src); if (im) c.g.drawImage(im, ANCH[an].x + (dx || 0), ANCH[an].y + (dy || 0)); } };
+  if (it.slot === 'hat'){
+    const fr = it.frames && it.frames.length ? it.frames : [{ src:it.src, dx:it.dx, dy:it.dy }];
+    for (const f of fr){ const k = 'f' + s.nextF++; s.frames.push(k); await put(k, f.src, 'hat', f.dx, f.dy); }
+  } else if (it.slot === 'glasses') await put('main', it.src, 'glasses', it.dx, it.dy);
+  else if (it.slot === 'shirt'){ await put('motif', it.detailSrc, 'shirt', it.ddx, it.ddy); s.pal = Object.assign({}, it.pal || BODY_PAL); }
+  else { await put('front', it.src, 'front', it.dx, it.dy); await put('back', it.farSrc, 'back', it.fdx, it.fdy); }
+  return s;
+}
+// équipement à dessiner sur Stelly ; omit : calque en cours d'édition (dessiné à part, par-dessus)
+function runtime(s, omit){
+  const it = s.item, eq = {}, cr = k => crop(s.L[k], anchorOf(s, k));
+  if (it.slot === 'glasses'){ const g = omit === 'main' ? null : cr('main');
+    if (g) eq.glasses = g; else if (omit === 'main') eq.glasses = { img:EMPTY, dx:0, dy:0 }; }   // lunettes en cours : yeux masqués comme en jeu
+  if (it.slot === 'shirt'){ const m = omit === 'motif' ? null : cr('motif'); eq.shirt = { pal:s.pal }; if (m) Object.assign(eq.shirt, { detail:m.img, ddx:m.dx, ddy:m.dy }); }
+  if (it.slot === 'shoes'){
+    const F = cr('front'), B = cr('back') || F;
+    if (F || B || omit) eq.shoes = { img:omit === 'front' || !F ? EMPTY : F.img, dx:F ? F.dx : 0, dy:F ? F.dy : 0,
+      far:omit === 'back' || !B ? EMPTY : darkOf(B.img), fdx:B ? B.dx : 0, fdy:B ? B.dy : 0 };
+  }
+  return eq;
+}
+function hatRuntime(s){
+  if (s.item.slot !== 'hat') return null;
+  const fr = s.frames.map(k => crop(s.L[k], 'hat')).filter(Boolean);
+  return fr.length ? Object.assign({}, fr[0], { frames:fr.length > 1 ? fr : null }) : null;
+}
+// vignette d'un costume : l'étoile seule avec sa palette et son motif
+function shirtBody(s){
+  const eq = runtime(s, null), c = mk(SW, SH);
+  drawStelly(c.getContext('2d'), Object.assign({}, POSE0, { tilt:0, bob:0, bodyOnly:true, eq }));
+  const lc = layerCanvas(); lc.g.drawImage(c, OX, OY + PAD);
+  return crop(lc, 'shirt');
+}
+// écrit les calques modifiés dans l'article (les images non retouchées gardent leur code d'origine)
+function commit(s){
+  const it = s.item, enc = r => r.img.toDataURL('image/png');
+  if (it.slot === 'hat' && s.dirty.size){
+    const fr = s.frames.map(k => crop(s.L[k], 'hat')).filter(Boolean);
+    if (fr.length){ it.src = enc(fr[0]); it.dx = fr[0].dx; it.dy = fr[0].dy; } else { delete it.src; }
+    if (fr.length > 1) it.frames = fr.map((f, i) => ({ n:i + 1, src:enc(f), dx:f.dx, dy:f.dy })); else delete it.frames;
+  }
+  if (it.slot === 'glasses' && s.dirty.has('main')){ const g = crop(s.L.main, 'glasses'); if (g){ it.src = enc(g); it.dx = g.dx; it.dy = g.dy; } else delete it.src; }
+  if (it.slot === 'shirt'){
+    it.pal = Object.assign(it.pal || {}, s.pal);
+    if (s.dirty.has('motif')){ const m = crop(s.L.motif, 'shirt');
+      if (m){ it.detailSrc = enc(m); it.ddx = m.dx; it.ddy = m.dy; } else { delete it.detailSrc; delete it.ddx; delete it.ddy; } }
+    if (!it.src) bodyIcon(s);
+  }
+  if (it.slot === 'shoes' && s.dirty.size){
+    const F = crop(s.L.front, 'front'), B = crop(s.L.back, 'back') || F;
+    if (F){ it.src = enc(F); it.dx = F.dx; it.dy = F.dy; } else delete it.src;
+    if (B){ it.farSrc = enc(B); it.fdx = B.dx; it.fdy = B.dy; } else delete it.farSrc;
+  }
+  saveDraft(); refreshState(); refreshChecks(); thumb(it, true);
+}
+function bodyIcon(s){ const b = shirtBody(s); if (!b) return; s.item.src = b.img.toDataURL('image/png'); s.item.dx = b.dx; s.item.dy = b.dy; delete s.item.iconSrc; }
+
+/* ================= Brouillon ================= */
+function saveDraft(){ try { localStorage.setItem(DRAFT_KEY, JSON.stringify({ saved:Date.now(), data:DATA })); } catch(e){ console.warn('[atelier] brouillon non enregistré', e); } }
+function refreshState(){
+  const mod = DATA.items.filter(it => !same(it, onlineOf(it.id))).length, del = ONLINE.items.filter(o => !DATA.items.some(x => x.id === o.id)).length;
+  $('state').innerHTML = mod || del ? '<b>' + (mod + del) + ' article' + (mod + del > 1 ? 's' : '') + ' modifié' + (mod + del > 1 ? 's' : '') + '</b> par rapport à la version en ligne' : 'Identique à la version en ligne';
+  document.querySelectorAll('.item').forEach(b => { const it = DATA.items.find(x => x.id === b.dataset.id); b.querySelector('.mod').textContent = it && !same(it, onlineOf(it.id)) ? '●' : ''; });
+}
+
+/* ================= Contrôles ================= */
+function problems(){
+  const out = [], seen = new Set();
+  for (const it of DATA.items){
+    const nm = (it.name && it.name.fr) || it.id, go = { id:it.id };
+    if (seen.has(it.id)) out.push(Object.assign({ txt:'Identifiant en double : ' + it.id }, go)); seen.add(it.id);
+    if (!/^(hat|glasses|shirt|shoes)-[a-z0-9_]+$/.test(it.id)) out.push(Object.assign({ txt:nm + ' : identifiant invalide' }, go));
+    for (const l of ['fr', 'en', 'es']) if (!it.name || !String(it.name[l] || '').trim()) out.push(Object.assign({ txt:nm + ' : nom ' + l.toUpperCase() + ' manquant' }, go));
+    if (!(Number.isInteger(it.price) && it.price > 0)) out.push(Object.assign({ txt:nm + ' : prix invalide' }, go));
+    if (!it.src) out.push(Object.assign({ txt:nm + ' : ' + { hat:'image 1 vide', glasses:'lunettes vides', shirt:'vignette manquante', shoes:'pied avant vide' }[it.slot] }, go));
+  }
+  return out;
+}
+function refreshChecks(){
+  const p = problems(), ul = $('checks'); ul.innerHTML = '';
+  if (!p.length){ ul.innerHTML = '<li class="ok">Tout est prêt (' + DATA.items.length + ' articles)</li>'; return; }
+  for (const x of p){ const li = document.createElement('li'); li.textContent = x.txt; li.onclick = () => select(x.id); ul.appendChild(li); }
+}
+
+/* ================= Liste des articles ================= */
+const THUMBS = {};
+async function thumb(it, force){
+  const src = it.iconSrc || it.src, el = document.querySelector('.item[data-id="' + it.id + '"] canvas');
+  if (!el) return;
+  const g = el.getContext('2d'); g.imageSmoothingEnabled = false; g.clearRect(0, 0, 32, 32);
+  if (!src) return;
+  if (force || !THUMBS[src]){ const im = await loadImg(src); THUMBS[src] = im ? iconOf(im) : null; }
+  if (THUMBS[src]) g.drawImage(THUMBS[src], 0, 0);
+}
+function renderSlots(){
+  const box = $('slots'); box.innerHTML = '';
+  for (const sl of SLOTS){ const b = document.createElement('button'); b.className = 'btn' + (sl === slot ? ' on' : '');
+    b.textContent = SLOT_NAME[sl] + ' (' + DATA.items.filter(x => x.slot === sl).length + ')'; b.onclick = () => { slot = sl; renderSlots(); renderList(); }; box.appendChild(b); }
+  $('newItem').textContent = 'Nouvel article : ' + SLOT_ONE[slot];
+}
+function renderList(){
+  const box = $('items'); box.innerHTML = '';
+  const list = DATA.items.filter(x => x.slot === slot).sort((a, b) => (a.price || 0) - (b.price || 0) || ((a.name && a.name.fr) || '').localeCompare((b.name && b.name.fr) || ''));
+  for (const it of list){
+    const b = document.createElement('button'); b.className = 'item' + (SES && SES.item === it ? ' sel' : ''); b.dataset.id = it.id;
+    b.innerHTML = '<canvas width="32" height="32"></canvas><span></span><span><span class="price"></span> <span class="mod"></span></span>';
+    b.children[1].textContent = (it.name && it.name.fr) || it.id; b.querySelector('.price').textContent = it.price || '?';
+    b.onclick = () => select(it.id); box.appendChild(b); thumb(it);
+  }
+  refreshState();
+}
+
+/* ================= Sélection ================= */
+async function select(id){
+  const it = DATA.items.find(x => x.id === id); if (!it) return;
+  if (SES && SES.dirty.size) commit(SES);
+  slot = it.slot; SES = await openSession(it); ACTIVE = layerKeys(SES)[0];
+  renderSlots(); renderList(); renderProps(); renderLayers(); collectColors(); invalidate(); fit();
+}
+
+/* ================= Fiche article ================= */
+function renderProps(){
+  const box = $('props'), it = SES && SES.item; box.innerHTML = '';
+  if (!it) return;
+  const isNew = !ONLINE_IDS.has(it.id);
+  box.innerHTML = '<h2>' + SLOT_ONE[it.slot][0].toUpperCase() + SLOT_ONE[it.slot].slice(1) + '</h2>' +
+    '<div class="field"><label for="pKey">Identifiant</label><input id="pKey"></div>' +
+    '<div class="field"><label for="pFr">Nom FR</label><input id="pFr"></div>' +
+    '<div class="field"><label for="pEn">Nom EN</label><input id="pEn"></div>' +
+    '<div class="field"><label for="pEs">Nom ES</label><input id="pEs"></div>' +
+    '<div class="field"><label for="pPrice">Prix</label><input id="pPrice" type="number" min="1" step="10"></div>';
+  const key = $('pKey'); key.value = it.key; key.disabled = !isNew;
+  key.title = isNew ? 'Lettres minuscules, chiffres et _ ; ne change plus une fois publié' : 'Déjà publié : les joueurs qui l\'ont acheté sont liés à cet identifiant';
+  key.onchange = () => {
+    const k = key.value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_'), id = it.slot + '-' + k;
+    if (!k || DATA.items.some(x => x !== it && x.id === id)){ key.value = it.key; hint('Identifiant vide ou déjà pris.'); return; }
+    it.key = k; it.id = id; key.value = k; saveDraft(); renderList(); refreshChecks();
+  };
+  it.name = it.name || { fr:'', en:'', es:'' };
+  [['pFr', 'fr'], ['pEn', 'en'], ['pEs', 'es']].forEach(([f, l]) => { const e = $(f); e.value = it.name[l] || '';
+    e.oninput = () => { it.name[l] = e.value; saveDraft(); refreshChecks(); refreshState(); if (l === 'fr'){ const b = document.querySelector('.item.sel span'); if (b) b.textContent = e.value || it.id; } }; });
+  const pr = $('pPrice'); pr.value = it.price || '';
+  pr.oninput = () => { it.price = Math.round(+pr.value) || 0; saveDraft(); refreshChecks(); refreshState(); const b = document.querySelector('.item.sel .price'); if (b) b.textContent = it.price; };
+
+  if (it.slot === 'shirt'){
+    const names = [['yellow', 'Corps'], ['yellowL', 'Lumière'], ['yellowM', 'Mi-ton'], ['orange', 'Ombre'], ['orangeD', 'Ombre foncée'], ['cheek', 'Joues']];
+    const p = document.createElement('div');
+    p.innerHTML = '<h2 style="margin-top:14px">Couleurs du corps</h2><div class="pal"></div>' +
+      '<div class="field"><label for="pBase">Teinte</label><input type="color" id="pBase" title="Remplit les six couleurs à partir d\'une teinte"></div>';
+    const grid = p.querySelector('.pal');
+    for (const [k, lab] of names){ const l = document.createElement('label'); l.innerHTML = lab + '<input type="color">'; const inp = l.querySelector('input');
+      inp.value = SES.pal[k].toLowerCase(); inp.oninput = () => { SES.pal[k] = inp.value.toUpperCase(); afterPal(); }; grid.appendChild(l); }
+    box.appendChild(p);
+    $('pBase').value = SES.pal.yellow.toLowerCase();
+    $('pBase').oninput = e => { Object.assign(SES.pal, paletteFrom(e.target.value)); grid.querySelectorAll('input').forEach((inp, i) => inp.value = SES.pal[names[i][0]].toLowerCase()); afterPal(); };
+  }
+  const row = document.createElement('div'); row.className = 'row';
+  if (it.slot === 'shirt') row.appendChild(button('Refaire la vignette', () => { bodyIcon(SES); commit(SES); drawIcon(); }, 'La vignette reprend l\'étoile avec ces couleurs et ce motif'));
+  row.appendChild(button('Dupliquer', duplicate));
+  row.appendChild(button('Supprimer', remove, '', 'danger'));
+  box.appendChild(row);
+}
+const button = (txt, fn, title, cls) => { const b = document.createElement('button'); b.className = 'btn' + (cls ? ' ' + cls : ''); b.textContent = txt; b.onclick = fn; if (title) b.title = title; return b; };
+let palT = 0;
+function afterPal(){ invalidate(); clearTimeout(palT); palT = setTimeout(() => commit(SES), 250); }
+// palette d'un costume à partir d'une teinte (même logique que les costumes existants)
+function paletteFrom(h){
+  const n = parseInt(h.slice(1), 16), rgb = [n >> 16, n >> 8 & 255, n & 255];
+  const mix = (t, k) => hex(rgb.map(v => Math.round(t ? v + (255 - v)*k : v*(1 - k))));
+  const light = mix(1, .18), dark = mix(0, .2);
+  return { yellow:hex(rgb), yellowL:light, yellowM:light, orange:dark, orangeD:mix(0, .35), cheek:dark };
+}
+function newItem(){
+  const base = 'nouveau', ids = new Set(DATA.items.map(x => x.id)); let k = base, i = 2;
+  while (ids.has(slot + '-' + k)) k = base + '_' + i++;
+  const it = { id:slot + '-' + k, slot, key:k, price:200, name:{ fr:'', en:'', es:'' } };
+  if (slot === 'shirt') it.pal = Object.assign({}, BODY_PAL);
+  DATA.items.push(it); saveDraft(); renderSlots(); select(it.id).then(() => { if (slot === 'shirt'){ bodyIcon(SES); commit(SES); } $('pKey').focus(); $('pKey').select(); });
+}
+function duplicate(){
+  if (!SES) return; commit(SES);
+  const src = SES.item, ids = new Set(DATA.items.map(x => x.id)); let k = src.key + '_copie', i = 2;
+  while (ids.has(src.slot + '-' + k)) k = src.key + '_copie' + i++;
+  const it = JSON.parse(JSON.stringify(src)); it.key = k; it.id = src.slot + '-' + k;
+  DATA.items.push(it); saveDraft(); renderSlots(); select(it.id);
+}
+function remove(){
+  if (!SES) return; const it = SES.item;
+  const warn = ONLINE_IDS.has(it.id) ? '\n\nCet article est déjà en ligne : les joueurs qui l\'ont acheté le perdront.' : '';
+  if (!confirm('Supprimer « ' + ((it.name && it.name.fr) || it.id) + ' » ?' + warn)) return;
+  DATA.items.splice(DATA.items.indexOf(it), 1); SES = null; ACTIVE = null; saveDraft();
+  const next = DATA.items.find(x => x.slot === slot) || DATA.items[0];
+  renderSlots(); renderList(); refreshChecks(); if (next) select(next.id); else { renderProps(); renderLayers(); }
+}
+
+/* ================= Calques ================= */
+function renderLayers(){
+  const box = $('layers'); box.innerHTML = ''; if (!SES) return;
+  for (const k of layerKeys(SES)){ const b = button(labelOf(SES, k), () => { ACTIVE = k; renderLayers(); invalidate(); }); if (k === ACTIVE) b.classList.add('on'); box.appendChild(b); }
+  const it = SES.item;
+  if (it.slot === 'hat'){
+    box.appendChild(button('Ajouter une image', () => {
+      const k = 'f' + SES.nextF++, c = layerCanvas(); c.g.drawImage(SES.L[ACTIVE], 0, 0); SES.L[k] = c;
+      SES.frames.splice(SES.frames.indexOf(ACTIVE) + 1, 0, k); ACTIVE = k; SES.dirty.add(k); commit(SES); renderLayers(); invalidate();
+    }, 'Copie l\'image en cours juste après elle (animation à 10 images par seconde)'));
+    if (SES.frames.length > 1) box.appendChild(button('Retirer cette image', () => {
+      const i = SES.frames.indexOf(ACTIVE); SES.frames.splice(i, 1); delete SES.L[ACTIVE]; ACTIVE = SES.frames[Math.max(0, i - 1)]; SES.dirty.add(ACTIVE); commit(SES); renderLayers(); invalidate();
+    }, '', 'danger'));
+  }
+  if (it.slot === 'shoes') box.appendChild(button('Copier l\'avant sur l\'arrière', () => {
+    const F = crop(SES.L.front, 'front'); if (!F) return; snapshot('back');
+    SES.L.back.g.clearRect(0, 0, EW, EH); SES.L.back.g.drawImage(F.img, ANCH.back.x + F.dx, ANCH.back.y + F.dy); SES.dirty.add('back'); commit(SES); invalidate();
+  }, 'Même dessin, même décalage par rapport à la cheville ; le jeu l\'assombrit'));
+  box.appendChild(button('Effacer le calque', () => { if (!confirm('Effacer « ' + labelOf(SES, ACTIVE) + ' » ?')) return; snapshot(ACTIVE); SES.L[ACTIVE].g.clearRect(0, 0, EW, EH); SES.dirty.add(ACTIVE); commit(SES); invalidate(); }, '', 'danger'));
+  hint({ front:'Pied avant : point d\'accroche sur la cheville avant.', back:'Pied arrière : laissé vide, il reprend le pied avant ; le jeu l\'assombrit.',
+    main:'Les lunettes masquent les yeux de Stelly.', motif:'Le motif se pose sur le corps recoloré ; il est facultatif.' }[ACTIVE] || 'Chapeau : dessiné par-dessus Stelly ; plusieurs images = animation (10 images par seconde).');
+}
+
+/* ================= Couleurs ================= */
+function collectColors(){
+  const set = new Set([C.plum, C.white, '#000000', C.purpleD, C.purple, C.purpleL, C.yellow, C.yellowL, C.orange, C.orangeD, C.red, C.redL, C.redD, C.grn, C.grnD, C.discY, C.cream]);
+  if (SES) for (const k of layerKeys(SES)){ const d = SES.L[k].g.getImageData(0, 0, EW, EH).data;
+    for (let i = 0; i < d.length; i += 4) if (d[i + 3]) set.add(hex([d[i], d[i + 1], d[i + 2]])); }
+  const box = $('colors'); box.querySelectorAll('.sw').forEach(e => e.remove());
+  [...set].slice(0, 40).forEach(c => { const b = document.createElement('button'); b.className = 'sw'; b.style.background = c; b.title = c; b.dataset.c = c.toUpperCase();
+    b.onclick = () => setColor(c); box.appendChild(b); });
+  setColor(color);
+}
+function setColor(c){
+  color = c.toUpperCase(); const cur = $('cur').getContext('2d'); cur.fillStyle = color; cur.fillRect(0, 0, 1, 1); $('picker').value = color.toLowerCase();
+  document.querySelectorAll('.sw').forEach(b => b.classList.toggle('sel', b.dataset.c === color));
+  if (tool === 'eraser' || tool === 'pick') setTool('pen');
+}
+
+/* ================= Rendu de l'éditeur ================= */
+const ed = $('ed'), eg = ed.getContext('2d');
+let BASE = null;   // Stelly avec les autres calques ; recalculé quand ils changent
+function invalidate(){ BASE = null; draw(); schedulePreview(); }
+function draw(){
+  if (!SES){ ed.width = EW*Z; ed.height = EH*Z; eg.clearRect(0, 0, ed.width, ed.height); return; }
+  if (!BASE){ BASE = mk(EW, EH); const c = mk(SW, SH + PAD);
+    drawStelly(c.getContext('2d'), Object.assign({}, POSE0, { oy:PAD, eq:runtime(SES, ACTIVE) })); BASE.getContext('2d').drawImage(c, OX, OY); }
+  if (ed.width !== EW*Z){ ed.width = EW*Z; ed.height = EH*Z; }
+  eg.imageSmoothingEnabled = false;
+  eg.fillStyle = C.cream; eg.fillRect(0, 0, ed.width, ed.height);
+  eg.globalAlpha = +$('onion').value / 100; eg.drawImage(BASE, 0, 0, EW*Z, EH*Z);
+  // chapeau animé : l'image précédente en transparence
+  if (SES.item.slot === 'hat'){ const i = SES.frames.indexOf(ACTIVE); if (i > 0){ eg.globalAlpha = .25; eg.drawImage(SES.L[SES.frames[i - 1]], 0, 0, EW*Z, EH*Z); } }
+  eg.globalAlpha = 1; eg.drawImage(SES.L[ACTIVE], 0, 0, EW*Z, EH*Z);
+  if ($('grid').checked && Z >= 5){ eg.fillStyle = 'rgba(46,14,48,.12)';
+    for (let x = 1; x < EW; x++) eg.fillRect(x*Z, 0, 1, ed.height); for (let y = 1; y < EH; y++) eg.fillRect(0, y*Z, ed.width, 1); }
+  // point d'accroche
+  const a = ANCH[anchorOf(SES, ACTIVE)]; eg.strokeStyle = 'rgba(224,65,58,.85)'; eg.lineWidth = 2;
+  eg.strokeRect(a.x*Z + 1, a.y*Z + 1, Z - 2, Z - 2);
+}
+function fit(){
+  const st = $('stage'), z = Math.floor(Math.min((st.clientWidth - 20) / EW, (st.clientHeight - 20) / EH));
+  Z = Math.max(3, Math.min(14, z || 6)); draw();
+}
+
+/* ================= Dessin ================= */
+function setTool(t){ tool = t; document.querySelectorAll('[data-tool]').forEach(b => b.classList.toggle('on', b.dataset.tool === t)); }
+function snapshot(k){ SES.hist.push({ k, d:SES.L[k].g.getImageData(0, 0, EW, EH) }); if (SES.hist.length > 80) SES.hist.shift(); SES.redo = []; }
+function undoRedo(from, to){
+  if (!SES || !from.length) return; const h = from.pop(), L = SES.L[h.k]; if (!L) return;
+  to.push({ k:h.k, d:L.g.getImageData(0, 0, EW, EH) }); L.g.putImageData(h.d, 0, 0); SES.dirty.add(h.k);
+  if (h.k !== ACTIVE && layerKeys(SES).includes(h.k)){ ACTIVE = h.k; renderLayers(); }
+  commit(SES); invalidate();
+}
+const cell = e => { const r = ed.getBoundingClientRect(); return [Math.floor((e.clientX - r.left) / Z), Math.floor((e.clientY - r.top) / Z)]; };
+const inside = (x, y) => x >= 0 && y >= 0 && x < EW && y < EH;
+function plot(x, y, erase){ if (!inside(x, y)) return; const g = SES.L[ACTIVE].g; if (erase) g.clearRect(x, y, 1, 1); else { g.fillStyle = color; g.fillRect(x, y, 1, 1); } }
+function line(x0, y0, x1, y1, erase){ const dx = Math.abs(x1 - x0), dy = -Math.abs(y1 - y0), sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1; let e = dx + dy;
+  for (;;){ plot(x0, y0, erase); if (x0 === x1 && y0 === y1) break; const e2 = 2*e; if (e2 >= dy){ e += dy; x0 += sx; } if (e2 <= dx){ e += dx; y0 += sy; } } }
+function pick(x, y){
+  if (!inside(x, y)) return;
+  let d = SES.L[ACTIVE].g.getImageData(x, y, 1, 1).data;
+  if (!d[3]) d = BASE.getContext('2d').getImageData(x, y, 1, 1).data;
+  if (d[3]) setColor(hex(d));
+}
+function fill(x, y){
+  if (!inside(x, y)) return;
+  const g = SES.L[ACTIVE].g, img = g.getImageData(0, 0, EW, EH), d = img.data, at = (x, y) => (y*EW + x)*4, t = d.slice(at(x, y), at(x, y) + 4);
+  const n = parseInt(color.slice(1), 16), rep = [n >> 16, n >> 8 & 255, n & 255, 255];
+  if (t.every((v, i) => v === rep[i])) return;
+  const match = i => t[3] === 0 ? d[i + 3] === 0 : d[i] === t[0] && d[i + 1] === t[1] && d[i + 2] === t[2] && d[i + 3] === t[3];
+  const st = [[x, y]];
+  while (st.length){ const [px, py] = st.pop(); if (!inside(px, py)) continue; const i = at(px, py); if (!match(i)) continue;
+    d.set(rep, i); st.push([px + 1, py], [px - 1, py], [px, py + 1], [px, py - 1]); }
+  g.putImageData(img, 0, 0);
+}
+function shift(dx, dy){
+  const L = SES.L[ACTIVE], tmp = mk(EW, EH, g => g.drawImage(L, 0, 0)); L.g.clearRect(0, 0, EW, EH); L.g.drawImage(tmp, dx, dy);
+}
+let stroke = null;
+ed.addEventListener('contextmenu', e => e.preventDefault());
+ed.addEventListener('pointerdown', e => {
+  if (!SES) return; ed.setPointerCapture(e.pointerId);
+  const [x, y] = cell(e), t = e.altKey ? 'pick' : e.button === 2 ? 'eraser' : tool;
+  if (t === 'pick'){ pick(x, y); return; }
+  snapshot(ACTIVE); SES.dirty.add(ACTIVE);
+  if (t === 'fill'){ fill(x, y); stroke = { t, x, y, n:0 }; draw(); return; }
+  stroke = { t, x, y, ox:x, oy:y, n:0 };
+  if (t === 'move') stroke.src = mk(EW, EH, g => g.drawImage(SES.L[ACTIVE], 0, 0));
+  else plot(x, y, t === 'eraser');
+  draw();
+});
+ed.addEventListener('pointermove', e => {
+  if (!SES) return; const [x, y] = cell(e);
+  $('hint').textContent = inside(x, y) ? 'x ' + (x - ANCH[anchorOf(SES, ACTIVE)].x) + ', y ' + (y - ANCH[anchorOf(SES, ACTIVE)].y) + ' par rapport au point d\'accroche' : '';
+  if (!stroke || (x === stroke.x && y === stroke.y)) return;
+  if (stroke.t === 'move'){ const L = SES.L[ACTIVE]; L.g.clearRect(0, 0, EW, EH); L.g.drawImage(stroke.src, x - stroke.ox, y - stroke.oy); }
+  else if (stroke.t !== 'fill') line(stroke.x, stroke.y, x, y, stroke.t === 'eraser');
+  stroke.x = x; stroke.y = y; draw();
+});
+const endStroke = () => { if (!stroke) return; stroke = null; commit(SES); collectColors(); schedulePreview(); };
+ed.addEventListener('pointerup', endStroke); ed.addEventListener('pointercancel', endStroke);
+function hint(t){ $('hint').textContent = t; }
+
+/* ================= Aperçu : toutes les poses ================= */
+let PREV = null, prevT = 0;
+function schedulePreview(){ clearTimeout(prevT); prevT = setTimeout(buildPreview, 60); }
+function buildPreview(){
+  if (!SES){ PREV = null; return; }
+  const eq = runtime(SES, null), hat = hatRuntime(SES);
+  const one = o => { const c = mk(SW, SH + PAD), ank = drawStelly(c.getContext('2d'), Object.assign({}, o, { oy:PAD, eq })); return { c, head:ank.head }; };
+  PREV = { hat, run:POSES.run.map(one), poses:POSE_LIST.slice(1).map(([n, o]) => Object.assign(one(o), { n })) };
+  // les 12 images de la course, puis les autres poses
+  const box = $('poses'), tiles = [...PREV.run.map((p, i) => Object.assign(p, { n:'Course ' + (i + 1) })), ...PREV.poses];
+  const y0 = hat ? 0 : 20, h = SH + PAD - y0;
+  if (box.children.length !== tiles.length){ box.innerHTML = '';
+    tiles.forEach(t => { const f = document.createElement('figure'), c = document.createElement('canvas'); c.width = 56; c.height = h; c.style.width = '112px';
+      f.appendChild(c); f.insertAdjacentHTML('beforeend', '<figcaption></figcaption>'); box.appendChild(f); }); }
+  tiles.forEach((t, i) => { const c = box.children[i].querySelector('canvas'); if (c.height !== h){ c.height = h; } box.children[i].querySelector('figcaption').textContent = t.n; t.view = c; t.y0 = y0; });
+  PREV.tiles = tiles; drawIcon();
+}
+function drawIcon(){
+  const it = SES && SES.item, g = $('icon').getContext('2d'); g.imageSmoothingEnabled = false; g.clearRect(0, 0, 96, 96);
+  if (!it) return;
+  let im = null, txt = '';
+  if (it.slot === 'shirt'){ txt = it.iconSrc ? 'Vignette dessinée à part (gardée telle quelle).' : 'L\'étoile avec ces couleurs : « Refaire la vignette » après un changement.';
+    const src = it.iconSrc || it.src; if (src) loadImg(src).then(x => { if (x){ g.clearRect(0, 0, 96, 96); g.drawImage(iconOf(x), 0, 0, 96, 96); } }); }
+  else { const r = it.slot === 'hat' ? hatRuntime(SES) : crop(SES.L[it.slot === 'glasses' ? 'main' : 'front'], it.slot === 'glasses' ? 'glasses' : 'front'); im = r && r.img;
+    txt = 'Calculée par le jeu : ' + (it.slot === 'hat' ? 'l\'image 1' : it.slot === 'glasses' ? 'les lunettes' : 'le pied avant') + ', agrandie d\'un facteur entier.'; }
+  if (im) g.drawImage(iconOf(im), 0, 0, 96, 96);
+  $('iconTxt').textContent = txt;
+}
+const big = $('big'); big.width = SW; big.height = SH + PAD; big.style.width = SW*3 + 'px';
+function tick(now){
+  requestAnimationFrame(tick);
+  if (!PREV) return;
+  const t = now / 1000, bg = big.getContext('2d'), p = PREV.run[Math.floor(now / 62) % PREV.run.length];
+  bg.clearRect(0, 0, big.width, big.height); bg.drawImage(p.c, 0, 0); drawHat(bg, p, 0, 0, PREV.hat, t);
+  for (const tl of PREV.tiles || []){ const g = tl.view.getContext('2d'); g.clearRect(0, 0, 56, tl.view.height); g.drawImage(tl.c, -4, -tl.y0); drawHat(g, tl, -4, -tl.y0, PREV.hat, t); }
+}
+requestAnimationFrame(tick);
+
+/* ================= Commandes ================= */
+document.querySelectorAll('[data-tool]').forEach(b => b.onclick = () => setTool(b.dataset.tool));
+$('undo').onclick = () => undoRedo(SES.hist, SES.redo);
+$('redo').onclick = () => undoRedo(SES.redo, SES.hist);
+$('zoomIn').onclick = () => { Z = Math.min(16, Z + 1); draw(); };
+$('zoomOut').onclick = () => { Z = Math.max(2, Z - 1); draw(); };
+$('onion').oninput = draw; $('grid').onchange = draw;
+$('picker').oninput = e => setColor(e.target.value);
+$('newItem').onclick = newItem;
+$('download').onclick = () => {
+  if (SES && SES.dirty.size) commit(SES);
+  const p = problems(); if (p.length && !confirm(p.length + ' point(s) à corriger (voir Contrôles). Télécharger quand même ?')) return;
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(DATA, null, 1) + '\n'], { type:'application/json' }));
+  a.download = 'boutique.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+};
+$('revert').onclick = () => {
+  if (!confirm('Abandonner le brouillon et revenir à la version en ligne ?')) return;
+  try { localStorage.removeItem(DRAFT_KEY); } catch(e){}
+  DATA = JSON.parse(JSON.stringify(ONLINE)); $('banner').classList.remove('show'); SES = null;
+  renderSlots(); renderList(); refreshChecks(); const f = DATA.items.find(x => x.slot === slot); if (f) select(f.id);
+};
+addEventListener('keydown', e => {
+  if (/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) || !SES) return;
+  const k = e.key.toLowerCase();
+  if ((e.ctrlKey || e.metaKey) && k === 'z'){ e.preventDefault(); e.shiftKey ? undoRedo(SES.redo, SES.hist) : undoRedo(SES.hist, SES.redo); return; }
+  if ((e.ctrlKey || e.metaKey) && k === 'y'){ e.preventDefault(); undoRedo(SES.redo, SES.hist); return; }
+  const tk = { b:'pen', e:'eraser', g:'fill', i:'pick', m:'move' }[k]; if (tk && !e.ctrlKey && !e.metaKey){ setTool(tk); return; }
+  const mv = { arrowleft:[-1, 0], arrowright:[1, 0], arrowup:[0, -1], arrowdown:[0, 1] }[k];
+  if (mv){ e.preventDefault(); snapshot(ACTIVE); SES.dirty.add(ACTIVE); shift(mv[0], mv[1]); draw(); clearTimeout(palT); palT = setTimeout(() => commit(SES), 300); schedulePreview(); }
+});
+addEventListener('resize', fit);
+
+/* ================= Démarrage ================= */
+(async () => {
+  setTool('pen');
+  try { ONLINE = await (await fetch('boutique.json', { cache:'no-cache' })).json(); }
+  catch(e){ $('state').textContent = 'boutique.json illisible : vérifie qu\'il est bien à côté de cette page.'; return; }
+  ONLINE_IDS = new Set(ONLINE.items.map(x => x.id));
+  DATA = JSON.parse(JSON.stringify(ONLINE));
+  try { const d = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null');
+    if (d && d.data && !same(d.data, ONLINE)){ DATA = d.data;
+      $('bannerTxt').textContent = 'Brouillon repris (' + new Date(d.saved).toLocaleString('fr-FR', { dateStyle:'short', timeStyle:'short' }) + '). Il reste sur cet appareil tant qu\'il n\'est pas publié.';
+      $('banner').classList.add('show'); } } catch(e){}
+  $('download').disabled = false;
+  renderSlots(); renderList(); refreshChecks();
+  const first = DATA.items.find(x => x.slot === slot); if (first) await select(first.id);
+})();
+})();
+</script>
+</body>
+</html>

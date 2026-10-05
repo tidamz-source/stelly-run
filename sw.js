@@ -1,6 +1,6 @@
 /* Stelly Run : service worker
    Pour publier une mise à jour du jeu : modifier VERSION ci-dessous. */
-const VERSION = 'stelly-run-v5.63';
+const VERSION = 'stelly-run-v5.64';
 const FILES = [
   './',
   './index.html',
@@ -32,6 +32,8 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET') return;
   if (new URL(req.url).origin !== location.origin) return;   // classement en ligne : jamais mis en cache
   // La page du jeu : réseau d'abord (pour récupérer les mises à jour), cache si hors ligne
+  // l'atelier n'est jamais mis en cache : il ne doit pas remplacer la page du jeu hors ligne
+  if (/atelier\.html$/.test(new URL(req.url).pathname)) return;
   if (req.mode === 'navigate'){
     e.respondWith(fetch(req).then(res => { const copy = res.clone(); caches.open(VERSION).then(c => c.put('./index.html', copy)); return res; })
       .catch(() => caches.match('./index.html')));

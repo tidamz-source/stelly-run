@@ -71,12 +71,15 @@ function drawStelly(g, o){
   const hips = [[cx-2 + tilt*10, cy+11], [cx+2 + tilt*10, cy+11]];
   const sh = [pts[8], pts[2]].map(p => [Math.round(lerp(p[0], cx, .28)), Math.round(lerp(p[1], cy, .28)) + 1]);
   const ank = [];
+  // bodyOnly : l'étoile seule, sans bras ni jambes (vignettes de costume dans l'atelier)
   const arm = (i, A) => {
+    if (o.bodyOnly) return;
     const hand = [A.h[0], A.h[1] + oy], s = sh[i], el = ik(s[0], s[1], hand[0], hand[1], 7, 7, A.b);
     thick(g, s[0], s[1], el[0], el[1], C.plum); thick(g, el[0], el[1], hand[0], hand[1], C.plum);
     if (A.g === 'none') return; const gl = A.g === 'hand' ? HAND : (A.g === 'point' ? POINT : FIST); pm(g, gl, hand[0] - (gl[0].length>>1), hand[1] - (gl === POINT ? 8 : 4), i === 0);
   };
   const leg = (i, L, far) => {
+    if (o.bodyOnly) return;
     const a = [Math.round(L[0]), Math.round(L[1] + oy)], hp = hips[i], kn = ik(hp[0], hp[1], a[0], a[1], 9, 9, 1);
     thick(g, hp[0], hp[1], kn[0], kn[1], C.plum); thick(g, kn[0], kn[1], a[0], a[1], C.plum);
     const sh = eq.shoes; if (sh) g.drawImage(far ? sh.far : sh.img, a[0] + (far ? sh.fdx : sh.dx), a[1] + (far ? sh.fdy : sh.dy)); else pm(g, SHOE, a[0]-3, a[1]-1, false, far ? PAL_FAR : PAL); ank[i] = a;
