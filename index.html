@@ -792,8 +792,8 @@ function roundThings(w, h, balls, kind){
       let c;
       if (!In(x-1,y)||!In(x+1,y)||!In(x,y-1)||!In(x,y+1)) c = C.plum;
       else if (kind === 'log'){
-        if (d > .78) c = (dx < 0 || dy > b[2]*.3) ? '#43280F' : '#5C3B1E';
-        else { const ring = Math.floor(d*5.5) % 2; c = ring ? '#8C6032' : '#B48A52'; if (d < .14) c = '#66401C'; if (dx > 1 && dy < -1 && d < .7 && ring === 0) c = '#C9A06A'; }
+        if (d > .78) c = (dx < 0 || dy > b[2]*.3) ? '#7E5530' : '#9E6D3E';
+        else { const ring = Math.floor(d*5.5) % 2; c = ring ? '#C9975C' : '#EBC88F'; if (d < .14) c = '#9A6C3B'; if (dx > 1 && dy < -1 && d < .7 && ring === 0) c = '#F6DDAE'; }
       } else {
         const sp = ((a/(Math.PI*2) + d*1.6) % .25 + .25) % .25 < .07;
         const k = -dx/b[2]*.55 + dy/b[2]*.8;
@@ -806,9 +806,9 @@ function roundThings(w, h, balls, kind){
 }
 const STUMP = mk(16, 15, g => {
   const test = (x,y) => (x >= 3 && x <= 12 && y >= 3) || (y >= 11 && x >= 1 && x <= 14 && y <= 14 && Math.abs(x - 7.5) <= 4 + (y - 10)*1.2) || (Math.hypot((x+.5-8)/5.6, (y+.5-3.5)/2.2) <= 1);
-  shade(g, 16, 15, (x,y) => y < 15 && test(x,y), { base:'#5C3B1E', out:C.plum, dark:'#43280F', light:'#744C2A' });
-  g.fillStyle = '#43280F'; [[5,6],[5,7],[9,8],[9,9],[11,6],[7,11],[7,12]].forEach(([x,y]) => g.fillRect(x, y, 1, 1));
-  for (let y=0;y<15;y++) for (let x=0;x<16;x++){ const d = Math.hypot((x+.5-8)/4.6, (y+.5-3.4)/1.5); if (d <= 1){ g.fillStyle = d > .66 ? '#8C6032' : (d > .33 ? '#B48A52' : '#A07444'); g.fillRect(x, y, 1, 1); } }
+  shade(g, 16, 15, (x,y) => y < 15 && test(x,y), { base:'#9E6D3E', out:C.plum, dark:'#7E5530', light:'#B88552' });
+  g.fillStyle = '#7E5530'; [[5,6],[5,7],[9,8],[9,9],[11,6],[7,11],[7,12]].forEach(([x,y]) => g.fillRect(x, y, 1, 1));
+  for (let y=0;y<15;y++) for (let x=0;x<16;x++){ const d = Math.hypot((x+.5-8)/4.6, (y+.5-3.4)/1.5); if (d <= 1){ g.fillStyle = d > .66 ? '#C9975C' : (d > .33 ? '#EBC88F' : '#DCB37A'); g.fillRect(x, y, 1, 1); } }
 });
 const LOGPYR = roundThings(26, 22, [[7,15,6.6],[19,15,6.6],[13,7.2,6.2]], 'log');
 const LOG3 = roundThings(38, 41, [[7,34,6.6],[19,34,6.6],[31,34,6.6],[13,23,6.4],[25,23,6.4],[19,12.4,6.2]], 'log');
@@ -1523,7 +1523,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.53';
+const APP_VERSION = '5.54';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -2497,6 +2497,7 @@ function drawBack(th){
   if (H - GY > 60) tile(T.fg, bgX, GY + Math.round((H-GY)*.8) - 26);
   if (th === 3) drawFlakes();
   if (th === 5){ drawRays(); tile(T.canopy, bgX*.3, 0); }
+  if (th === 5){ ctx.fillStyle = 'rgba(16,10,26,.24)'; ctx.fillRect(0, 0, W, H); }   // forêt assombrie : les obstacles, dessinés après, ressortent mieux
 }
 // taupes et crabes : sortent la tête ; avec la difficulté, certains sautent un peu hors du trou
 function critter(o){
