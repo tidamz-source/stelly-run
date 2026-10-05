@@ -1493,7 +1493,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.49';
+const APP_VERSION = '5.50';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -1566,7 +1566,7 @@ const TROPHIES = [
   ['master', 'Master', 'Jouer 100 parties'],
   ['huck', 'Huck', 'Attraper 150 disques en une partie'],
   ['elfe', 'Un elfe libre', 'Attraper 3 chaussettes en 1 partie'],
-  ['bulldozer', 'Bulldozer', 'Renverser 20 obstacles en 1 partie'],
+  ['bulldozer', 'Bulldozer', 'Renverser 30 obstacles en 1 partie'],
   ['hydrate', 'Bien hydraté', 'Boire 3 gourdes en 1 partie'],
   ['argent', 'Handler d’argent', '5 000 frisbees catchés'],
   ['picsou', 'Picsou', 'Avoir 5 000 disques de côté'],
@@ -1625,7 +1625,7 @@ const TR = (() => {
     sock(){ if (++g.socks >= 3) unlock('elfe'); },
     miss(){ if (++g.miss >= 25) unlock('mains'); },
     fire(){ g.fire = true; if (++g.fires >= 3) unlock('hydrate'); },
-    smash(n){ g.smash += n || 1; if (g.smash >= 20) unlock('bulldozer'); },   // chaque élément compte : rangée de 3 = 3, pyramide = 3, pyramide à 3 niveaux = 6
+    smash(n){ g.smash += n || 1; if (g.smash >= 30) unlock('bulldozer'); },   // chaque élément compte : rangée de 3 = 3, pyramide = 3, pyramide à 3 niveaux = 6
     stomp(sp, tier){ if (++g.stomps >= 5) unlock('plumes'); if (EQUIPPED.hat && EQUIPPED.hat.id === 'hat-casque' && ++d.helmet >= 10) unlock('tetedure'); if (tier === 2) unlock('voltige');
       const i = BIRD_KINDS.indexOf(sp); if (i >= 0){ d.birds |= 1 << i; if ((d.birds & 31) === 31) unlock('angry'); save(); } },
     // boutique
@@ -1714,7 +1714,7 @@ function buildTrophyIcons(){
   ic('or', g => medal(g, null, C.yellow, C.orange, C.yellowL));
   ic('heros', g => { put(g, SOCK[0], 12, 15); put(g, BOTTLE, 24, 17); });
   ic('elfe', g => { put(g, SOCK[0], 15, 15); num(g, '3'); });
-  ic('bulldozer', g => { put(g, CONES[0], 15, 18, 1, Math.PI/2); g.fillStyle = C.yellow; for (const [x, y] of [[4,6],[9,3],[25,6]]){ g.fillRect(x, y-1, 1, 3); g.fillRect(x-1, y, 3, 1); } num(g, '20'); });
+  ic('bulldozer', g => { put(g, CONES[0], 15, 18, 1, Math.PI/2); g.fillStyle = C.yellow; for (const [x, y] of [[4,6],[9,3],[25,6]]){ g.fillRect(x, y-1, 1, 3); g.fillRect(x-1, y, 3, 1); } num(g, '30'); });
   ic('hydrate', g => { put(g, BOTTLE, 14, 15); num(g, '3'); });
   ic('intouchable', g => { put(g, BOTTLE, 16, 16); forbid(g); });
   ic('rainbow', g => { put(g, RBDISC, 16, 17); g.fillStyle = C.white; for (const [x, y] of [[4,5],[27,6],[25,27],[7,26],[16,4]]){ g.fillRect(x, y-1, 1, 3); g.fillRect(x-1, y, 3, 1); } });
