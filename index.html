@@ -348,6 +348,21 @@ body{
 #lbres{ font-family:var(--num); font-size:max(calc(var(--s)*4.5px),10px); color:var(--yellow); margin:calc(var(--s)*1px) 0 calc(var(--s)*3px); }
 @media (prefers-reduced-motion: reduce){ #lb, #lb.open{ transition-duration:.01s; } }
 
+/* ----- Écran de fin : bilan de la partie ----- */
+.ostats{ display:flex; gap:calc(var(--s)*4px); justify-content:center; margin:calc(var(--s)*2px) 0 calc(var(--s)*3px); }
+.ostat{ min-width:calc(var(--s)*38px); padding:calc(var(--s)*1.6px) calc(var(--s)*3px); background:#43234A; border:calc(var(--s)*1px) solid #5C3D63; border-radius:calc(var(--s)*2px); text-align:center; }
+.ostat b{ display:flex; align-items:center; justify-content:center; gap:calc(var(--s)*1.5px); font-family:var(--num); font-weight:400; font-size:max(calc(var(--s)*6.5px),12px); color:var(--white); line-height:1.1; }
+.ostat b canvas{ height:calc(var(--s)*4.5px); width:auto; image-rendering:pixelated; }
+.ostat b.gold{ color:var(--yellow); }
+.ostat span{ display:block; font-size:max(calc(var(--s)*3.8px),8px); font-weight:700; color:var(--purple-l); margin-top:calc(var(--s)*.5px); white-space:nowrap; }
+.otro{ display:flex; align-items:center; justify-content:center; gap:calc(var(--s)*3px); margin:0 0 calc(var(--s)*4px); }
+.otro[hidden]{ display:none; }
+.otro .lab{ font-size:max(calc(var(--s)*4.6px),9px); font-weight:700; color:var(--yellow); margin-right:calc(var(--s)*1px); white-space:nowrap; }
+.otro .ic{ width:calc(var(--s)*16px); height:calc(var(--s)*16px); flex:none; background:#FFF4D6; border:calc(var(--s)*1px) solid var(--plum); border-radius:calc(var(--s)*2px); display:flex; align-items:center; justify-content:center; animation:badge .5s cubic-bezier(.3,1.7,.5,1) both; }
+.otro .ic canvas{ width:calc(var(--s)*14px); height:calc(var(--s)*14px); image-rendering:pixelated; }
+.otro .nm{ font-size:max(calc(var(--s)*4.6px),9px); font-weight:700; color:var(--white); max-width:calc(var(--s)*90px); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.otro.mini{ margin:calc(var(--s)*1px) 0 calc(var(--s)*3px); }
+
 @media (prefers-reduced-motion: reduce){
   #title *, .panel, #toast.show{ animation-duration:.01s; animation-delay:0s; }
 }
@@ -390,6 +405,8 @@ body{
         <h2>Plot touché !</h2>
         <p class="big" id="final">0</p>
         <p class="line" id="bestline">Record 0</p>
+        <div class="ostats"><div class="ostat"><b class="gold"><span id="ocoins">0</span><canvas class="icoCoin"></canvas></b><span data-i18n="over.coins">frisbees gagnés</span></div><div class="ostat"><b id="ostreak">0</b><span data-i18n="over.streak">meilleure série</span></div><div class="ostat"><b id="oko">0</b><span data-i18n="over.ko">mis K.O.</span></div></div>
+        <div class="otro" id="otro" hidden></div>
         <div id="lbentry" hidden><div class="lbt" data-i18n="lb.entry">Record perso ! Ton nom pour le classement :</div>
           <div class="lbslots"><div class="lbslot"><button class="up" aria-label="Lettre précédente" data-i18n-aria="lb.prevLetter"><i></i></button><b>A</b><button class="dn" aria-label="Lettre suivante" data-i18n-aria="lb.nextLetter"><i></i></button></div><div class="lbslot"><button class="up" aria-label="Lettre précédente" data-i18n-aria="lb.prevLetter"><i></i></button><b>A</b><button class="dn" aria-label="Lettre suivante" data-i18n-aria="lb.nextLetter"><i></i></button></div><div class="lbslot"><button class="up" aria-label="Lettre précédente" data-i18n-aria="lb.prevLetter"><i></i></button><b>A</b><button class="dn" aria-label="Lettre suivante" data-i18n-aria="lb.nextLetter"><i></i></button></div></div>
           <button id="lbsend" class="btn" data-i18n="ui.send">Envoyer</button></div>
@@ -1539,13 +1556,13 @@ function sealedLoad(key){ const v = sealedGet(key); return v != null ? v : seale
 let best = 0; { const v = sealedLoad('stellyrun_best'); best = v != null ? (+v || 0) : 0; if (v != null) sealedSave('stellyrun_best', String(best)); }
 let shake = 0, flash = 0, overT = 0, bgX = 0, nextObs = 0, sockIn = 0, fireIn = 0, lastCatch = -9, combo = 0, milestone = 500;
 let graceT = 0, theme = 0, prevTheme = 0, transT = 0, fireT = 0, boost = 1, deathKind = 'hit', titleSlammed = false;
-let groups = {}, gidN = 0, discCount = 0, streak = 0;
+let groups = {}, gidN = 0, discCount = 0, streak = 0, bestStreak = 0, koCount = 0;
 const newGroup = n => { gidN++; groups[gidN] = { n, got:0 }; return gidN; };
 let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.58';
+const APP_VERSION = '5.59';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -1557,7 +1574,7 @@ const pad = n => String(n).padStart(5,'0');
 function showTitleRecord(){ ui.trec.hidden = best <= 0; ui.trec.textContent = txt('ui.record') + ' ' + pad(best); }
 
 function reset(){
-  t = 0; dist = 0; bonus = 0; zoneIdx = 0; zoneT = 12 + Math.random()*6; deer = []; flyers = []; flyIn = 4 + Math.random()*3; birdWait = false; groups = {}; discCount = 0; streak = 0; $('dcn').textContent = '0'; speed = 235; spEff = 190; obs = []; discs = []; items = []; parts = []; pops = []; debris = []; lines = [];
+  t = 0; dist = 0; bonus = 0; zoneIdx = 0; zoneT = 12 + Math.random()*6; deer = []; flyers = []; flyIn = 4 + Math.random()*3; birdWait = false; groups = {}; discCount = 0; streak = 0; bestStreak = 0; koCount = 0; $('dcn').textContent = '0'; speed = 235; spEff = 190; obs = []; discs = []; items = []; parts = []; pops = []; debris = []; lines = [];
   nextObs = 170; sockIn = 11 + Math.random()*6; fireIn = 17 + Math.random()*7; lastCatch = -9; combo = 0; milestone = 500; shownScore = -1;
   theme = 0; prevTheme = 0; transT = 0; fireT = 0; graceT = 0; boost = 1; shark = null;
   Object.assign(P, { y:GY, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, land:0, sink:false, stomps:0 });
@@ -1613,7 +1630,7 @@ const TR = (() => {
     // frisbee arc-en-ciel : une seule chance par partie (1/300), la probabilité grimpe à chaque partie sans l'attraper (pitié), plafonnée à 5 %
     rainbowAt(){ const p = Math.min(.05, (1/300)*(1 + d.rbMiss/100)); d.rbMiss++; return Math.random() < p ? 8 + Math.random()*30 : -1; },
     rainbow(){ d.rb++; d.coins += 100; if (d.coins >= 5000) unlock('picsou'); d.rbMiss = 0; unlock('rainbow'); save(); },
-    start(){ g = { socks:0, fires:0, smash:0, stomps:0, fire:false, miss:0 }; d.games++; d.th |= 1; for (const [n, id] of GAMES) if (d.games >= n) unlock(id); save(); },
+    start(){ g = { socks:0, fires:0, smash:0, stomps:0, fire:false, miss:0, coins0: d.coins, t0: Date.now() }; d.games++; d.th |= 1; for (const [n, id] of GAMES) if (d.games >= n) unlock(id); save(); },
     zone(n){ d.th |= 1 << n; if (ZONES[n]) unlock(ZONES[n]); if ((d.th & 127) === 127) unlock('globe'); },
     disc(){
       d.discs++; d.coins++; if (d.coins >= 5000) unlock('picsou');
@@ -1637,6 +1654,8 @@ const TR = (() => {
       const all = SHOP.filter(x => x.img); if (all.filter(x => x.slot === 'hat').every(x => d.own[x.id])) unlock('chapelier'); if (all.every(x => d.own[x.id])) unlock('dressing'); save(); },
     tried(it){ if (d.own[it.id] || d.tried[it.id]) return; d.tried[it.id] = 1; if (Object.keys(d.tried).filter(k => !d.own[k]).length >= 10) unlock('vitrine'); save(); },
     worn(){ if (SHOP_SLOTS.every(sl => EQUIPPED[sl])) unlock('fashion'); },
+    // bilan de la partie : frisbees gagnés pour la boutique, trophées débloqués pendant la partie
+    game: () => ({ coins: d.coins - (g.coins0 != null ? g.coins0 : d.coins), trophies: TROPHY_IDS.filter(id => d.u[id] && d.u[id] >= (g.t0 || Infinity)) }),
     shark(){ if (++d.sharks >= 10) unlock('requin'); }
   };
 })();
@@ -2110,6 +2129,17 @@ function addConfetti(n, fromTop, cx, cy){
 
 /* ================= Mise à jour ================= */
 const deathMsg = k => TEXTS['death.' + k] ? txt('death.' + k) : txt('ui.hit');
+// trophées débloqués pendant la partie : icônes et noms, ou une ligne courte si la saisie du classement prend la place
+function overTrophies(ids, compact){
+  const box = $('otro'); box.textContent = ''; box.hidden = !ids.length; box.classList.toggle('mini', compact);
+  if (!ids.length) return;
+  const lab = document.createElement('span'); lab.className = 'lab'; lab.textContent = txt(ids.length > 1 ? 'over.trophies' : 'over.trophy1', { n: ids.length }); box.appendChild(lab);
+  if (compact) return;
+  const I = overTrophies.ico || (overTrophies.ico = buildTrophyIcons());
+  ids.slice(0, 3).forEach((id, i) => { const d = document.createElement('div'); d.className = 'ic'; d.style.animationDelay = (.15 + i*.12) + 's';
+    const c = document.createElement('canvas'); c.width = 32; c.height = 32; c.getContext('2d').drawImage(I[id], 0, 0); d.appendChild(c); box.appendChild(d); });
+  const nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = ids.map(id => txt('tr.' + id + '.n')).join(', '); box.appendChild(nm);
+}
 function die(kind){
   if (state !== 'play') return;
   $('pausebtn').hidden = true;
@@ -2117,7 +2147,7 @@ function die(kind){
   if (kind === 'hole' || kind === 'sewer'){ P.sink = true; P.vy = 30; P.ground = false; sfx.fall(); dust(P.x, GY, 10); shake = .15; }
   else { P.vy = -180; P.ground = false; shake = .35; sfx.hit(); burst(P.x, P.y-28, 16, kind === 'slip' ? ['#3FA3E0', '#BFE8FF', C.white] : (kind === 'ski' ? [C.white, '#DCE9F5', C.purple] : [C.yellow, C.orange, C.white]), 95, 300); }
   TR.die(kind);
-  P.newBest = score > best;
+  P.prevBest = best; P.newBest = score > best;
   if (P.newBest){ best = score; sealedSave('stellyrun_best', String(best)); }
 }
 function smash(o){
@@ -2136,7 +2166,7 @@ function stomp(f, fy){
   P.vy = -(P.sockT > 0 ? 420 : (P.hold ? 340 : 290)); P.y = Math.min(P.y, fy - FLY_SPECS[f.sp].hh);
   const tier = f.tier || 0, pts = Math.round(100*ALT_MULT[tier]); bonus += pts;   // 100 / 150 / 200
   pops.push({ x:f.x, y:fy - 14, s: '+' + pts, t:0, col: C.yellow });
-  TR.stomp(f.sp, f.tier); sfx.stomp(1 + tier*2); shake = Math.max(shake, .06);
+  koCount++; TR.stomp(f.sp, f.tier); sfx.stomp(1 + tier*2); shake = Math.max(shake, .06);
   burst(f.x, fy - 4, 10, [C.white, C.yellow, '#E6DCF0'], 70, 160);
 }
 function catchDisc(o){
@@ -2147,7 +2177,7 @@ function catchDisc(o){
     for (let i=0;i<40;i++) confetti.push({ x:o.x, y:o.y, vx:(Math.random()-.5)*240, vy:-60-Math.random()*140, col:RB_COLS[i % 6], ph:Math.random()*6, t:0 }); }
   combo = (t - lastCatch < 1.3) ? Math.min(combo+1, 5) : 1; lastCatch = t;
   if (o.g && groups[o.g]){ const G = groups[o.g]; G.got++; if (G.n >= 5 && G.got === G.n){ toast(txt('toast.combo')); bonus += 500; } }
-  streak++;
+  streak++; if (streak > bestStreak) bestStreak = streak;
   if (streak === 10){ bonus += 1000; toast(txt('toast.superCombo'), true); sfx.mile(); }
   else if (streak === 50){ bonus += 5000; toast(txt('toast.megaCombo'), true); sfx.world(); }
   else if (streak % 100 === 0){ bonus += 10000; toast(txt('toast.gigaCombo'), true); sfx.world(); flash = .15; }
@@ -2266,8 +2296,11 @@ function update(dt){
 
   if (state === 'over' && overT > .65 && ui.over.hidden){
     ui.final.textContent = pad(score);
-    ui.bestline.textContent = P.newBest ? txt('ui.newRecord') : txt('ui.record') + ' ' + pad(best);
+    ui.bestline.textContent = P.newBest ? (P.prevBest > 0 ? txt('over.newBest', { n: fmtN(score - P.prevBest) }) : txt('ui.newRecord'))
+      : (best - score > 0 ? txt('over.gap', { n: fmtN(best - score) }) : txt('over.tie'));
     ui.bestline.className = 'line' + (P.newBest ? ' new' : '');
+    const gm = TR.game(); $('ocoins').textContent = '+' + fmtN(gm.coins); $('ostreak').textContent = 'x' + bestStreak; $('oko').textContent = koCount;
+    overTrophies(gm.trophies, score > (TR.d.lbBest || 0));
     ui.hi.textContent = txt('ui.record') + ' ' + pad(best);
     ui.sockbar.hidden = true; ui.firebar.hidden = true; ui.over.hidden = false;
     ui.over.querySelector('h2').textContent = deathMsg(deathKind);

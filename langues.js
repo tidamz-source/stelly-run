@@ -84,6 +84,15 @@ const TEXTS = {
   "lb.rank": { fr:"Classement mondial : n° {n}", en:"World rank: #{n}", es:"Ranking mundial: n.º {n}" },
   "lb.sent": { fr:"Score envoyé !", en:"Score sent!", es:"¡Puntuación enviada!" },
   "lb.offline": { fr:"Envoi à la prochaine connexion", en:"Will be sent when you’re back online", es:"Se enviará cuando vuelvas a tener conexión" },
+  // ----- écran de fin -----
+  "over.gap": { fr:"À {n} pts de ton record", en:"{n} pts short of your best", es:"A {n} pts de tu récord" },
+  "over.tie": { fr:"Égalité avec ton record !", en:"You tied your best!", es:"¡Igualas tu récord!" },
+  "over.newBest": { fr:"Nouveau record ! +{n}", en:"New best! +{n}", es:"¡Nuevo récord! +{n}" },
+  "over.coins": { fr:"frisbees gagnés", en:"frisbees earned", es:"frisbees ganados" },
+  "over.streak": { fr:"meilleure série", en:"best streak", es:"mejor racha" },
+  "over.ko": { fr:"mis K.O.", en:"knocked out", es:"noqueados" },
+  "over.trophy1": { fr:"1 trophée !", en:"1 trophy!", es:"¡1 trofeo!" },
+  "over.trophies": { fr:"{n} trophées !", en:"{n} trophies!", es:"¡{n} trofeos!" },
   // ----- causes de mort -----
   "death.hole": { fr:"Tombée dans le trou !", en:"Fell in the hole!", es:"¡Caída en el agujero!" },
   "death.slip": { fr:"Glissade dans la flaque !", en:"Slipped in the puddle!", es:"¡Resbalón en el charco!" },
