@@ -1515,7 +1515,27 @@ const MUSIC = (() => {
 /* ================= État ================= */
 let titleCaught = false;
 let state = 'title', clock = 0, titleT = 0, t = 0, dist = 0, bonus = 0, speed = 30, spEff = 30, score = 0, shownScore = -1;
-let best = 0; try { best = +localStorage.getItem('stellyrun_best') || 0; } catch(e){}
+// ----- anti-triche -----
+// empreinte rapide (cyrb53), identique dans le script du classement
+function cyrb53(str, seed = 0){
+  let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+  for (let i = 0; i < str.length; i++){ const ch = str.charCodeAt(i); h1 = Math.imul(h1 ^ ch, 2654435761); h2 = Math.imul(h2 ^ ch, 1597334677); }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+}
+// sceau des données locales : une valeur retouchée à la main n'a plus le bon sceau et est ignorée
+const SEAL_SALT = 'st3lly-seal-v1';
+const sealOf = v => cyrb53(v + '|' + SEAL_SALT);
+// appareil pas encore passé aux sceaux : ses anciennes données sont acceptées une dernière fois
+const SEAL_LEGACY = (() => { try { return !localStorage.getItem('stellyrun_sealed'); } catch(e){ return false; } })();
+function sealedSet(key, v){ try { localStorage.setItem(key, v); localStorage.setItem(key + '_h', sealOf(v)); localStorage.setItem('stellyrun_sealed', '1'); } catch(e){} }
+// renvoie la valeur si elle est intacte ; null si elle a été modifiée ; une ancienne valeur sans sceau est acceptée une fois
+function sealedGet(key){ try { const v = localStorage.getItem(key), h = localStorage.getItem(key + '_h'); if (v == null) return null; if (h === sealOf(v) || (h == null && SEAL_LEGACY)) return v; } catch(e){} return null; }
+// avec copie de secours : une valeur retouchée est remplacée par la dernière valeur intacte
+function sealedSave(key, v){ sealedSet(key, v); sealedSet(key + '_bk', v); }
+function sealedLoad(key){ const v = sealedGet(key); return v != null ? v : sealedGet(key + '_bk'); }
+let best = 0; { const v = sealedLoad('stellyrun_best'); best = v != null ? (+v || 0) : 0; if (v != null) sealedSave('stellyrun_best', String(best)); }
 let shake = 0, flash = 0, overT = 0, bgX = 0, nextObs = 0, sockIn = 0, fireIn = 0, lastCatch = -9, combo = 0, milestone = 500;
 let graceT = 0, theme = 0, prevTheme = 0, transT = 0, fireT = 0, boost = 1, deathKind = 'hit', titleSlammed = false;
 let groups = {}, gidN = 0, discCount = 0, streak = 0;
@@ -1524,7 +1544,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.56';
+const APP_VERSION = '5.57';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -1573,10 +1593,11 @@ const DEATH_KINDS = ['hit', 'slip', 'hole', 'mole', 'crab', 'marmot', 'sewer', '
 const TR = (() => {
   const KEY = 'stellyrun_trophies';
   const d = { u:{}, s:{}, games:0, discs:0, sharks:0, th:0, birds:0, rbMiss:0, rb:0, deer:0, deaths:0, own:{}, eq:{}, spent:0, tried:{}, helmet:0 };
-  try { const j = JSON.parse(localStorage.getItem(KEY)); if (j && typeof j === 'object') Object.assign(d, j); } catch(e){}
+  { const raw = sealedLoad(KEY);   // version retouchée -> copie de secours -> données vierges
+    try { const j = JSON.parse(raw); if (j && typeof j === 'object') Object.assign(d, j); } catch(e){} }
   if (typeof d.coins !== 'number') d.coins = d.discs;   // monnaie de la boutique : frisbees attrapés (rétroactif)
   let g = { socks:0, fires:0, smash:0, stomps:0, fire:false, miss:0 };
-  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch(e){} };
+  const save = () => sealedSave(KEY, JSON.stringify(d));
   function unlock(id){
     if (d.u[id]) return; d.u[id] = Date.now();
     if (!d.u.greatest && TROPHIES.every(([k]) => k === 'greatest' || k === 'parzival' || d.u[k])) d.u.greatest = Date.now();
@@ -1810,13 +1831,16 @@ const LB = (() => {
     last = await r.json(); first(); return last;
   }
   const first = () => { if (last && last.me && last.me.rank === 1) TR.unlock('parzival'); };
-  async function send(name, score){
-    store('stellyrun_lbpending', JSON.stringify({ name, score }));
-    const r = await fetch(LB_URL, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body: JSON.stringify({ name, score, id, v: APP_VERSION }) });
+  const LB_SECRET = 'lg-st3lly-9f2k';   // même clé que dans le script du classement
+  async function send(name, score, tm, discs){
+    tm = Math.round(tm || 0); discs = discs | 0;
+    store('stellyrun_lbpending', JSON.stringify({ name, score, t: tm, discs }));
+    const sig = cyrb53([name, score, tm, discs, id].join('|') + '|' + LB_SECRET);
+    const r = await fetch(LB_URL, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body: JSON.stringify({ name, score, t: tm, discs, id, v: APP_VERSION, sig }) });
     last = await r.json(); store('stellyrun_lbpending', ''); first(); return last;
   }
   // un record en attente (envoyé hors connexion) repart dès que possible
-  async function flushPending(){ const p = store('stellyrun_lbpending'); if (!p) return; try { const o = JSON.parse(p); await send(o.name, o.score); } catch(e){} }
+  async function flushPending(){ const p = store('stellyrun_lbpending'); if (!p) return; try { const o = JSON.parse(p); await send(o.name, o.score, o.t, o.discs); } catch(e){} }
   return { get, send, flushPending, id, name: () => store('stellyrun_name') || 'AAA', setName: n => store('stellyrun_name', n), last: () => last };
 })();
 LB.flushPending();
@@ -1830,8 +1854,9 @@ const lbEntry = (() => {
     box.querySelectorAll('.lbslot').forEach((s, i) => { s.querySelector('b').textContent = letters[i]; s.classList.toggle('on', i === pos); });
   }
   function bump(i, d){ const k = (LB_CHARS.indexOf(letters[i]) + d + LB_CHARS.length) % LB_CHARS.length; letters[i] = LB_CHARS[k]; pos = i; draw(); sfx.disc(1); }
-  function show(sc){
-    score = sc; active = true; pos = 0; letters = LB.name().split('').slice(0, 3);
+  let meta = { t: 0, discs: 0 };
+  function show(sc, tm, discs){
+    score = sc; meta = { t: tm, discs }; active = true; pos = 0; letters = LB.name().split('').slice(0, 3);
     box.hidden = false; res.hidden = true; draw();
   }
   function hide(){ box.hidden = true; res.hidden = true; active = false; }
@@ -1839,7 +1864,7 @@ const lbEntry = (() => {
     if (!active) return; active = false;
     const name = letters.join(''); LB.setName(name); TR.d.lbBest = score; TR.save();
     box.hidden = true; res.hidden = false; res.textContent = txt('lb.sending');
-    try { const r = await LB.send(name, score); res.textContent = r && r.me ? txt('lb.rank', { n: fmtN(r.me.rank) }) : txt('lb.sent'); }
+    try { const r = await LB.send(name, score, meta.t, meta.discs); res.textContent = r && r.me ? txt('lb.rank', { n: fmtN(r.me.rank) }) : txt('lb.sent'); }
     catch(e){ res.textContent = txt('lb.offline'); }
   }
   box.querySelectorAll('.lbslot').forEach((s, i) => {
@@ -2092,7 +2117,7 @@ function die(kind){
   else { P.vy = -180; P.ground = false; shake = .35; sfx.hit(); burst(P.x, P.y-28, 16, kind === 'slip' ? ['#3FA3E0', '#BFE8FF', C.white] : (kind === 'ski' ? [C.white, '#DCE9F5', C.purple] : [C.yellow, C.orange, C.white]), 95, 300); }
   TR.die(kind);
   P.newBest = score > best;
-  if (P.newBest){ best = score; try { localStorage.setItem('stellyrun_best', best); } catch(e){} }
+  if (P.newBest){ best = score; sealedSave('stellyrun_best', String(best)); }
 }
 function smash(o){
   for (const [img, x, y] of pieces(o)) debris.push({ img, x, y, vx: 200 + Math.random()*160, vy: -240 - Math.random()*140, rot:0, vr:(Math.random()-.5)*24 });
@@ -2245,7 +2270,7 @@ function update(dt){
     ui.hi.textContent = txt('ui.record') + ' ' + pad(best);
     ui.sockbar.hidden = true; ui.firebar.hidden = true; ui.over.hidden = false;
     ui.over.querySelector('h2').textContent = deathMsg(deathKind);
-    if (score > (TR.d.lbBest || 0)) lbEntry.show(score); else lbEntry.hide();
+    if (score > (TR.d.lbBest || 0)) lbEntry.show(score, t, discCount); else lbEntry.hide();
   }
 
   // requin (plage)
@@ -2704,7 +2729,7 @@ function press(){
 function release(){ P.hold = false; }
 function pause(){ if (state !== 'play') return; MUSIC.pause(); state = 'pause'; ui.pause.hidden = false; $('pausebtn').hidden = true; P.hold = false; $('resume').focus({ preventScroll:true }); }
 // abandon depuis la pause : la partie s'arrête, les points comptent pour le record, aucun trophée de mort
-function quitToHome(){ if (state !== 'pause') return; if (score > best){ best = score; try { localStorage.setItem('stellyrun_best', best); } catch(e){} } TR.save(); ui.pause.hidden = true; goHome(); }
+function quitToHome(){ if (state !== 'pause') return; if (score > best){ best = score; sealedSave('stellyrun_best', String(best)); } TR.save(); ui.pause.hidden = true; goHome(); }
 function resume(){ MUSIC.resume(); state = 'play'; ui.pause.hidden = true; $('pausebtn').hidden = false; last = 0; }
 let zoneTimer = 0;
 function setZone(n){ const z = $('zone'); z.textContent = THEME_NAMES[n]; z.hidden = false; z.classList.toggle('ice', n === 3); z.classList.remove('pop'); void z.offsetWidth; z.classList.add('pop'); clearTimeout(zoneTimer); zoneTimer = setTimeout(() => { z.hidden = true; }, 3000); }
