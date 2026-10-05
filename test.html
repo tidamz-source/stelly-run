@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Stelly Run</title>
+<title>[TEST] Stelly Run</title>
 <meta name="theme-color" content="#2E0E30">
 <meta name="description" content="Stelly Run : cours, saute et attrape un max de frisbees !">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -469,7 +469,7 @@ body{
 <script>
 /* ================= Langues ================= */
 // textes dans langues.js ; txt('clé', { n: 3 }) renvoie le texte dans la langue choisie (français si non traduit)
-let LANG = (() => { try { const l = localStorage.getItem('stellyrun_lang'); if (l && LANGS[l]) return l; } catch(e){}
+let LANG = (() => { try { const l = localStorage.getItem('stellyrun_test_lang'); if (l && LANGS[l]) return l; } catch(e){}
   const n = (navigator.language || 'fr').slice(0, 2).toLowerCase(); return LANGS[n] ? n : 'fr'; })();
 function txt(key, vars){
   const e = TEXTS[key]; let s = e ? (e[LANG] != null ? e[LANG] : e.fr) : key;
@@ -1233,7 +1233,7 @@ const BOAT = mk(14, 11, g => pm(g, ['......o.......','......oww.....','......oww
 
 /* ================= Audio ================= */
 let actx = null, musicOn = true, sfxOn = true, sfxBus = null, musBus = null;
-try { const old = localStorage.getItem('stellyrun_muted') === '1', m = localStorage.getItem('stellyrun_music'), x = localStorage.getItem('stellyrun_sfx');
+try { const old = localStorage.getItem('stellyrun_test_muted') === '1', m = localStorage.getItem('stellyrun_test_music'), x = localStorage.getItem('stellyrun_test_sfx');
   musicOn = m === null ? !old : m === '1'; sfxOn = x === null ? !old : x === '1'; } catch(e){}
 function ensureAudio(){
   if (!actx){ try { actx = new (window.AudioContext||window.webkitAudioContext)();
@@ -1423,14 +1423,14 @@ function cyrb53(str, seed = 0){
 const SEAL_SALT = 'st3lly-seal-v1';
 const sealOf = v => cyrb53(v + '|' + SEAL_SALT);
 // appareil pas encore passé aux sceaux : ses anciennes données sont acceptées une dernière fois
-const SEAL_LEGACY = (() => { try { return !localStorage.getItem('stellyrun_sealed'); } catch(e){ return false; } })();
-function sealedSet(key, v){ try { localStorage.setItem(key, v); localStorage.setItem(key + '_h', sealOf(v)); localStorage.setItem('stellyrun_sealed', '1'); } catch(e){} }
+const SEAL_LEGACY = (() => { try { return !localStorage.getItem('stellyrun_test_sealed'); } catch(e){ return false; } })();
+function sealedSet(key, v){ try { localStorage.setItem(key, v); localStorage.setItem(key + '_h', sealOf(v)); localStorage.setItem('stellyrun_test_sealed', '1'); } catch(e){} }
 // renvoie la valeur si elle est intacte ; null si elle a été modifiée ; une ancienne valeur sans sceau est acceptée une fois
 function sealedGet(key){ try { const v = localStorage.getItem(key), h = localStorage.getItem(key + '_h'); if (v == null) return null; if (h === sealOf(v) || (h == null && SEAL_LEGACY)) return v; } catch(e){} return null; }
 // avec copie de secours : une valeur retouchée est remplacée par la dernière valeur intacte
 function sealedSave(key, v){ sealedSet(key, v); sealedSet(key + '_bk', v); }
 function sealedLoad(key){ const v = sealedGet(key); return v != null ? v : sealedGet(key + '_bk'); }
-let best = 0; { const v = sealedLoad('stellyrun_best'); best = v != null ? (+v || 0) : 0; if (v != null) sealedSave('stellyrun_best', String(best)); }
+let best = 0; { const v = sealedLoad('stellyrun_test_best'); best = v != null ? (+v || 0) : 0; if (v != null) sealedSave('stellyrun_test_best', String(best)); }
 let shake = 0, flash = 0, overT = 0, bgX = 0, nextObs = 0, sockIn = 0, fireIn = 0, lastCatch = -9, combo = 0, milestone = 500;
 let graceT = 0, theme = 0, prevTheme = 0, transT = 0, fireT = 0, boost = 1, deathKind = 'hit', titleSlammed = false;
 let groups = {}, gidN = 0, discCount = 0, streak = 0, bestStreak = 0, koCount = 0;
@@ -1452,7 +1452,7 @@ function showTitleRecord(){ ui.trec.hidden = best <= 0; ui.trec.textContent = tx
 
 function reset(){
   t = 0; dist = 0; bonus = 0; zoneIdx = 0; zoneT = 12 + Math.random()*6; deer = []; flyers = []; flyIn = 4 + Math.random()*3; birdWait = false; groups = {}; discCount = 0; streak = 0; bestStreak = 0; koCount = 0; $('dcn').textContent = '0'; speed = 235; spEff = 190; obs = []; discs = []; items = []; parts = []; pops = []; debris = []; lines = [];
-  nextObs = 170; sockIn = 11 + Math.random()*6; fireIn = 17 + Math.random()*7; lastCatch = -9; combo = 0; milestone = 500; shownScore = -1;
+  nextObs = 170; sockIn = itemDelay('sock', true); fireIn = itemDelay('fire', true); lastCatch = -9; combo = 0; milestone = 500; shownScore = -1;
   theme = 0; prevTheme = 0; transT = 0; fireT = 0; graceT = 0; boost = 1; shark = null;
   Object.assign(P, { y:GY, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, land:0, sink:false, stomps:0 });
 }
@@ -1486,7 +1486,7 @@ const BIRD_KINDS = ['pigeon', 'gull', 'eagle', 'owl', 'crow'];
 // toutes les morts possibles dans le jeu (Cascadeuse) : obstacles, pièges des trous et volants
 const DEATH_KINDS = ['hit', 'slip', 'hole', 'mole', 'crab', 'marmot', 'sewer', 'stump', 'bale', 'pigeon', 'gull', 'eagle', 'owl', 'crow', 'shuttle'];
 const TR = (() => {
-  const KEY = 'stellyrun_trophies';
+  const KEY = 'stellyrun_test_trophies';
   const d = { u:{}, s:{}, games:0, discs:0, sharks:0, th:0, birds:0, rbMiss:0, rb:0, deer:0, deaths:0, own:{}, eq:{}, spent:0, tried:{}, helmet:0 };
   { const raw = sealedLoad(KEY);   // version retouchée -> copie de secours -> données vierges
     try { const j = JSON.parse(raw); if (j && typeof j === 'object') Object.assign(d, j); } catch(e){} }
@@ -1721,24 +1721,24 @@ const LB_URL = 'https://script.google.com/macros/s/AKfycbwJCiKyJ7zyoGK7BEGem0crH
 const LB_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 const LB = (() => {
   const store = (k, v) => { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch(e){ return null; } };
-  let id = store('stellyrun_id'); if (!id){ id = Math.random().toString(36).slice(2, 10) + Date.now().toString(36); store('stellyrun_id', id); }
+  let id = store('stellyrun_test_id'); if (!id){ id = Math.random().toString(36).slice(2, 10) + Date.now().toString(36); store('stellyrun_test_id', id); }
   let last = null;   // dernière réponse du serveur
-  async function get(){
+  async function get(){ throw new Error('test');
     const r = await fetch(LB_URL + '?id=' + encodeURIComponent(id), { cache:'no-store' });
     last = await r.json(); first(); return last;
   }
   const first = () => { if (last && last.me && last.me.rank === 1) TR.unlock('parzival'); };
   const LB_SECRET = 'lg-st3lly-9f2k';   // même clé que dans le script du classement
-  async function send(name, score, tm, discs){
+  async function send(name, score, tm, discs){ throw new Error('test');
     tm = Math.round(tm || 0); discs = discs | 0;
-    store('stellyrun_lbpending', JSON.stringify({ name, score, t: tm, discs }));
+    store('stellyrun_test_lbpending', JSON.stringify({ name, score, t: tm, discs }));
     const sig = cyrb53([name, score, tm, discs, id].join('|') + '|' + LB_SECRET);
     const r = await fetch(LB_URL, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body: JSON.stringify({ name, score, t: tm, discs, id, v: APP_VERSION, sig }) });
-    last = await r.json(); store('stellyrun_lbpending', ''); first(); return last;
+    last = await r.json(); store('stellyrun_test_lbpending', ''); first(); return last;
   }
   // un record en attente (envoyé hors connexion) repart dès que possible
-  async function flushPending(){ const p = store('stellyrun_lbpending'); if (!p) return; try { const o = JSON.parse(p); await send(o.name, o.score, o.t, o.discs); } catch(e){} }
-  return { get, send, flushPending, id, name: () => store('stellyrun_name') || 'AAA', setName: n => store('stellyrun_name', n), last: () => last };
+  async function flushPending(){ const p = store('stellyrun_test_lbpending'); if (!p) return; try { const o = JSON.parse(p); await send(o.name, o.score, o.t, o.discs); } catch(e){} }
+  return { get, send, flushPending, id, name: () => store('stellyrun_test_name') || 'AAA', setName: n => store('stellyrun_test_name', n), last: () => last };
 })();
 LB.flushPending();
 addEventListener('online', () => LB.flushPending());
@@ -1935,14 +1935,16 @@ function spawnObstacle(){
   else { let n = 1; if (Math.random() < .1 + .4*d) n = Math.random() < .35*d ? 3 : 2; const pw = th === 2 ? 14 : (ROUND[th] ? 16 : 12); o = { k:'cone', x:x0, n, w:n*pw+1, th, c }; }
   obs.push(o);
   const cx = x0 + o.w/2, fireOn = fireT > 0;
-  if (Math.random() < (sockOn || fireOn ? .75 : .42)){
+  if (Math.random() < (sockOn || fireOn ? .75 : .42) && !items.some(it => Math.abs(it.x - cx) < 110)){
     const peak = sockOn ? 92 : (o.k === 'pyr3' ? 66 : (o.k === 'pyr' ? 56 : 46)), sp = Math.max(28, speed*(sockOn ? .1 : .07)), half = sp >= 36 ? 2 : 1;
     const gid = newGroup(2*half+1); for (let i=-half;i<=half;i++){ const hh = peak * (1 - Math.pow(i/(half+.7), 2)); discs.push({ x: cx + i*sp, y: GY - 30 - hh, g: gid }); }
   }
   const gap = gapFor() + o.w + (o.k === 'pyr' ? 30 : (o.k === 'pyr3' ? 45 : 0)); nextObs = gap;
   const mx = x0 + o.w + (gap - o.w)/2, roomy = gap - o.w > speed*.64 + 125;
-  if (fireIn <= 0 && !fireOn && !items.length && gap - o.w > 190){ items.push({ k:'fire', x: mx, y: GY - 76 }); fireIn = 21 + Math.random()*9; return; }
-  if (sockIn <= 0 && P.sockT <= 0 && !items.length && gap - o.w > 190){ items.push({ k:'sock', x: mx, y: GY - 88 }); sockIn = 15 + Math.random()*10; return; }
+  // objet seul dans un espace libre : aucun frisbee à moins de 80 px ; la position varie dans l'espace, la hauteur sur 3 niveaux
+  const free = gap - o.w > 190, ix = x0 + o.w + 70 + Math.random()*Math.max(0, gap - o.w - 140), clear = !discs.some(dd => Math.abs(dd.x - ix) < 80);
+  if (fireIn <= 0 && !fireOn && !items.length && free && clear){ const lv = itemLevel(); items.push({ k:'fire', x: ix, y: GY - [30, 76, 100][lv], lv }); itemLog('fire', lv); fireIn = itemDelay('fire'); return; }
+  if (sockIn <= 0 && P.sockT <= 0 && !items.length && free && clear){ const lv = itemLevel(); items.push({ k:'sock', x: ix - 9, y: GY - [40, 88, 112][lv], lv }); itemLog('sock', lv); sockIn = itemDelay('sock'); return; }
   if (roomy && Math.random() < (sockOn || fireOn ? .8 : .45)){
     const rr = Math.random();
     if (sockOn){ const gid = newGroup(5); for (let i=0;i<5;i++) discs.push({ x: mx + (i-2)*30, y: GY - 128, g: gid }); }
@@ -2026,7 +2028,7 @@ function die(kind){
   else { P.vy = -180; P.ground = false; shake = .35; sfx.hit(); burst(P.x, P.y-28, 16, kind === 'slip' ? ['#3FA3E0', '#BFE8FF', C.white] : (kind === 'ski' ? [C.white, '#DCE9F5', C.purple] : [C.yellow, C.orange, C.white]), 95, 300); }
   TR.die(kind);
   P.prevBest = best; P.newBest = score > best;
-  if (P.newBest){ best = score; sealedSave('stellyrun_best', String(best)); }
+  if (P.newBest){ best = score; sealedSave('stellyrun_test_best', String(best)); }
 }
 function smash(o){
   for (const [img, x, y] of pieces(o)) debris.push({ img, x, y, vx: 200 + Math.random()*160, vy: -240 - Math.random()*140, rot:0, vr:(Math.random()-.5)*24 });
@@ -2616,13 +2618,31 @@ function applyLang(){
   $('langmenu').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === LANG));
   refreshSound(); showTitleRecord();
 }
-function setLang(l){ if (!LANGS[l]) return; LANG = l; try { localStorage.setItem('stellyrun_lang', l); } catch(e){} applyLang(); }
+function setLang(l){ if (!LANGS[l]) return; LANG = l; try { localStorage.setItem('stellyrun_test_lang', l); } catch(e){} applyLang(); }
 { const menu = $('langmenu');
   for (const code in LANGS){ const b = document.createElement('button'); b.dataset.lang = code; b.appendChild(flagCanvas(LANGS[code].flag)); b.appendChild(document.createTextNode(LANGS[code].name));
     b.addEventListener('click', e => { e.stopPropagation(); setLang(code); menu.hidden = true; sfx.disc(1); }); menu.appendChild(b); }
   $('langbtn').addEventListener('click', e => { e.stopPropagation(); ensureAudio(); $('soundmenu').hidden = true; menu.hidden = !menu.hidden; });
   document.addEventListener('pointerdown', e => { if (!menu.hidden && !e.target.closest('#langmenu') && !e.target.closest('#langbtn')) menu.hidden = true; }); }
 applyLang();
+
+
+/* ---- TEST : apparition des objets moins prévisible ---- */
+// délai tiré dans une large fourchette (garde-fous 8 à 40 s), même moyenne qu'avant : chaussette ~20 s, gourde ~25 s
+const bell = () => (Math.random() + Math.random() + Math.random())/3;
+function itemDelay(k, first){
+  if (first) return k === 'sock' ? 6 + 18*Math.pow(bell(), 1.1) : 10 + 22*Math.pow(bell(), 1.4);
+  return 8 + 32*Math.pow(bell(), k === 'sock' ? 1.3 : .92);
+}
+// hauteur : au sol 30 %, à hauteur de saut 45 %, en hauteur (saut appuyé) 25 %
+const itemLevel = () => { const r = Math.random(); return r < .3 ? 0 : (r < .75 ? 1 : 2); };
+const ITEM_LOG = [];
+function itemLog(k, lv){ ITEM_LOG.unshift((Math.round(t*10)/10).toFixed(1) + ' s  ' + (k === 'sock' ? 'chaussette' : 'gourde') + ' · ' + ['sol', 'saut', 'haut'][lv]); ITEM_LOG.length = Math.min(ITEM_LOG.length, 6); }
+// panneau de suivi en haut au centre
+{ const d = document.createElement('div'); d.id = 'dbg';
+  d.style.cssText = 'position:fixed;left:50%;top:6px;transform:translateX(-50%);z-index:99;font:11px/1.35 monospace;color:#fff;background:rgba(46,14,48,.82);padding:6px 8px;border-radius:6px;pointer-events:none;white-space:pre';
+  document.body.appendChild(d);
+  setInterval(() => { d.textContent = 'TEST · apparition des objets\n' + (state === 'play' ? 'chaussette dans ' + Math.max(0, sockIn).toFixed(1) + ' s\ngourde dans ' + Math.max(0, t > 13 ? fireIn : fireIn).toFixed(1) + ' s\n' : '') + (ITEM_LOG.length ? '— derniers objets —\n' + ITEM_LOG.join('\n') : ''); }, 200); }
 
 /* ================= Icônes ================= */
 function icon(id, img){ const c = $(id); c.width = img.width; c.height = img.height; c.getContext('2d').drawImage(img, 0, 0); }
@@ -2641,7 +2661,7 @@ function press(){
 function release(){ P.hold = false; }
 function pause(){ if (state !== 'play') return; MUSIC.pause(); state = 'pause'; ui.pause.hidden = false; $('pausebtn').hidden = true; P.hold = false; $('resume').focus({ preventScroll:true }); }
 // abandon depuis la pause : la partie s'arrête, les points comptent pour le record, aucun trophée de mort
-function quitToHome(){ if (state !== 'pause') return; if (score > best){ best = score; sealedSave('stellyrun_best', String(best)); } TR.save(); ui.pause.hidden = true; goHome(); }
+function quitToHome(){ if (state !== 'pause') return; if (score > best){ best = score; sealedSave('stellyrun_test_best', String(best)); } TR.save(); ui.pause.hidden = true; goHome(); }
 function resume(){ MUSIC.resume(); state = 'play'; ui.pause.hidden = true; $('pausebtn').hidden = false; last = 0; }
 let zoneTimer = 0;
 function setZone(n){ const z = $('zone'); z.textContent = THEME_NAMES[n]; z.hidden = false; z.classList.toggle('ice', n === 3); z.classList.remove('pop'); void z.offsetWidth; z.classList.add('pop'); clearTimeout(zoneTimer); zoneTimer = setTimeout(() => { z.hidden = true; }, 3000); }
@@ -2669,7 +2689,7 @@ function refreshSound(){
   ui.mute.textContent = (musicOn || sfxOn) ? txt('ui.sound') : txt('ui.muted');
   if (musBus) musBus.gain.setTargetAtTime(musicOn ? .6 : 0, actx.currentTime, .05);
   if (sfxBus) sfxBus.gain.setTargetAtTime(sfxOn ? 1 : 0, actx.currentTime, .02);
-  try { localStorage.setItem('stellyrun_music', musicOn ? '1' : '0'); localStorage.setItem('stellyrun_sfx', sfxOn ? '1' : '0'); } catch(e){}
+  try { localStorage.setItem('stellyrun_test_music', musicOn ? '1' : '0'); localStorage.setItem('stellyrun_test_sfx', sfxOn ? '1' : '0'); } catch(e){}
 }
 ui.mute.addEventListener('click', e => { e.stopPropagation(); ensureAudio(); smenu.hidden = !smenu.hidden; if (!smenu.hidden) pause(); ui.mute.blur(); });
 $('tgMusic').addEventListener('click', e => { e.stopPropagation(); ensureAudio(); musicOn = !musicOn; refreshSound(); });
@@ -2687,7 +2707,7 @@ requestAnimationFrame(frame);
 <script>
 /* ================= PWA ================= */
 (() => {
-  if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+
   const btn = document.getElementById('install');
   const standalone = matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches || navigator.standalone;
   const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
