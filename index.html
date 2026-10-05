@@ -792,8 +792,8 @@ function roundThings(w, h, balls, kind){
       let c;
       if (!In(x-1,y)||!In(x+1,y)||!In(x,y-1)||!In(x,y+1)) c = C.plum;
       else if (kind === 'log'){
-        if (d > .78) c = (dx < 0 || dy > b[2]*.3) ? '#5A3A1C' : '#7A5230';
-        else { const ring = Math.floor(d*5.5) % 2; c = ring ? '#B5844A' : '#D9B27A'; if (d < .14) c = '#8A5A2B'; if (dx > 1 && dy < -1 && d < .7 && ring === 0) c = '#E8C792'; }
+        if (d > .78) c = (dx < 0 || dy > b[2]*.3) ? '#43280F' : '#5C3B1E';
+        else { const ring = Math.floor(d*5.5) % 2; c = ring ? '#8C6032' : '#B48A52'; if (d < .14) c = '#66401C'; if (dx > 1 && dy < -1 && d < .7 && ring === 0) c = '#C9A06A'; }
       } else {
         const sp = ((a/(Math.PI*2) + d*1.6) % .25 + .25) % .25 < .07;
         const k = -dx/b[2]*.55 + dy/b[2]*.8;
@@ -806,9 +806,9 @@ function roundThings(w, h, balls, kind){
 }
 const STUMP = mk(16, 15, g => {
   const test = (x,y) => (x >= 3 && x <= 12 && y >= 3) || (y >= 11 && x >= 1 && x <= 14 && y <= 14 && Math.abs(x - 7.5) <= 4 + (y - 10)*1.2) || (Math.hypot((x+.5-8)/5.6, (y+.5-3.5)/2.2) <= 1);
-  shade(g, 16, 15, (x,y) => y < 15 && test(x,y), { base:'#7A5230', out:C.plum, dark:'#5A3A1C', light:'#946640' });
-  g.fillStyle = '#5A3A1C'; [[5,6],[5,7],[9,8],[9,9],[11,6],[7,11],[7,12]].forEach(([x,y]) => g.fillRect(x, y, 1, 1));
-  for (let y=0;y<15;y++) for (let x=0;x<16;x++){ const d = Math.hypot((x+.5-8)/4.6, (y+.5-3.4)/1.5); if (d <= 1){ g.fillStyle = d > .66 ? '#B5844A' : (d > .33 ? '#D9B27A' : '#C99A5E'); g.fillRect(x, y, 1, 1); } }
+  shade(g, 16, 15, (x,y) => y < 15 && test(x,y), { base:'#5C3B1E', out:C.plum, dark:'#43280F', light:'#744C2A' });
+  g.fillStyle = '#43280F'; [[5,6],[5,7],[9,8],[9,9],[11,6],[7,11],[7,12]].forEach(([x,y]) => g.fillRect(x, y, 1, 1));
+  for (let y=0;y<15;y++) for (let x=0;x<16;x++){ const d = Math.hypot((x+.5-8)/4.6, (y+.5-3.4)/1.5); if (d <= 1){ g.fillStyle = d > .66 ? '#8C6032' : (d > .33 ? '#B48A52' : '#A07444'); g.fillRect(x, y, 1, 1); } }
 });
 const LOGPYR = roundThings(26, 22, [[7,15,6.6],[19,15,6.6],[13,7.2,6.2]], 'log');
 const LOG3 = roundThings(38, 41, [[7,34,6.6],[19,34,6.6],[31,34,6.6],[13,23,6.4],[25,23,6.4],[19,12.4,6.2]], 'log');
@@ -1523,7 +1523,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.52';
+const APP_VERSION = '5.53';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -1606,7 +1606,8 @@ const TR = (() => {
     miss(){ if (++g.miss >= 25) unlock('mains'); },
     fire(){ g.fire = true; if (++g.fires >= 3) unlock('hydrate'); },
     smash(n){ g.smash += n || 1; if (g.smash >= 30) unlock('bulldozer'); },   // chaque élément compte : rangée de 3 = 3, pyramide = 3, pyramide à 3 niveaux = 6
-    stomp(sp, tier){ if (++g.stomps >= 5) unlock('plumes'); if (EQUIPPED.hat && EQUIPPED.hat.id === 'hat-casque' && ++d.helmet >= 10) unlock('tetedure'); if (tier === 2) unlock('voltige');
+    stomp(sp, tier){ if (sp === 'shuttle'){ if (tier === 2) unlock('voltige'); return; }
+      if (++g.stomps >= 5) unlock('plumes'); if (EQUIPPED.hat && EQUIPPED.hat.id === 'hat-casque' && ++d.helmet >= 10) unlock('tetedure'); if (tier === 2) unlock('voltige');
       const i = BIRD_KINDS.indexOf(sp); if (i >= 0){ d.birds |= 1 << i; if ((d.birds & 31) === 31) unlock('angry'); save(); } },
     // boutique
     bought(it){ d.spent += it.price; unlock('soldes'); if (d.spent >= 10000) unlock('prada');
@@ -2207,7 +2208,7 @@ function update(dt){
       if (Math.abs(f.x - P.x) < S.hw + 7 && fy + S.hh > P.y - 46 && fy - S.hh < P.y - 2){
         // mi-hauteur : tolérance élargie (pieds jusqu'à 9 px sous le centre, accepté dès le sommet du saut) car le saut appuyé l'atteint tout juste
         const mid = f.tier === 1;
-        if (f.sp !== 'shuttle' && !P.ground && P.vy > (mid ? -60 : 40) && P.y < fy + (mid ? 9 : 3)){ stomp(f, fy); continue; }
+        if (!P.ground && P.vy > (mid ? -60 : 40) && P.y < fy + (mid ? 9 : 3)){ stomp(f, fy); continue; }
         if (fireT > 0 || graceT > 0){ f.gone = true; debris.push({ img: f.sp === 'shuttle' ? SHUTTLE : FLY_FR[f.sp][1], x: f.x - S.w/2, y: fy - S.h/2, vx: 220, vy: -260, rot: 0, vr: 14 }); sfx.smash(); }
         else { die(f.sp); break; }
       }
@@ -2598,7 +2599,7 @@ function draw(){
     for (const f of flyers){
       const S = FLY_SPECS[f.sp], fy = Math.round(flyerY(f)), fx = Math.round(f.x);
       if (f.ko){
-        const ky = Math.round(f.ky); ctx.save(); ctx.translate(fx, ky); ctx.rotate(f.kr); ctx.drawImage(FLY_FR[f.sp][1], -(S.w >> 1), -(S.h >> 1)); ctx.restore();
+        const ky = Math.round(f.ky); ctx.save(); ctx.translate(fx, ky); ctx.rotate(f.kr); ctx.drawImage(f.sp === 'shuttle' ? SHUTTLE : FLY_FR[f.sp][1], -(S.w >> 1), -(S.h >> 1)); ctx.restore();
         for (let i=0;i<3;i++){ const a = clock*8 + i*2.09, sx = Math.round(fx + Math.cos(a)*8), sy = Math.round(ky + S.hh + 3 + Math.sin(a)*2.5);
           ctx.fillStyle = C.yellow; ctx.fillRect(sx, sy - 1, 1, 3); ctx.fillRect(sx - 1, sy, 3, 1); }
         continue;
