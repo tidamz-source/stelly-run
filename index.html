@@ -459,7 +459,8 @@ function txt(key, vars){
   return s;
 }
 // séparateur des milliers : espace (fr), point (es), virgule (en)
-const fmtN = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, { fr:' ', es:'.' }[LANG] || ',');
+// (espace fine insécable en français : l'espace normale de la police pixel est aussi large qu'un chiffre)
+const fmtN = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, { fr:'\u202F', es:'.' }[LANG] || ',');
 // contrôle : textes non traduits (visibles dans la console du navigateur)
 { const miss = {}; for (const k in TEXTS) for (const l in LANGS) if (TEXTS[k][l] == null) (miss[l] = miss[l] || []).push(k);
   for (const l in miss) console.warn('[langues] ' + miss[l].length + ' texte(s) sans traduction ' + l + ' :', miss[l]); }
@@ -1544,7 +1545,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.57';
+const APP_VERSION = '5.58';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
