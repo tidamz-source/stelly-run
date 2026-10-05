@@ -4,6 +4,7 @@ const VERSION = 'stelly-run-v5.24';
 const FILES = [
   './',
   './index.html',
+  './langues.js',
   './manifest.webmanifest',
   './icons/icon-192.png',
   './icons/icon-512.png',
