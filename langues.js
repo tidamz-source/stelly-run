@@ -90,7 +90,6 @@ const TEXTS = {
   "over.newBest": { fr:"Nouveau record ! +{n}", en:"New best! +{n}", es:"¡Nuevo récord! +{n}" },
   "over.coins": { fr:"frisbees gagnés", en:"frisbees earned", es:"frisbees ganados" },
   "over.streak": { fr:"meilleure série", en:"best streak", es:"mejor racha" },
-  "over.ko": { fr:"mis K.O.", en:"knocked out", es:"noqueados" },
   "over.trophy1": { fr:"1 trophée !", en:"1 trophy!", es:"¡1 trofeo!" },
   "over.trophies": { fr:"{n} trophées !", en:"{n} trophies!", es:"¡{n} trofeos!" },
   // ----- causes de mort -----

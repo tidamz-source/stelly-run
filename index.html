@@ -405,7 +405,7 @@ body{
         <h2>Plot touché !</h2>
         <p class="big" id="final">0</p>
         <p class="line" id="bestline">Record 0</p>
-        <div class="ostats"><div class="ostat"><b class="gold"><span id="ocoins">0</span><canvas class="icoCoin"></canvas></b><span data-i18n="over.coins">frisbees gagnés</span></div><div class="ostat"><b id="ostreak">0</b><span data-i18n="over.streak">meilleure série</span></div><div class="ostat"><b id="oko">0</b><span data-i18n="over.ko">mis K.O.</span></div></div>
+        <div class="ostats"><div class="ostat"><b class="gold"><span id="ocoins">0</span><canvas class="icoCoin"></canvas></b><span data-i18n="over.coins">frisbees gagnés</span></div><div class="ostat"><b id="ostreak">0</b><span data-i18n="over.streak">meilleure série</span></div></div>
         <div class="otro" id="otro" hidden></div>
         <div id="lbentry" hidden><div class="lbt" data-i18n="lb.entry">Record perso ! Ton nom pour le classement :</div>
           <div class="lbslots"><div class="lbslot"><button class="up" aria-label="Lettre précédente" data-i18n-aria="lb.prevLetter"><i></i></button><b>A</b><button class="dn" aria-label="Lettre suivante" data-i18n-aria="lb.nextLetter"><i></i></button></div><div class="lbslot"><button class="up" aria-label="Lettre précédente" data-i18n-aria="lb.prevLetter"><i></i></button><b>A</b><button class="dn" aria-label="Lettre suivante" data-i18n-aria="lb.nextLetter"><i></i></button></div><div class="lbslot"><button class="up" aria-label="Lettre précédente" data-i18n-aria="lb.prevLetter"><i></i></button><b>A</b><button class="dn" aria-label="Lettre suivante" data-i18n-aria="lb.nextLetter"><i></i></button></div></div>
@@ -464,7 +464,7 @@ body{
     <div id="dcount" hidden aria-label="Frisbees attrapés" data-i18n-aria="ui.discsCaught"><canvas id="icoCount"></canvas><span id="dcn">0</span></div>
   </div>
 </div>
-<script src="langues.js?v=5.60"></script>
+<script src="langues.js?v=5.61"></script>
 <script>
 /* ================= Langues ================= */
 // textes dans langues.js ; txt('clé', { n: 3 }) renvoie le texte dans la langue choisie (français si non traduit)
@@ -1562,7 +1562,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.60';
+const APP_VERSION = '5.61';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -2299,7 +2299,7 @@ function update(dt){
     ui.bestline.textContent = P.newBest ? (P.prevBest > 0 ? txt('over.newBest', { n: fmtN(score - P.prevBest) }) : txt('ui.newRecord'))
       : (best - score > 0 ? txt('over.gap', { n: fmtN(best - score) }) : txt('over.tie'));
     ui.bestline.className = 'line' + (P.newBest ? ' new' : '');
-    const gm = TR.game(); $('ocoins').textContent = '+' + fmtN(gm.coins); $('ostreak').textContent = 'x' + bestStreak; $('oko').textContent = koCount;
+    const gm = TR.game(); $('ocoins').textContent = '+' + fmtN(gm.coins); $('ostreak').textContent = 'x' + bestStreak;
     overTrophies(gm.trophies, score > (TR.d.lbBest || 0));
     ui.hi.textContent = txt('ui.record') + ' ' + pad(best);
     ui.sockbar.hidden = true; ui.firebar.hidden = true; ui.over.hidden = false;
