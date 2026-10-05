@@ -54,8 +54,6 @@ const TEXTS = {
   "toast.superCombo": { fr:"Super Combo !", en:"Super Combo!" },
   "toast.megaCombo": { fr:"Méga Combo !", en:"Mega Combo!" },
   "toast.gigaCombo": { fr:"Giga Combo !", en:"Giga Combo!" },
-  "toast.tripleBounce": { fr:"Triple rebond !", en:"Triple bounce!" },
-  "toast.bounceFrenzy": { fr:"Rebond infernal !", en:"Bounce frenzy!" },
   "toast.rainbow": { fr:"Frisbee arc-en-ciel !", en:"Rainbow frisbee!" },
   "tr.title": { fr:"Trophées", en:"Trophies" },
   "tr.locked": { fr:"Pas encore débloqué", en:"Not unlocked yet" },

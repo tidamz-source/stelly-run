@@ -863,7 +863,7 @@ FLY_SPECS.shuttle = { w:16, h:13, hw:6, hh:4, k:[1.6,1.9] };
 const FLY_BY_THEME = ['pigeon', 'shuttle', 'gull', 'eagle', 'pigeon', 'owl', 'crow'];   // gymnase : volants de badminton
 
 /* ================= Police pixel (points) ================= */
-const FONT = {'0':['111','101','101','101','111'],'1':['010','110','010','010','111'],'2':['111','001','111','100','111'],
+const FONT = {'^':['010','111','010','010','010'],'0':['111','101','101','101','111'],'1':['010','110','010','010','111'],'2':['111','001','111','100','111'],
 '3':['111','001','011','001','111'],'4':['101','101','111','001','001'],'5':['111','100','111','001','111'],
 '6':['111','100','111','101','111'],'7':['111','001','010','010','010'],'8':['111','101','111','101','111'],
 '9':['111','101','111','001','111'],'+':['000','010','111','010','000'],'x':['000','101','010','101','000'],' ':['000','000','000','000','000']};
@@ -1523,7 +1523,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.51';
+const APP_VERSION = '5.52';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -2101,14 +2101,14 @@ function smash(o){
   sfx.smash(); shake = Math.max(shake, .08); TR.smash(o.k === 'cone' ? o.n : (o.k === 'pyr' ? 3 : (o.k === 'pyr3' ? 6 : 1)));
 }
 // Stelly retombe sur la tête d'un animal volant : il est assommé, elle rebondit ; enchaîner sans toucher le sol multiplie les points
+// bonus d'altitude (points de base seulement) : bas x1, milieu x1,5, haut x2 ; couleur et flèche du pop selon la hauteur
+const ALT_MULT = [1, 1.5, 2], ALT_COL = [C.white, C.yellow, C.orange], ALT_MARK = ['', ' ^', ' ^^'];
 function stomp(f, fy){
   f.ko = true; f.ky = flyerY(f); f.kvy = -60; f.kr = 0;
-  P.stomps = Math.min((P.stomps || 0) + 1, 5);
   P.vy = -(P.sockT > 0 ? 420 : (P.hold ? 340 : 290)); P.y = Math.min(P.y, fy - FLY_SPECS[f.sp].hh);
-  const pts = 100*P.stomps; bonus += pts;
-  pops.push({ x:f.x, y:fy - 14, s: P.stomps > 1 ? '+'+pts+' x'+P.stomps : '+'+pts, t:0, col: C.yellow });
-  if (P.stomps === 3) toast(txt('toast.tripleBounce')); else if (P.stomps === 5) toast(txt('toast.bounceFrenzy'), true);
-  TR.stomp(f.sp, f.tier); sfx.stomp(P.stomps); shake = Math.max(shake, .06);
+  const tier = f.tier || 0, pts = Math.round(100*ALT_MULT[tier]); bonus += pts;   // 100 / 150 / 200
+  pops.push({ x:f.x, y:fy - 14, s: '+' + pts + ALT_MARK[tier], t:0, col: tier ? ALT_COL[tier] : C.yellow });
+  TR.stomp(f.sp, f.tier); sfx.stomp(1 + tier*2); shake = Math.max(shake, .06);
   burst(f.x, fy - 4, 10, [C.white, C.yellow, '#E6DCF0'], 70, 160);
 }
 function catchDisc(o){
@@ -2124,8 +2124,9 @@ function catchDisc(o){
   else if (streak === 50){ bonus += 5000; toast(txt('toast.megaCombo'), true); sfx.world(); }
   else if (streak % 100 === 0){ bonus += 10000; toast(txt('toast.gigaCombo'), true); sfx.world(); flash = .15; }
   discCount++; $('dcn').textContent = discCount; TR.disc();
-  const pts = 10*combo; bonus += pts; sfx.disc(combo);
-  pops.push({ x:o.x, y:o.y-10, s: combo > 1 ? '+'+pts+' x'+combo : '+'+pts, t:0, col: C.white });
+  const h = GY - o.y, tier = h >= 100 ? 2 : (h >= 56 ? 1 : 0);   // bas : attrapé en courant ; milieu : avec un saut ; haut : avec la chaussette
+  const pts = Math.round(10*combo*ALT_MULT[tier]); bonus += pts; sfx.disc(combo);
+  pops.push({ x:o.x, y:o.y-10, s: '+' + pts + (combo > 1 ? ' x' + combo : '') + ALT_MARK[tier], t:0, col: ALT_COL[tier] });
   burst(o.x, o.y, 9, [C.yellow, C.white, C.disc], 65, 120);
 }
 
