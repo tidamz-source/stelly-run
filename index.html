@@ -1493,7 +1493,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.48';
+const APP_VERSION = '5.49';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -1625,7 +1625,7 @@ const TR = (() => {
     sock(){ if (++g.socks >= 3) unlock('elfe'); },
     miss(){ if (++g.miss >= 25) unlock('mains'); },
     fire(){ g.fire = true; if (++g.fires >= 3) unlock('hydrate'); },
-    smash(){ if (++g.smash >= 20) unlock('bulldozer'); },
+    smash(n){ g.smash += n || 1; if (g.smash >= 20) unlock('bulldozer'); },   // chaque élément compte : rangée de 3 = 3, pyramide = 3, pyramide à 3 niveaux = 6
     stomp(sp, tier){ if (++g.stomps >= 5) unlock('plumes'); if (EQUIPPED.hat && EQUIPPED.hat.id === 'hat-casque' && ++d.helmet >= 10) unlock('tetedure'); if (tier === 2) unlock('voltige');
       const i = BIRD_KINDS.indexOf(sp); if (i >= 0){ d.birds |= 1 << i; if ((d.birds & 31) === 31) unlock('angry'); save(); } },
     // boutique
@@ -2125,7 +2125,7 @@ function smash(o){
   if (o.th === 3) burst(o.x + o.w/2, GY-12, 14, [C.white, '#DCE9F5', '#BFD3E6'], 90, 240);
   if (o.th === 5) burst(o.x + o.w/2, GY-12, 14, ['#B5844A', '#D9B27A', '#5A3A1C'], 90, 240);
   if (o.th === 6) burst(o.x + o.w/2, GY-12, 18, ['#EDCD68', '#F7DD85', '#C9A23A'], 90, 200);
-  sfx.smash(); shake = Math.max(shake, .08); TR.smash();
+  sfx.smash(); shake = Math.max(shake, .08); TR.smash(o.k === 'cone' ? o.n : (o.k === 'pyr' ? 3 : (o.k === 'pyr3' ? 6 : 1)));
 }
 // Stelly retombe sur la tête d'un animal volant : il est assommé, elle rebondit ; enchaîner sans toucher le sol multiplie les points
 function stomp(f, fy){
