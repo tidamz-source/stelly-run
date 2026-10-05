@@ -294,6 +294,41 @@ body{
 #shbub.down::after{ top:calc(var(--s)*-3.7px); transform:translateX(-50%) rotate(-135deg); }
 @media (prefers-reduced-motion: reduce){ #shop, #shop.open{ transition-duration:.01s; } #shbub{ animation:none; } }
 
+/* ----- Classement ----- */
+#lbbtn{ position:absolute; top:0; height:100%; left:calc(100% + var(--s)*7px); aspect-ratio:1; padding:0; display:flex; align-items:center; justify-content:center; }
+#lbbtn canvas{ height:calc(var(--s)*11px); width:auto; image-rendering:pixelated; display:block; }
+#lb{ position:absolute; inset:0; z-index:30; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:calc(var(--s)*4px);
+  background:repeating-linear-gradient(135deg, rgba(255,255,255,.035) 0 calc(var(--s)*6px), transparent 0 calc(var(--s)*12px)), var(--plum);
+  border-bottom:calc(var(--s)*2px) solid var(--yellow); box-shadow:0 calc(var(--s)*3px) 0 rgba(0,0,0,.35);
+  transform:translateY(calc(-100% - var(--s)*6px)); transition:transform .45s cubic-bezier(.6,0,.4,1); touch-action:none; }
+#lb.open{ transform:none; transition:transform .55s cubic-bezier(.25,1.25,.45,1); }
+#lbcount{ font-family:var(--num); font-size:max(calc(var(--s)*4.5px),9px); color:var(--purple-l); }
+#lbclose{ position:absolute; top:calc(var(--s)*7px); right:calc(var(--s)*9px); font-size:max(calc(var(--s)*7px),12px); padding:calc(var(--s)*1.5px) calc(var(--s)*5px) calc(var(--s)*2px); }
+#lblist{ width:calc(var(--s)*150px); padding:calc(var(--s)*3px) calc(var(--s)*5px); box-sizing:border-box; background:#FFF4D6; color:var(--plum);
+  border:calc(var(--s)*1.5px) solid var(--plum); border-radius:calc(var(--s)*3px); box-shadow:inset 0 calc(var(--s)*-2.5px) 0 #EBD8A6, 0 calc(var(--s)*2px) 0 rgba(0,0,0,.4); }
+.lbrow{ display:grid; grid-template-columns:calc(var(--s)*26px) calc(var(--s)*24px) 1fr; align-items:center; height:calc(var(--s)*8.6px);
+  font-family:var(--num); font-size:max(calc(var(--s)*4.6px),9px); padding:0 calc(var(--s)*2px); border-radius:calc(var(--s)*1.5px); }
+.lbrow .sc{ text-align:right; }
+.lbrow.r1 .rk{ color:#C98A00; } .lbrow.r2 .rk{ color:#7D8794; } .lbrow.r3 .rk{ color:#A0592A; }
+.lbrow.me{ background:var(--yellow); }
+.lbsep{ height:0; margin:calc(var(--s)*1.5px) 0; border-top:calc(var(--s)*.8px) dashed #B9A27A; }
+.lbmsg{ text-align:center; padding:calc(var(--s)*8px) 0; font-weight:700; font-size:max(calc(var(--s)*5.5px),10px); }
+/* saisie des initiales en fin de partie */
+#lbentry{ margin:calc(var(--s)*1px) 0 calc(var(--s)*4px); display:flex; flex-direction:column; align-items:center; }
+#lbentry[hidden]{ display:none; }
+#lbentry .lbt{ font-size:max(calc(var(--s)*5px),10px); font-weight:700; color:var(--yellow); margin-bottom:calc(var(--s)*2px); }
+.lbslots{ display:flex; justify-content:center; gap:calc(var(--s)*3px); }
+.lbslot{ display:flex; flex-direction:column; align-items:center; }
+.lbslot button{ width:calc(var(--s)*11px); height:calc(var(--s)*6px); padding:0; border:none; background:none; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.lbslot button i{ width:0; height:0; border-left:calc(var(--s)*3px) solid transparent; border-right:calc(var(--s)*3px) solid transparent; }
+.lbslot .up i{ border-bottom:calc(var(--s)*3.5px) solid var(--purple-l); } .lbslot .dn i{ border-top:calc(var(--s)*3.5px) solid var(--purple-l); }
+.lbslot b{ width:calc(var(--s)*11px); height:calc(var(--s)*12px); display:flex; align-items:center; justify-content:center; font-family:var(--num); font-size:max(calc(var(--s)*8px),15px);
+  background:#FFF4D6; color:var(--plum); border:calc(var(--s)*1px) solid var(--plum); border-radius:calc(var(--s)*1.5px); }
+.lbslot.on b{ background:var(--yellow); }
+#lbsend{ margin-top:calc(var(--s)*3px); font-size:max(calc(var(--s)*6px),11px); padding:calc(var(--s)*1.5px) calc(var(--s)*6px) calc(var(--s)*2px); animation:none; }
+#lbres{ font-family:var(--num); font-size:max(calc(var(--s)*4.5px),10px); color:var(--yellow); margin:calc(var(--s)*1px) 0 calc(var(--s)*3px); }
+@media (prefers-reduced-motion: reduce){ #lb, #lb.open{ transition-duration:.01s; } }
+
 @media (prefers-reduced-motion: reduce){
   #title *, .panel, #toast.show{ animation-duration:.01s; animation-delay:0s; }
 }
@@ -318,7 +353,7 @@ body{
       <p class="at presents">Lutèce Games presents</p>
       <div class="at ribbon"><h1>Stelly Run</h1></div>
       <div class="at cta"><div class="ctarow"><button id="shopbtn" class="btn alt" aria-label="Boutique"><canvas id="icoShop"></canvas></button><button id="start" class="btn">Start</button>
-<button id="trobtn" class="btn alt" aria-label="Trophées"><canvas id="icoTrophy"></canvas><span id="trbadge" class="trstar" hidden><svg viewBox="0 0 24 24"><polygon points="12,1.5 14.9,8.6 22.5,9.2 16.7,14.2 18.5,21.6 12,17.6 5.5,21.6 7.3,14.2 1.5,9.2 9.1,8.6"/></svg><b></b></span></button></div></div>
+<button id="trobtn" class="btn alt" aria-label="Trophées"><canvas id="icoTrophy"></canvas><span id="trbadge" class="trstar" hidden><svg viewBox="0 0 24 24"><polygon points="12,1.5 14.9,8.6 22.5,9.2 16.7,14.2 18.5,21.6 12,17.6 5.5,21.6 7.3,14.2 1.5,9.2 9.1,8.6"/></svg><b></b></span></button><button id="lbbtn" class="btn alt" aria-label="Classement"><canvas id="icoLb"></canvas></button></div></div>
       <div class="at legend"><div>
         <span><canvas id="icoDisc"></canvas>Points</span>
         <span><canvas id="icoSock"></canvas>Super saut</span>
@@ -336,6 +371,10 @@ body{
         <h2>Plot touché !</h2>
         <p class="big" id="final">0</p>
         <p class="line" id="bestline">Record 0</p>
+        <div id="lbentry" hidden><div class="lbt">Record perso ! Ton nom pour le classement :</div>
+          <div class="lbslots"><div class="lbslot"><button class="up" aria-label="Lettre précédente"><i></i></button><b>A</b><button class="dn" aria-label="Lettre suivante"><i></i></button></div><div class="lbslot"><button class="up" aria-label="Lettre précédente"><i></i></button><b>A</b><button class="dn" aria-label="Lettre suivante"><i></i></button></div><div class="lbslot"><button class="up" aria-label="Lettre précédente"><i></i></button><b>A</b><button class="dn" aria-label="Lettre suivante"><i></i></button></div></div>
+          <button id="lbsend" class="btn">Envoyer</button></div>
+        <p id="lbres" hidden></p>
         <div class="row"><button id="home" class="btn alt">Accueil</button><button id="again" class="btn">Rejouer</button></div>
         <p class="sub">ou appuie sur espace</p>
       </div>
@@ -366,6 +405,11 @@ body{
         </div>
       </div>
       <div id="shbub" hidden><b></b><span></span><button id="shbuy" class="btn">Acheter</button></div>
+    </div>
+    <div id="lb" hidden role="dialog" aria-modal="true" aria-label="Classement">
+      <div class="trhead"><h2>Classement</h2><span id="lbcount"></span></div>
+      <button id="lbclose" class="btn alt">Fermer</button>
+      <div id="lblist"></div>
     </div>
     <div id="trophies" hidden role="dialog" aria-modal="true" aria-label="Trophées">
       <div class="trhead"><h2>Trophées</h2><span id="trcount"></span></div>
@@ -1443,7 +1487,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.42';
+const APP_VERSION = '5.43';
 // le record repart de zéro à chaque nouvelle version déployée
 try { if (localStorage.getItem('stellyrun_best_ver') !== APP_VERSION){ localStorage.setItem('stellyrun_best_ver', APP_VERSION); localStorage.setItem('stellyrun_best', '0'); best = 0; } } catch(e){}
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
@@ -1463,7 +1507,7 @@ function reset(){
   Object.assign(P, { y:GY, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, land:0, sink:false, stomps:0 });
 }
 function startGame(){
-  trUI.close(); shopUI.close(); ensureAudio(); sfx.start(); reset(); TR.start(); rbAt = TR.rainbowAt(); state = 'play'; MUSIC.tempo = MUSIC.target = 1; MUSIC.fire = false; MUSIC.play(0, true);
+  lbEntry.submit(); lbEntry.hide(); trUI.close(); shopUI.close(); lbUI.close(); ensureAudio(); sfx.start(); reset(); TR.start(); rbAt = TR.rainbowAt(); state = 'play'; MUSIC.tempo = MUSIC.target = 1; MUSIC.fire = false; MUSIC.play(0, true);
   ui.title.hidden = true; ui.over.hidden = true; ui.pause.hidden = true; ui.hud.hidden = false;
   ui.hi.textContent = 'Record ' + pad(best); ui.firebar.hidden = true; ui.sockbar.hidden = true; ui.dcount.hidden = false; $('pausebtn').hidden = false; clearTimeout(zoneTimer); $('zone').hidden = true;
   if (document.activeElement) document.activeElement.blur();
@@ -1471,7 +1515,7 @@ function startGame(){
 function goHome(){
   state = 'title'; titleT = 0; titleSlammed = false; titleCaught = false; MUSIC.tempo = 1; MUSIC.fire = false; MUSIC.play('title', true); ui.dcount.hidden = true; $('pausebtn').hidden = true; $('zone').hidden = true; theme = 0; prevTheme = 0; transT = 0; confetti = [];
   obs = []; discs = []; items = []; debris = []; parts = []; pops = []; fireT = 0; boost = 1;
-  ui.over.hidden = true; ui.hud.hidden = true; ui.title.hidden = false; showTitleRecord(); refreshTrophyBadge();
+  lbEntry.submit(); lbEntry.hide(); ui.over.hidden = true; ui.hud.hidden = true; ui.title.hidden = false; showTitleRecord(); refreshTrophyBadge();
   // relance les animations CSS de l'accueil
   ui.title.querySelectorAll('.at, h1, #start, #trbadge').forEach(el => { el.style.animation = 'none'; void el.offsetWidth; el.style.animation = ''; });
   if (document.activeElement) document.activeElement.blur();
@@ -1759,6 +1803,91 @@ const trUI = (() => {
   return { open, close, go, isOpen: () => isOpen };
 })();
 refreshTrophyBadge();
+
+/* ================= Classement en ligne (Google Sheet) ================= */
+const LB_URL = 'https://script.google.com/macros/s/AKfycbwJCiKyJ7zyoGK7BEGem0crHldaZgvWSWcj6KE-rIQQlqkaoltC68gVqk7Hz5O8U0W6jQ/exec';
+const LB_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+const LB = (() => {
+  const store = (k, v) => { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch(e){ return null; } };
+  let id = store('stellyrun_id'); if (!id){ id = Math.random().toString(36).slice(2, 10) + Date.now().toString(36); store('stellyrun_id', id); }
+  let last = null;   // dernière réponse du serveur
+  async function get(){
+    const r = await fetch(LB_URL + '?id=' + encodeURIComponent(id), { cache:'no-store' });
+    last = await r.json(); return last;
+  }
+  async function send(name, score){
+    store('stellyrun_lbpending', JSON.stringify({ name, score }));
+    const r = await fetch(LB_URL, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body: JSON.stringify({ name, score, id, v: APP_VERSION }) });
+    last = await r.json(); store('stellyrun_lbpending', ''); return last;
+  }
+  // un record en attente (envoyé hors connexion) repart dès que possible
+  async function flushPending(){ const p = store('stellyrun_lbpending'); if (!p) return; try { const o = JSON.parse(p); await send(o.name, o.score); } catch(e){} }
+  return { get, send, flushPending, id, name: () => store('stellyrun_name') || 'AAA', setName: n => store('stellyrun_name', n), last: () => last };
+})();
+LB.flushPending();
+addEventListener('online', () => LB.flushPending());
+
+// saisie des 3 lettres sur l'écran de fin, quand le record personnel en ligne est battu
+const lbEntry = (() => {
+  const box = $('lbentry'), res = $('lbres');
+  let letters = [], pos = 0, active = false, score = 0;
+  function draw(){
+    box.querySelectorAll('.lbslot').forEach((s, i) => { s.querySelector('b').textContent = letters[i]; s.classList.toggle('on', i === pos); });
+  }
+  function bump(i, d){ const k = (LB_CHARS.indexOf(letters[i]) + d + LB_CHARS.length) % LB_CHARS.length; letters[i] = LB_CHARS[k]; pos = i; draw(); sfx.disc(1); }
+  function show(sc){
+    score = sc; active = true; pos = 0; letters = LB.name().split('').slice(0, 3);
+    box.hidden = false; res.hidden = true; draw();
+  }
+  function hide(){ box.hidden = true; res.hidden = true; active = false; }
+  async function submit(){
+    if (!active) return; active = false;
+    const name = letters.join(''); LB.setName(name); TR.d.lbBest = score; TR.save();
+    box.hidden = true; res.hidden = false; res.textContent = 'Envoi…';
+    try { const r = await LB.send(name, score); res.textContent = r && r.me ? 'Classement mondial : n° ' + r.me.rank : 'Score envoyé !'; }
+    catch(e){ res.textContent = 'Envoi à la prochaine connexion'; }
+  }
+  box.querySelectorAll('.lbslot').forEach((s, i) => {
+    s.querySelector('.up').addEventListener('click', e => { e.stopPropagation(); bump(i, -1); });
+    s.querySelector('.dn').addEventListener('click', e => { e.stopPropagation(); bump(i, 1); });
+    s.querySelector('b').addEventListener('click', e => { e.stopPropagation(); pos = i; draw(); });
+  });
+  $('lbsend').addEventListener('click', e => { e.stopPropagation(); submit(); });
+  return { show, hide, submit, isActive: () => active,
+    key(code){ if (code === 'ArrowUp') bump(pos, -1); else if (code === 'ArrowDown') bump(pos, 1); else if (code === 'ArrowLeft'){ pos = (pos + 2) % 3; draw(); } else if (code === 'ArrowRight'){ pos = (pos + 1) % 3; draw(); } else if (code === 'Enter') submit(); else return false; return true; } };
+})();
+
+// page du classement : top 10, puis la position du joueur s'il n'y figure pas
+const lbUI = (() => {
+  const page = $('lb'), list = $('lblist'), cnt = $('lbcount');
+  let isOpen = false, hideT = 0;
+  const fmt = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  const row = (p, me) => '<div class="lbrow' + (p.rank <= 3 ? ' r' + p.rank : '') + (me ? ' me' : '') + '"><span class="rk">' + p.rank + '</span><span class="nm">' + p.name.replace(/[^A-Z0-9]/g, '') + '</span><span class="sc">' + fmt(p.score) + '</span></div>';
+  function render(r){
+    if (!r || !r.top){ list.innerHTML = '<div class="lbmsg">Classement indisponible pour le moment</div>'; cnt.textContent = ''; return; }
+    if (!r.top.length){ list.innerHTML = '<div class="lbmsg">Sois le premier à entrer au classement !</div>'; cnt.textContent = ''; return; }
+    let h = r.top.map(p => row(p, p.me)).join('');
+    if (r.me && r.me.rank > 10) h += '<div class="lbsep"></div>' + row(r.me, true);
+    list.innerHTML = h; cnt.textContent = r.players ? fmt(r.players) + ' joueur' + (r.players > 1 ? 's' : '') : '';
+  }
+  async function open(){
+    if (isOpen || state !== 'title') return;
+    list.innerHTML = '<div class="lbmsg">Chargement…</div>'; cnt.textContent = '';
+    clearTimeout(hideT); page.hidden = false; void page.offsetWidth; page.classList.add('open'); isOpen = true;
+    $('soundmenu').hidden = true; sfx.start();
+    try { await LB.flushPending(); render(await LB.get()); } catch(e){ render(LB.last()); }
+  }
+  function close(){
+    if (!isOpen) return; isOpen = false; page.classList.remove('open');
+    clearTimeout(hideT); hideT = setTimeout(() => { if (!isOpen) page.hidden = true; }, 500);
+    if (document.activeElement) document.activeElement.blur();
+  }
+  $('lbclose').addEventListener('click', e => { e.stopPropagation(); close(); });
+  $('lbbtn').addEventListener('click', e => { e.stopPropagation(); ensureAudio(); open(); });
+  return { open, close, isOpen: () => isOpen };
+})();
+{ const c = $('icoLb'), m = ['....ooooo....','....oyyyo....','....oyYyo....','oooooyYyo....','owwwoyYyooooo','owWwoyyyobbbo','owWwoyyyobBbo','owwwoyyyobbbo','ooooooooooooo'];
+  c.width = 13; c.height = m.length; pm(c.getContext('2d'), m, 0, 0, false, Object.assign({}, PAL, { y:C.yellow, Y:C.orange, w:'#D7DCE3', W:'#8E97A4', b:'#D08A4E', B:'#9A5A2A' })); }
 
 /* ================= Boutique ================= */
 // accessoires extraits du PSD de la boutique (calques type_nom) ; dx, dy : décalage par rapport au point d'accroche
@@ -2127,6 +2256,7 @@ function update(dt){
     ui.hi.textContent = 'Record ' + pad(best);
     ui.sockbar.hidden = true; ui.firebar.hidden = true; ui.over.hidden = false;
     ui.over.querySelector('h2').textContent = DEATH_MSG[deathKind] || 'Plot touché !';
+    if (score > (TR.d.lbBest || 0)) lbEntry.show(score); else lbEntry.hide();
   }
 
   // requin (plage)
@@ -2544,10 +2674,13 @@ function resize(){
   const rs = document.documentElement.style;
   rs.setProperty('--s', s.toFixed(3)); rs.setProperty('--gy', GY);
   rs.setProperty('--py', lay.py); rs.setProperty('--ry', lay.ry); rs.setProperty('--by', lay.by); rs.setProperty('--ly', lay.ly);
-  buildThemes(); RAYS = null;
+  buildThemes(); RAYS = null; placeLbBtn();
   if (state === 'title' || P.ground) P.y = GY;
   obs.length = 0; discs.length = 0; items.length = 0;
 }
+
+function placeLbBtn(){ const t = $('trobtn'), st = $('start'), gap = t.offsetLeft - st.offsetLeft - st.offsetWidth; $('lbbtn').style.left = (t.offsetLeft + t.offsetWidth + gap) + 'px'; }
+if (document.fonts) document.fonts.ready.then(placeLbBtn);
 
 /* ================= Icônes ================= */
 function icon(id, img){ const c = $(id); c.width = img.width; c.height = img.height; c.getContext('2d').drawImage(img, 0, 0); }
@@ -2557,7 +2690,7 @@ icon('icoFire', BOTTLE);
 /* ================= Contrôles ================= */
 function press(){
   ensureAudio();
-  if (trUI.isOpen() || shopUI.isOpen()) return;
+  if (trUI.isOpen() || shopUI.isOpen() || lbUI.isOpen()) return;
   if (state === 'title'){ startGame(); return; }
   if (state === 'over'){ if (overT > .7) startGame(); return; }
   if (state === 'pause'){ resume(); return; }
@@ -2573,13 +2706,15 @@ function setZone(n){ const z = $('zone'); z.textContent = THEME_NAMES[n]; z.hidd
 $('pausebtn').addEventListener('click', e => { e.stopPropagation(); pause(); });
 
 addEventListener('keydown', e => {
+  if (state === 'over' && lbEntry.isActive() && e.code !== 'Space' && lbEntry.key(e.code)){ e.preventDefault(); return; }
   if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW'){ e.preventDefault(); if (!e.repeat) press(); }
+  else if (lbUI.isOpen()){ if (e.code === 'Escape') lbUI.close(); }
   else if (shopUI.isOpen()){ if (e.code === 'Escape') shopUI.close(); }
   else if (trUI.isOpen()){ if (e.code === 'Escape') trUI.close(); else if (e.code === 'ArrowLeft') trUI.go(-1); else if (e.code === 'ArrowRight') trUI.go(1); }
   else if (e.code === 'Escape' || e.code === 'KeyP'){ state === 'pause' ? resume() : pause(); }
 });
 addEventListener('keyup', e => { if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') release(); });
-wrap.addEventListener('pointerdown', e => { if (e.target.closest('button') || e.target.closest('#soundmenu') || e.target.closest('#trophies') || e.target.closest('#shop')) return; if (!smenu.hidden){ smenu.hidden = true; return; } e.preventDefault(); press(); });
+wrap.addEventListener('pointerdown', e => { if (e.target.closest('button') || e.target.closest('#soundmenu') || e.target.closest('#trophies') || e.target.closest('#shop') || e.target.closest('#lb') || e.target.closest('#lbentry')) return; if (!smenu.hidden){ smenu.hidden = true; return; } e.preventDefault(); press(); });
 addEventListener('pointerup', release); addEventListener('pointercancel', release);
 $('start').addEventListener('click', e => { e.stopPropagation(); startGame(); });
 $('again').addEventListener('click', e => { e.stopPropagation(); startGame(); });

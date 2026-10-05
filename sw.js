@@ -27,6 +27,7 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
+  if (new URL(req.url).origin !== location.origin) return;   // classement en ligne : jamais mis en cache
   // La page du jeu : réseau d'abord (pour récupérer les mises à jour), cache si hors ligne
   if (req.mode === 'navigate'){
     e.respondWith(fetch(req).then(res => { const copy = res.clone(); caches.open(VERSION).then(c => c.put('./index.html', copy)); return res; })
