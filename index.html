@@ -317,15 +317,19 @@ body{
 #lbentry{ margin:calc(var(--s)*1px) 0 calc(var(--s)*4px); display:flex; flex-direction:column; align-items:center; }
 #lbentry[hidden]{ display:none; }
 #lbentry .lbt{ font-size:max(calc(var(--s)*5px),10px); font-weight:700; color:var(--yellow); margin-bottom:calc(var(--s)*2px); }
-.lbslots{ display:flex; justify-content:center; gap:calc(var(--s)*3px); }
-.lbslot{ display:flex; flex-direction:column; align-items:center; }
-.lbslot button{ width:calc(var(--s)*11px); height:calc(var(--s)*6px); padding:0; border:none; background:none; cursor:pointer; display:flex; align-items:center; justify-content:center; }
-.lbslot button i{ width:0; height:0; border-left:calc(var(--s)*3px) solid transparent; border-right:calc(var(--s)*3px) solid transparent; }
-.lbslot .up i{ border-bottom:calc(var(--s)*3.5px) solid var(--purple-l); } .lbslot .dn i{ border-top:calc(var(--s)*3.5px) solid var(--purple-l); }
-.lbslot b{ width:calc(var(--s)*11px); height:calc(var(--s)*12px); display:flex; align-items:center; justify-content:center; font-family:var(--num); font-size:max(calc(var(--s)*8px),15px);
-  background:#FFF4D6; color:var(--plum); border:calc(var(--s)*1px) solid var(--plum); border-radius:calc(var(--s)*1.5px); }
+.lbslots{ display:flex; justify-content:center; gap:calc(var(--s)*6px); }
+.lbslot{ display:flex; flex-direction:column; align-items:center; gap:calc(var(--s)*1.5px); }
+/* grosses flèches faciles à toucher, et la lettre elle-même avance d'un cran quand on la touche */
+.lbslot button{ width:calc(var(--s)*18px); height:calc(var(--s)*10px); padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  background:#5C3D63; border:calc(var(--s)*1px) solid var(--plum); border-radius:calc(var(--s)*2px); box-shadow:0 calc(var(--s)*1px) 0 rgba(0,0,0,.35); }
+.lbslot button:active{ transform:translateY(calc(var(--s)*1px)); box-shadow:none; background:var(--purple); }
+.lbslot button i{ width:0; height:0; border-left:calc(var(--s)*5px) solid transparent; border-right:calc(var(--s)*5px) solid transparent; }
+.lbslot .up i{ border-bottom:calc(var(--s)*5px) solid var(--white); } .lbslot .dn i{ border-top:calc(var(--s)*5px) solid var(--white); }
+.lbslot b{ width:calc(var(--s)*18px); height:calc(var(--s)*20px); display:flex; align-items:center; justify-content:center; cursor:pointer; font-family:var(--num); font-size:max(calc(var(--s)*13px),22px);
+  background:#FFF4D6; color:var(--plum); border:calc(var(--s)*1.5px) solid var(--plum); border-radius:calc(var(--s)*2px); user-select:none; -webkit-user-select:none; }
 .lbslot.on b{ background:var(--yellow); }
-#lbsend{ margin-top:calc(var(--s)*3px); font-size:max(calc(var(--s)*6px),11px); padding:calc(var(--s)*1.5px) calc(var(--s)*6px) calc(var(--s)*2px); animation:none; }
+#lbsend{ margin-top:calc(var(--s)*4px); font-size:max(calc(var(--s)*7px),12px); padding:calc(var(--s)*2px) calc(var(--s)*8px) calc(var(--s)*2.5px); animation:none; }
+#over .panel:has(#lbentry:not([hidden])) .sub{ display:none; }
 #lbres{ font-family:var(--num); font-size:max(calc(var(--s)*4.5px),10px); color:var(--yellow); margin:calc(var(--s)*1px) 0 calc(var(--s)*3px); }
 @media (prefers-reduced-motion: reduce){ #lb, #lb.open{ transition-duration:.01s; } }
 
@@ -1487,7 +1491,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.44';
+const APP_VERSION = '5.45';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -1848,7 +1852,7 @@ const lbEntry = (() => {
   box.querySelectorAll('.lbslot').forEach((s, i) => {
     s.querySelector('.up').addEventListener('click', e => { e.stopPropagation(); bump(i, -1); });
     s.querySelector('.dn').addEventListener('click', e => { e.stopPropagation(); bump(i, 1); });
-    s.querySelector('b').addEventListener('click', e => { e.stopPropagation(); pos = i; draw(); });
+    s.querySelector('b').addEventListener('click', e => { e.stopPropagation(); bump(i, 1); });
   });
   $('lbsend').addEventListener('click', e => { e.stopPropagation(); submit(); });
   return { show, hide, submit, isActive: () => active,
