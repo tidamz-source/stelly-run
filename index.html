@@ -523,8 +523,8 @@ body{
     <div id="dcount" hidden aria-label="Frisbees attrapés" data-i18n-aria="ui.discsCaught"><canvas id="icoCount"></canvas><span id="dcn">0</span></div>
   </div>
 </div>
-<script src="langues.js?v=5.69"></script>
-<script src="stelly.js?v=5.69"></script>
+<script src="langues.js?v=5.70"></script>
+<script src="stelly.js?v=5.70"></script>
 <script>
 /* ================= Langues ================= */
 // textes dans langues.js ; txt('clé', { n: 3 }) renvoie le texte dans la langue choisie (français si non traduit)
@@ -1470,6 +1470,8 @@ const MUSIC = (() => {
 let titleCaught = false;
 // chronomètre Fast Count : facteur de vitesse durable (x0,8 par chrono), délai avant le prochain, effet visuel
 let slowMul = 1, slowIn = 1e9, slowFx = 0, slowX = 0, slowY = 0;
+// safeT : courte protection après un chrono (on traverse tout, sans rien détruire ni assommer)
+let safeT = 0;
 let state = 'title', clock = 0, titleT = 0, t = 0, dist = 0, bonus = 0, speed = 30, spEff = 30, score = 0, shownScore = -1;
 // ----- anti-triche -----
 // empreinte rapide (cyrb53), identique dans le script du classement
@@ -1500,7 +1502,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.69';
+const APP_VERSION = '5.70';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -1513,7 +1515,7 @@ function showTitleRecord(){ ui.trec.hidden = best <= 0; ui.trec.textContent = tx
 
 function reset(){
   t = 0; dist = 0; bonus = 0; zoneIdx = 0; zoneT = 12 + Math.random()*6; deer = []; flyers = []; flyIn = 4 + Math.random()*3; birdWait = false; groups = {}; discCount = 0; streak = 0; bestStreak = 0; koCount = 0; $('dcn').textContent = '0'; speed = 235; spEff = 190; obs = []; discs = []; items = []; parts = []; pops = []; debris = []; lines = [];
-  nextObs = 170; sockIn = itemDelay('sock', true); fireIn = itemDelay('fire', true); slowMul = 1; slowIn = 5 + Math.random()*15; slowFx = 0; lastCatch = -9; combo = 0; milestone = 500; shownScore = -1;
+  nextObs = 170; sockIn = itemDelay('sock', true); fireIn = itemDelay('fire', true); slowMul = 1; slowIn = 5 + Math.random()*15; slowFx = 0; safeT = 0; lastCatch = -9; combo = 0; milestone = 500; shownScore = -1;
   theme = 0; prevTheme = 0; transT = 0; fireT = 0; graceT = 0; boost = 1; shark = null;
   Object.assign(P, { y:GY, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, land:0, sink:false, stomps:0 });
 }
@@ -2270,7 +2272,7 @@ function update(dt){
       if (P.sockT > 0) burst(P.x-8, P.y-4, 8, [C.white, '#E6DCF0'], 60, 80);
     }
     { const tg = fireT > 0 ? 1.3 : 1; MUSIC.tempo += (tg - MUSIC.tempo) * Math.min(1, dt*(tg > MUSIC.tempo ? 4 : 1.5)); MUSIC.fire = fireT > 0; }
-    P.sockT = Math.max(0, P.sockT - dt); graceT = Math.max(0, graceT - dt); { const had = fireT > 0; fireT = Math.max(0, fireT - dt); if (had && fireT <= 0) graceT = 1; }
+    P.sockT = Math.max(0, P.sockT - dt); graceT = Math.max(0, graceT - dt); safeT = Math.max(0, safeT - dt); { const had = fireT > 0; fireT = Math.max(0, fireT - dt); if (had && fireT <= 0) graceT = 1; }
     P.anim += dt * (10 + spEff/17);
     if (P.ground && P.land <= 0){ P.dust -= dt; if (P.dust <= 0){ dust(P.x-5, GY-1, 1); P.dust = .08; } }
     if (fireT > 0){ flame(P.x-4, P.y-28, 3, 34); if (Math.random() < dt*40) lines.push({ x: W + Math.random()*30, y: 8 + Math.random()*(GY+10), len: 10 + Math.random()*26 }); }
@@ -2286,7 +2288,7 @@ function update(dt){
 
   if (state === 'play'){
     for (const o of obs){
-      if (o.smashed) continue;
+      if (o.smashed || safeT > 0) continue;
       if (o.k === 'hole'){
         if (P.ground && fireT <= 0 && graceT <= 0 && P.x > o.x + 6 && P.x < o.x + o.w - 6){
           if (o.th === 1) die('slip');
@@ -2304,7 +2306,7 @@ function update(dt){
     }
     obs = obs.filter(o => !o.smashed);
     for (const f of flyers){
-      if (f.ko) continue;
+      if (f.ko || safeT > 0) continue;
       const S = FLY_SPECS[f.sp], fy = f.y0;
       if (Math.abs(f.x - P.x) < S.hw + 7 && fy + S.hh > P.y - 46 && fy - S.hh < P.y - 2){
         // mi-hauteur : tolérance élargie (pieds jusqu'à 9 px sous le centre, accepté dès le sommet du saut) car le saut appuyé l'atteint tout juste
@@ -2322,7 +2324,7 @@ function update(dt){
     }
     for (const s of items){
       if (s.k === 'slow' && !s.got && Math.abs(s.x - P.x) < 16 && s.y + 8 > P.y-56 && s.y - 8 < P.y+2){
-        s.got = true; TR.slow(); slowMul = Math.max(.35, slowMul*.8); slowFx = 1.1; slowX = s.x; slowY = s.y; sfx.slow(); toast(txt('toast.timeout'));
+        s.got = true; TR.slow(); safeT = .5; slowMul = Math.max(.35, slowMul*.8); slowFx = 1.1; slowX = s.x; slowY = s.y; sfx.slow(); toast(txt('toast.timeout'));
         burst(s.x, s.y, 18, [C.purpleL, C.yellow, C.white, C.purple], 90, 120);
       }
       if (s.k === 'sock' && Math.abs(s.x+9 - P.x) < 17 && s.y+14 > P.y-56 && s.y+6 < P.y+2){
@@ -2743,7 +2745,7 @@ function draw(){
       const col = Math.floor(clock*14) % 2 ? 'rgba(122,87,160,.7)' : 'rgba(255,255,255,.75)';
       ctx.globalAlpha = .25; ctx.drawImage(tinted(spr, 'rgba(128,88,162,.85)'), px - 14, py); ctx.globalAlpha = .45; ctx.drawImage(TMP, px - 7, py); ctx.globalAlpha = 1;
       ctx.drawImage(spr, px, py); ctx.drawImage(tinted(spr, col), px, py); drawHat(ctx, spr, px, py, EQUIPPED.hat, clock);
-    } else { if (graceT > 0 && state === 'play' && Math.floor(clock*16) % 2) ctx.globalAlpha = .4; ctx.drawImage(spr, px, py); drawHat(ctx, spr, px, py, EQUIPPED.hat, clock); ctx.globalAlpha = 1; }
+    } else { if ((graceT > 0 || safeT > 0) && state === 'play' && Math.floor(clock*16) % 2) ctx.globalAlpha = .4; ctx.drawImage(spr, px, py); drawHat(ctx, spr, px, py, EQUIPPED.hat, clock); ctx.globalAlpha = 1; }
     const blink = P.sockT > 0 && P.sockT < 1.6 && Math.floor(clock*10)%2;
     if (P.sockT > 0 && !blink && state === 'play' && spr.ank){ const f = Math.floor(clock*14)%2; for (const a of spr.ank) ctx.drawImage(HEEL_WINGS[f], px + a[0] - 10, py + a[1] - 3 - f); }
     if (P.sink) ctx.restore();
