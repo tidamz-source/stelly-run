@@ -523,8 +523,8 @@ body{
     <div id="dcount" hidden aria-label="Frisbees attrapés" data-i18n-aria="ui.discsCaught"><canvas id="icoCount"></canvas><span id="dcn">0</span></div>
   </div>
 </div>
-<script src="langues.js?v=5.70"></script>
-<script src="stelly.js?v=5.70"></script>
+<script src="langues.js?v=5.71"></script>
+<script src="stelly.js?v=5.71"></script>
 <script>
 /* ================= Langues ================= */
 // textes dans langues.js ; txt('clé', { n: 3 }) renvoie le texte dans la langue choisie (français si non traduit)
@@ -1502,7 +1502,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.70';
+const APP_VERSION = '5.71';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -1545,7 +1545,7 @@ const TROPHIES = TROPHY_IDS.map(id => { const a = [id];
   Object.defineProperty(a, 1, { get: () => txt('tr.' + id + '.n'), enumerable: true });
   Object.defineProperty(a, 2, { get: () => txt('tr.' + id + '.d'), enumerable: true }); return a; });
 // u : débloqués (date), s : déjà consultés ; compteurs cumulés sur toutes les parties. Jamais remis à zéro par une nouvelle version.
-const BIRD_KINDS = ['pigeon', 'gull', 'eagle', 'owl', 'crow'];
+const BIRD_KINDS = ['pigeon', 'gull', 'eagle', 'owl', 'crow', 'shuttle'];
 // toutes les morts possibles dans le jeu (Cascadeuse) : obstacles, pièges des trous et volants
 const DEATH_KINDS = ['hit', 'slip', 'hole', 'mole', 'crab', 'marmot', 'sewer', 'stump', 'bale', 'pigeon', 'gull', 'eagle', 'owl', 'crow', 'shuttle'];
 const TR = (() => {
@@ -1592,10 +1592,10 @@ const TR = (() => {
     miss(){ d.st.missed++; if (++g.miss >= 25) unlock('mains'); },
     fire(){ d.st.fires++; g.fire = true; if (++g.fires >= 3) unlock('hydrate'); },
     smash(n){ g.smash += n || 1; if (g.smash >= 30) unlock('bulldozer'); },   // chaque élément compte : rangée de 3 = 3, pyramide = 3, pyramide à 3 niveaux = 6
-    stomp(sp, tier){ if (sp !== 'shuttle') d.st.ko++;
-      if (sp === 'shuttle'){ if (tier === 2) unlock('voltige'); return; }
+    // les volants comptent comme des oiseaux (stats, trophées, espèces d'Angry Birds)
+    stomp(sp, tier){ d.st.ko++;
       if (++g.stomps >= 5) unlock('plumes'); if (EQUIPPED.hat && EQUIPPED.hat.id === 'hat-casque' && ++d.helmet >= 10) unlock('tetedure'); if (tier === 2) unlock('voltige');
-      const i = BIRD_KINDS.indexOf(sp); if (i >= 0){ d.birds |= 1 << i; if ((d.birds & 31) === 31) unlock('angry'); save(); } },
+      const i = BIRD_KINDS.indexOf(sp); if (i >= 0){ d.birds |= 1 << i; if ((d.birds & 63) === 63) unlock('angry'); save(); } },
     // boutique
     bought(it){ d.spent += it.price; unlock('soldes'); if (d.spent >= 10000) unlock('prada');
       const all = SHOP.filter(x => x.img); if (all.filter(x => x.slot === 'hat').every(x => d.own[x.id])) unlock('chapelier'); if (all.every(x => d.own[x.id])) unlock('dressing'); save(); },
@@ -1930,7 +1930,7 @@ const statsUI = (() => {
     const tiles = [
       ['stats.games', fmtN(d.games)], ['stats.discs', fmtN(d.discs), true], ['stats.rainbow', fmtN(d.rb)], ['stats.spent', fmtN(d.spent)],
       ['stats.ko', fmtN(st.ko)], ['stats.deer', fmtN(st.doe) + ' / ' + fmtN(st.stag)], ['stats.sharks', fmtN(d.sharks)], ['stats.dist', distTxt(st.dist)],
-      ['stats.streak', 'x' + fmtN(st.streak), true], ['stats.missed', fmtN(st.missed)], ['stats.fires', fmtN(st.fires)], ['stats.socks', fmtN(st.socks)], ['stats.slows', fmtN(st.slows)]
+      ['stats.streak', fmtN(st.streak), true], ['stats.missed', fmtN(st.missed)], ['stats.fires', fmtN(st.fires)], ['stats.socks', fmtN(st.socks)], ['stats.slows', fmtN(st.slows)]
     ];
     let h = '<div class="sgrid">' + tiles.map(([k, v, gold]) => '<div class="stile"><b' + (gold ? ' class="gold"' : '') + '>' + esc(v) + '</b><span>' + esc(txt(k)) + '</span></div>').join('') + '</div>';
     const deaths = Object.entries(st.deathBy).sort((a, b) => b[1] - a[1]);
@@ -2349,7 +2349,7 @@ function update(dt){
     ui.bestline.textContent = P.newBest ? (P.prevBest > 0 ? txt('over.newBest', { n: fmtN(score - P.prevBest) }) : txt('ui.newRecord'))
       : (best - score > 0 ? txt('over.gap', { n: fmtN(best - score) }) : txt('over.tie'));
     ui.bestline.className = 'line' + (P.newBest ? ' new' : '');
-    const gm = TR.game(); $('ocoins').textContent = '+' + fmtN(gm.coins); $('ostreak').textContent = 'x' + bestStreak;
+    const gm = TR.game(); $('ocoins').textContent = '+' + fmtN(gm.coins); $('ostreak').textContent = fmtN(bestStreak);
     overTrophies(gm.trophies, score > (TR.d.lbBest || 0));
     ui.hi.textContent = txt('ui.record') + ' ' + pad(best);
     ui.sockbar.hidden = true; ui.firebar.hidden = true; ui.over.hidden = false;
