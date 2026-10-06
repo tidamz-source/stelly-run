@@ -219,8 +219,8 @@ const TEXTS = {
 
 /* Nouvelles du jeu : la plus récente en premier. icon : image du jeu affichée à côté (chrono…) */
 const NEWS = [
-  { id:'2026-10-06-dats-count', date:'2026-10-06', icon:'chrono',
-    title:{ fr:'Nouveau power-up : Dats Count', en:'New power-up: Dats Count', es:'Nuevo power-up: Dats Count' },
+  { id:'2026-10-06-fast-count', date:'2026-10-06', icon:'chrono',
+    title:{ fr:'Nouveau power-up : Fast Count', en:'New power-up: Fast Count', es:'Nuevo power-up: Fast Count' },
     text:{ fr:'Attrape le chronomètre violet pour ralentir le jeu de 20 % : la vitesse baisse et l’accélération repart de plus bas. Il apparaît après 30 secondes de jeu, et ses effets se cumulent !',
            en:'Grab the purple stopwatch to slow the game down by 20%: the speed drops and acceleration starts again from lower down. It shows up after 30 seconds of play, and its effects stack!',
            es:'Atrapa el cronómetro morado para ralentizar el juego un 20 %: la velocidad baja y la aceleración vuelve a empezar desde más abajo. Aparece tras 30 segundos de juego, ¡y sus efectos se acumulan!' } }

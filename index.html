@@ -491,8 +491,8 @@ body{
     <div id="dcount" hidden aria-label="Frisbees attrapés" data-i18n-aria="ui.discsCaught"><canvas id="icoCount"></canvas><span id="dcn">0</span></div>
   </div>
 </div>
-<script src="langues.js?v=5.67"></script>
-<script src="stelly.js?v=5.67"></script>
+<script src="langues.js?v=5.68"></script>
+<script src="stelly.js?v=5.68"></script>
 <script>
 /* ================= Langues ================= */
 // textes dans langues.js ; txt('clé', { n: 3 }) renvoie le texte dans la langue choisie (français si non traduit)
@@ -1436,7 +1436,7 @@ const MUSIC = (() => {
 
 /* ================= État ================= */
 let titleCaught = false;
-// chronomètre Dats Count : facteur de vitesse durable (x0,8 par chrono), délai avant le prochain, effet visuel
+// chronomètre Fast Count : facteur de vitesse durable (x0,8 par chrono), délai avant le prochain, effet visuel
 let slowMul = 1, slowIn = 1e9, slowFx = 0, slowX = 0, slowY = 0;
 let state = 'title', clock = 0, titleT = 0, t = 0, dist = 0, bonus = 0, speed = 30, spEff = 30, score = 0, shownScore = -1;
 // ----- anti-triche -----
@@ -1468,7 +1468,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.67';
+const APP_VERSION = '5.68';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -2732,7 +2732,7 @@ function itemDelay(k, first){
 }
 // hauteur des objets : au sol 40 %, à hauteur de saut 60 %
 const itemLevel = () => Math.random() < .4 ? 0 : 1;
-// chronomètre violet et jaune (Dats Count), 16 x 20, l'aiguille tourne (4 images)
+// chronomètre violet et jaune (Fast Count), 16 x 20, l'aiguille tourne (4 images)
 const CHRONO = [0, 1, 2, 3].map(f => mk(16, 20, g => {
   const P2 = { o:C.plum, y:C.yellow, Y:C.yellowL, p:C.purple, P:C.purpleD, l:C.purpleL };
   pm(g, ['......oooo......','......oyyo......','......oooo......','.......oo.......','.......oo.......'], 0, 0, false, Object.assign({}, PAL, P2));
