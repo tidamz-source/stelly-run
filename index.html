@@ -384,6 +384,32 @@ body{
 .nart p{ margin:0; font-weight:500; font-size:max(calc(var(--s)*5px),10px); line-height:1.3; }
 @media (prefers-reduced-motion: reduce){ #news, #news.open{ transition-duration:.01s; } }
 
+/* ----- Fiche de stats ----- */
+#statsbtn{ position:absolute; left:calc(var(--s)*25px); bottom:calc(var(--s)*14px); padding:calc(var(--s)*1.5px); display:flex; pointer-events:auto; cursor:pointer;
+  background:rgba(255,255,255,.85); border:calc(var(--s)*1px) solid var(--plum); border-radius:calc(var(--s)*1.5px); }
+#statsbtn canvas{ width:calc(var(--s)*11px); height:auto; image-rendering:pixelated; display:block; }
+#stats{ position:absolute; inset:0; z-index:30; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:calc(var(--s)*4px);
+  background:repeating-linear-gradient(135deg, rgba(255,255,255,.035) 0 calc(var(--s)*6px), transparent 0 calc(var(--s)*12px)), var(--plum);
+  border-bottom:calc(var(--s)*2px) solid var(--yellow); box-shadow:0 calc(var(--s)*3px) 0 rgba(0,0,0,.35);
+  transform:translateY(calc(-100% - var(--s)*6px)); transition:transform .45s cubic-bezier(.6,0,.4,1); }
+#stats.open{ transform:none; transition:transform .55s cubic-bezier(.25,1.25,.45,1); }
+#statsclose{ position:absolute; top:calc(var(--s)*7px); right:calc(var(--s)*9px); font-size:max(calc(var(--s)*7px),12px); padding:calc(var(--s)*1.5px) calc(var(--s)*5px) calc(var(--s)*2px); }
+#statsbody{ display:flex; gap:calc(var(--s)*6px); align-items:flex-start; max-height:calc(var(--s)*150px); overflow-y:auto; padding:0 calc(var(--s)*2px); }
+.sgrid{ display:grid; grid-template-columns:repeat(4, calc(var(--s)*44px)); gap:calc(var(--s)*3px); }
+.stile{ padding:calc(var(--s)*2px) calc(var(--s)*2px) calc(var(--s)*2.5px); background:#43234A; border:calc(var(--s)*1px) solid #5C3D63; border-radius:calc(var(--s)*2px); text-align:center; }
+.stile b{ display:block; font-family:var(--num); font-weight:400; font-size:max(calc(var(--s)*6px),11px); color:var(--white); line-height:1.15; white-space:nowrap; }
+.stile b.gold{ color:var(--yellow); }
+.stile span{ display:block; font-size:max(calc(var(--s)*3.6px),8px); font-weight:700; color:var(--purple-l); line-height:1.15; margin-top:calc(var(--s)*.5px); }
+.sdeaths{ width:calc(var(--s)*86px); padding:calc(var(--s)*3px) calc(var(--s)*4px); background:#FFF4D6; color:var(--plum); border:calc(var(--s)*1.5px) solid var(--plum); border-radius:calc(var(--s)*3px); box-shadow:0 calc(var(--s)*2px) 0 rgba(0,0,0,.4); }
+.sdeaths h3{ margin:0 0 calc(var(--s)*2px); font-size:max(calc(var(--s)*5px),10px); }
+.sdrow{ display:grid; grid-template-columns:1fr auto; gap:calc(var(--s)*2px); align-items:center; font-size:max(calc(var(--s)*4.2px),9px); font-weight:700; margin-top:calc(var(--s)*1px); }
+.sdrow i{ grid-column:1 / -1; height:calc(var(--s)*1.6px); background:var(--orange); border-radius:calc(var(--s)*1px); }
+.sdrow em{ font-style:normal; font-family:var(--num); font-weight:400; }
+.sfatal{ margin-top:calc(var(--s)*3px); padding-top:calc(var(--s)*2px); border-top:calc(var(--s)*.8px) dashed #B9A27A; font-size:max(calc(var(--s)*4.2px),9px); font-weight:700; }
+.sfatal b{ color:#C0392B; }
+.snone{ font-size:max(calc(var(--s)*4.2px),9px); color:#8E7C93; }
+@media (prefers-reduced-motion: reduce){ #stats, #stats.open{ transition-duration:.01s; } }
+
 @media (prefers-reduced-motion: reduce){
   #title *, .panel, #toast.show{ animation-duration:.01s; animation-delay:0s; }
 }
@@ -417,6 +443,7 @@ body{
         <span class="rec" id="trec" hidden></span>
       </div></div>
       <button id="install" hidden data-i18n="ui.install">Installer l’appli</button>
+    <button id="statsbtn" aria-label="Statistiques" data-i18n-aria="stats.title"><canvas id="icoStats"></canvas></button>
     <button id="newsbtn" aria-label="Nouvelles" data-i18n-aria="news.title"><canvas id="icoNews"></canvas><span class="dot" hidden></span></button>
     <p class="ver" id="ver"></p>
     <p class="copy">© Lutèce Games</p>
@@ -470,6 +497,11 @@ body{
       <button id="lbclose" class="btn alt" data-i18n="ui.close">Fermer</button>
       <div id="lblist"></div>
     </div>
+    <div id="stats" hidden role="dialog" aria-modal="true" aria-label="Statistiques" data-i18n-aria="stats.title">
+      <div class="trhead"><h2 data-i18n="stats.title">Statistiques</h2></div>
+      <button id="statsclose" class="btn alt" data-i18n="ui.close">Fermer</button>
+      <div id="statsbody"></div>
+    </div>
     <div id="news" hidden role="dialog" aria-modal="true" aria-label="Nouvelles" data-i18n-aria="news.title">
       <div class="trhead"><h2 data-i18n="news.title">Nouvelles</h2></div>
       <button id="newsclose" class="btn alt" data-i18n="ui.close">Fermer</button>
@@ -491,8 +523,8 @@ body{
     <div id="dcount" hidden aria-label="Frisbees attrapés" data-i18n-aria="ui.discsCaught"><canvas id="icoCount"></canvas><span id="dcn">0</span></div>
   </div>
 </div>
-<script src="langues.js?v=5.68"></script>
-<script src="stelly.js?v=5.68"></script>
+<script src="langues.js?v=5.69"></script>
+<script src="stelly.js?v=5.69"></script>
 <script>
 /* ================= Langues ================= */
 // textes dans langues.js ; txt('clé', { n: 3 }) renvoie le texte dans la langue choisie (français si non traduit)
@@ -1468,7 +1500,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.68';
+const APP_VERSION = '5.69';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -1486,7 +1518,7 @@ function reset(){
   Object.assign(P, { y:GY, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, land:0, sink:false, stomps:0 });
 }
 function startGame(){
-  lbEntry.submit(); lbEntry.hide(); trUI.close(); shopUI.close(); lbUI.close(); newsUI.close(); $('langbtn').hidden = true; $('langmenu').hidden = true; ensureAudio(); sfx.start(); reset(); TR.start(); rbAt = TR.rainbowAt(); state = 'play'; MUSIC.tempo = MUSIC.target = 1; MUSIC.fire = false; MUSIC.play(0, true);
+  lbEntry.submit(); lbEntry.hide(); trUI.close(); shopUI.close(); lbUI.close(); newsUI.close(); statsUI.close(); $('langbtn').hidden = true; $('langmenu').hidden = true; ensureAudio(); sfx.start(); reset(); TR.start(); rbAt = TR.rainbowAt(); state = 'play'; MUSIC.tempo = MUSIC.target = 1; MUSIC.fire = false; MUSIC.play(0, true);
   ui.title.hidden = true; ui.over.hidden = true; ui.pause.hidden = true; ui.hud.hidden = false;
   ui.hi.textContent = txt('ui.record') + ' ' + pad(best); ui.firebar.hidden = true; ui.sockbar.hidden = true; ui.dcount.hidden = false; $('pausebtn').hidden = false; clearTimeout(zoneTimer); $('zone').hidden = true;
   if (document.activeElement) document.activeElement.blur();
@@ -1517,11 +1549,15 @@ const DEATH_KINDS = ['hit', 'slip', 'hole', 'mole', 'crab', 'marmot', 'sewer', '
 const TR = (() => {
   const KEY = 'stellyrun_trophies';
   const d = { u:{}, s:{}, games:0, discs:0, sharks:0, th:0, birds:0, rbMiss:0, rb:0, deer:0, deaths:0, own:{}, eq:{}, spent:0, tried:{}, helmet:0 };
+  // stats de la fiche joueur (à partir de la v5.69)
+  d.st = Object.assign({ ko:0, doe:0, stag:0, dist:0, streak:0, missed:0, fires:0, socks:0, slows:0, deathBy:{}, deathTh:{} }, d.st || {});
   { const raw = sealedLoad(KEY);   // version retouchée -> copie de secours -> données vierges
     try { const j = JSON.parse(raw); if (j && typeof j === 'object') Object.assign(d, j); } catch(e){} }
   if (typeof d.coins !== 'number') d.coins = d.discs;   // monnaie de la boutique : frisbees attrapés (rétroactif)
   let g = { socks:0, fires:0, smash:0, stomps:0, fire:false, miss:0 };
   const save = () => sealedSave(KEY, JSON.stringify(d));
+  let ended = false;
+  function endStats(){ if (ended) return; ended = true; d.st.dist += Math.round(dist); if (bestStreak > d.st.streak) d.st.streak = bestStreak; }
   function unlock(id){
     if (d.u[id]) return; d.u[id] = Date.now();
     if (!d.u.greatest && TROPHIES.every(([k]) => k === 'greatest' || k === 'parzival' || d.u[k])) d.u.greatest = Date.now();
@@ -1536,7 +1572,7 @@ const TR = (() => {
     // frisbee arc-en-ciel : une seule chance par partie (1/300), la probabilité grimpe à chaque partie sans l'attraper (pitié), plafonnée à 5 %
     rainbowAt(){ const p = Math.min(.05, (1/300)*(1 + d.rbMiss/100)); d.rbMiss++; return Math.random() < p ? 8 + Math.random()*30 : -1; },
     rainbow(){ d.rb++; d.coins += 100; if (d.coins >= 5000) unlock('picsou'); d.rbMiss = 0; unlock('rainbow'); save(); },
-    start(){ g = { socks:0, fires:0, smash:0, stomps:0, fire:false, miss:0, coins0: d.coins, t0: Date.now() }; d.games++; d.th |= 1; for (const [n, id] of GAMES) if (d.games >= n) unlock(id); save(); },
+    start(){ ended = false; g = { socks:0, fires:0, smash:0, stomps:0, fire:false, miss:0, coins0: d.coins, t0: Date.now() }; d.games++; d.th |= 1; for (const [n, id] of GAMES) if (d.games >= n) unlock(id); save(); },
     zone(n){ d.th |= 1 << n; if (ZONES[n]) unlock(ZONES[n]); if ((d.th & 127) === 127) unlock('globe'); },
     disc(){
       d.discs++; d.coins++; if (d.coins >= 5000) unlock('picsou');
@@ -1544,15 +1580,18 @@ const TR = (() => {
       if (discCount >= 150) unlock('huck');
       if (d.discs >= 1000) unlock('bronze'); if (d.discs >= 5000) unlock('argent'); if (d.discs >= 10000) unlock('or');
     },
-    die(kind){ if (t < 5) unlock('pasdebol'); if (kind === 'mole' || kind === 'hole') unlock('taupe'); if (kind === 'crab') unlock('crabe'); if (kind === 'marmot') unlock('marmotte');
+    die(kind){ d.st.deathBy[kind] = (d.st.deathBy[kind] || 0) + 1; d.st.deathTh[theme] = (d.st.deathTh[theme] || 0) + 1; endStats();
+      if (t < 5) unlock('pasdebol'); if (kind === 'mole' || kind === 'hole') unlock('taupe'); if (kind === 'crab') unlock('crabe'); if (kind === 'marmot') unlock('marmotte');
       const i = DEATH_KINDS.indexOf(kind); if (i >= 0){ d.deaths |= 1 << i; if (d.deaths === (1 << DEATH_KINDS.length) - 1) unlock('cascadeuse'); } save(); },
-    deer(kind){ d.deer |= kind === 'stag' ? 2 : 1; if (d.deer === 3) unlock('deer'); },
+    deer(kind){ d.st[kind === 'stag' ? 'stag' : 'doe']++; d.deer |= kind === 'stag' ? 2 : 1; if (d.deer === 3) unlock('deer'); },
     tick(){ if (score >= 3000 && EQUIPPED.shoes && EQUIPPED.shoes.id === 'shoes-heels') unlock('cendrillon'); if (fireT > 0 && P.sockT > 0) unlock('heros'); if (score >= 10000 && !g.fire) unlock('intouchable'); },
-    sock(){ if (++g.socks >= 3) unlock('elfe'); },
-    miss(){ if (++g.miss >= 25) unlock('mains'); },
-    fire(){ g.fire = true; if (++g.fires >= 3) unlock('hydrate'); },
+    sock(){ d.st.socks++; if (++g.socks >= 3) unlock('elfe'); },
+    slow(){ d.st.slows++; },
+    miss(){ d.st.missed++; if (++g.miss >= 25) unlock('mains'); },
+    fire(){ d.st.fires++; g.fire = true; if (++g.fires >= 3) unlock('hydrate'); },
     smash(n){ g.smash += n || 1; if (g.smash >= 30) unlock('bulldozer'); },   // chaque élément compte : rangée de 3 = 3, pyramide = 3, pyramide à 3 niveaux = 6
-    stomp(sp, tier){ if (sp === 'shuttle'){ if (tier === 2) unlock('voltige'); return; }
+    stomp(sp, tier){ if (sp !== 'shuttle') d.st.ko++;
+      if (sp === 'shuttle'){ if (tier === 2) unlock('voltige'); return; }
       if (++g.stomps >= 5) unlock('plumes'); if (EQUIPPED.hat && EQUIPPED.hat.id === 'hat-casque' && ++d.helmet >= 10) unlock('tetedure'); if (tier === 2) unlock('voltige');
       const i = BIRD_KINDS.indexOf(sp); if (i >= 0){ d.birds |= 1 << i; if ((d.birds & 31) === 31) unlock('angry'); save(); } },
     // boutique
@@ -1562,6 +1601,8 @@ const TR = (() => {
     worn(){ if (SHOP_SLOTS.every(sl => EQUIPPED[sl])) unlock('fashion'); },
     // bilan de la partie : frisbees gagnés pour la boutique, trophées débloqués pendant la partie
     game: () => ({ coins: d.coins - (g.coins0 != null ? g.coins0 : d.coins), trophies: TROPHY_IDS.filter(id => d.u[id] && d.u[id] >= (g.t0 || Infinity)) }),
+    // fin de partie (mort ou abandon) : distance parcourue et meilleure série
+    end(){ endStats(); save(); },
     shark(){ if (++d.sharks >= 10) unlock('requin'); }
   };
 })();
@@ -1872,6 +1913,47 @@ const newsUI = (() => {
   { const m = ['.o.o.o.o.o.','ooooooooooo','owwwwwwwwwo','owLLLLLLLwo','owwwwwwwwwo','owLLLLLLwwo','owwwwwwwwwo','owLLLLLLLwo','owwwwwwwwwo','owLLLLwwwwo','owwwwwwwwwo','ooooooooooo'];
     const c = $('icoNews'); c.width = 11; c.height = m.length; pm(c.getContext('2d'), m, 0, 0, false, Object.assign({}, PAL, { w:'#FFF4D6', L:C.purpleL })); }
   refreshDot();
+  return { open, close, isOpen: () => isOpen };
+})();
+
+/* ================= Fiche de stats du joueur ================= */
+const statsUI = (() => {
+  const page = $('stats'), body = $('statsbody');
+  let isOpen = false, hideT = 0;
+  const esc = v => String(v).replace(/[&<>]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' })[c]);
+  // distance : 30 px du jeu = 1 mètre
+  const distTxt = px => { const m = Math.round(px/30); return m >= 10000 ? fmtN(Math.round(m/100)/10).replace('.', LANG === 'en' ? '.' : ',') + ' km' : fmtN(m) + ' m'; };
+  function render(){
+    const d = TR.d, st = d.st;
+    const tiles = [
+      ['stats.games', fmtN(d.games)], ['stats.discs', fmtN(d.discs), true], ['stats.rainbow', fmtN(d.rb)], ['stats.spent', fmtN(d.spent)],
+      ['stats.ko', fmtN(st.ko)], ['stats.deer', fmtN(st.doe) + ' / ' + fmtN(st.stag)], ['stats.sharks', fmtN(d.sharks)], ['stats.dist', distTxt(st.dist)],
+      ['stats.streak', 'x' + fmtN(st.streak), true], ['stats.missed', fmtN(st.missed)], ['stats.fires', fmtN(st.fires)], ['stats.socks', fmtN(st.socks)], ['stats.slows', fmtN(st.slows)]
+    ];
+    let h = '<div class="sgrid">' + tiles.map(([k, v, gold]) => '<div class="stile"><b' + (gold ? ' class="gold"' : '') + '>' + esc(v) + '</b><span>' + esc(txt(k)) + '</span></div>').join('') + '</div>';
+    const deaths = Object.entries(st.deathBy).sort((a, b) => b[1] - a[1]);
+    h += '<div class="sdeaths"><h3>' + esc(txt('stats.deaths')) + '</h3>';
+    if (!deaths.length) h += '<div class="snone">' + esc(txt('stats.none')) + '</div>';
+    else { const mx = deaths[0][1];
+      h += deaths.map(([k, n]) => '<div class="sdrow"><span>' + esc(TEXTS['cause.' + k] ? txt('cause.' + k) : k) + '</span><em>' + fmtN(n) + '</em><i style="width:' + Math.max(6, n/mx*100) + '%"></i></div>').join('');
+      const th = Object.entries(st.deathTh).sort((a, b) => b[1] - a[1])[0];
+      if (th) h += '<div class="sfatal">' + esc(txt('stats.fatal')) + ' <b>' + esc(THEME_NAMES[th[0]] || '') + '</b></div>'; }
+    h += '</div>';
+    body.innerHTML = h;
+  }
+  function open(){
+    if (isOpen || state !== 'title') return;
+    render(); clearTimeout(hideT); page.hidden = false; void page.offsetWidth; page.classList.add('open'); isOpen = true; $('soundmenu').hidden = true; sfx.start();
+  }
+  function close(){
+    if (!isOpen) return; isOpen = false; page.classList.remove('open');
+    clearTimeout(hideT); hideT = setTimeout(() => { if (!isOpen) page.hidden = true; }, 500);
+    if (document.activeElement) document.activeElement.blur();
+  }
+  $('statsclose').addEventListener('click', e => { e.stopPropagation(); close(); });
+  $('statsbtn').addEventListener('click', e => { e.stopPropagation(); ensureAudio(); open(); });
+  { const m = ['ooooooooooo','owwwwwwwwwo','owwwwwwYYwo','owwwwwwYYwo','owwwRRwYYwo','owwwRRwYYwo','owPPwRRwYYo','owPPwRRwYYo','owPPwRRwYYo','owwwwwwwwwo','ooooooooooo'];
+    const c = $('icoStats'); c.width = 11; c.height = m.length; pm(c.getContext('2d'), m, 0, 0, false, Object.assign({}, PAL, { w:'#FFF4D6', Y:C.yellow, R:C.orange, P:C.purple })); }
   return { open, close, isOpen: () => isOpen };
 })();
 
@@ -2240,7 +2322,7 @@ function update(dt){
     }
     for (const s of items){
       if (s.k === 'slow' && !s.got && Math.abs(s.x - P.x) < 16 && s.y + 8 > P.y-56 && s.y - 8 < P.y+2){
-        s.got = true; slowMul = Math.max(.35, slowMul*.8); slowFx = 1.1; slowX = s.x; slowY = s.y; sfx.slow(); toast(txt('toast.timeout'));
+        s.got = true; TR.slow(); slowMul = Math.max(.35, slowMul*.8); slowFx = 1.1; slowX = s.x; slowY = s.y; sfx.slow(); toast(txt('toast.timeout'));
         burst(s.x, s.y, 18, [C.purpleL, C.yellow, C.white, C.purple], 90, 120);
       }
       if (s.k === 'sock' && Math.abs(s.x+9 - P.x) < 17 && s.y+14 > P.y-56 && s.y+6 < P.y+2){
@@ -2753,7 +2835,7 @@ icon('icoFire', BOTTLE);
 /* ================= Contrôles ================= */
 function press(){
   ensureAudio();
-  if (trUI.isOpen() || shopUI.isOpen() || lbUI.isOpen() || newsUI.isOpen()) return;
+  if (trUI.isOpen() || shopUI.isOpen() || lbUI.isOpen() || newsUI.isOpen() || statsUI.isOpen()) return;
   if (state === 'title'){ startGame(); return; }
   if (state === 'over'){ if (overT > .7) startGame(); return; }
   if (state === 'pause'){ resume(); return; }
@@ -2762,7 +2844,7 @@ function press(){
 function release(){ P.hold = false; }
 function pause(){ if (state !== 'play') return; MUSIC.pause(); state = 'pause'; ui.pause.hidden = false; $('pausebtn').hidden = true; P.hold = false; $('resume').focus({ preventScroll:true }); }
 // abandon depuis la pause : la partie s'arrête, les points comptent pour le record, aucun trophée de mort
-function quitToHome(){ if (state !== 'pause') return; if (score > best){ best = score; sealedSave('stellyrun_best', String(best)); } TR.save(); ui.pause.hidden = true; goHome(); }
+function quitToHome(){ if (state !== 'pause') return; TR.end(); if (score > best){ best = score; sealedSave('stellyrun_best', String(best)); } TR.save(); ui.pause.hidden = true; goHome(); }
 function resume(){ MUSIC.resume(); state = 'play'; ui.pause.hidden = true; $('pausebtn').hidden = false; last = 0; }
 let zoneTimer = 0;
 function setZone(n){ const z = $('zone'); z.textContent = THEME_NAMES[n]; z.hidden = false; z.classList.toggle('ice', n === 3); z.classList.remove('pop'); void z.offsetWidth; z.classList.add('pop'); clearTimeout(zoneTimer); zoneTimer = setTimeout(() => { z.hidden = true; }, 3000); }
@@ -2771,6 +2853,7 @@ $('pausebtn').addEventListener('click', e => { e.stopPropagation(); pause(); });
 addEventListener('keydown', e => {
   if (state === 'over' && lbEntry.isActive() && e.code !== 'Space' && lbEntry.key(e.code)){ e.preventDefault(); return; }
   if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW'){ e.preventDefault(); if (!e.repeat) press(); }
+  else if (statsUI.isOpen()){ if (e.code === 'Escape') statsUI.close(); }
   else if (newsUI.isOpen()){ if (e.code === 'Escape') newsUI.close(); }
   else if (lbUI.isOpen()){ if (e.code === 'Escape') lbUI.close(); }
   else if (shopUI.isOpen()){ if (e.code === 'Escape') shopUI.close(); }
@@ -2778,7 +2861,7 @@ addEventListener('keydown', e => {
   else if (e.code === 'Escape' || e.code === 'KeyP'){ state === 'pause' ? resume() : pause(); }
 });
 addEventListener('keyup', e => { if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') release(); });
-wrap.addEventListener('pointerdown', e => { if (e.target.closest('button') || e.target.closest('#soundmenu') || e.target.closest('#trophies') || e.target.closest('#shop') || e.target.closest('#lb') || e.target.closest('#lbentry') || e.target.closest('#langmenu') || e.target.closest('#news')) return; if (!smenu.hidden){ smenu.hidden = true; return; } e.preventDefault(); press(); });
+wrap.addEventListener('pointerdown', e => { if (e.target.closest('button') || e.target.closest('#soundmenu') || e.target.closest('#trophies') || e.target.closest('#shop') || e.target.closest('#lb') || e.target.closest('#lbentry') || e.target.closest('#langmenu') || e.target.closest('#news') || e.target.closest('#stats')) return; if (!smenu.hidden){ smenu.hidden = true; return; } e.preventDefault(); press(); });
 addEventListener('pointerup', release); addEventListener('pointercancel', release);
 $('start').addEventListener('click', e => { e.stopPropagation(); startGame(); });
 $('again').addEventListener('click', e => { e.stopPropagation(); startGame(); });
