@@ -84,6 +84,8 @@ const TEXTS = {
   "lb.rank": { fr:"Classement mondial : n° {n}", en:"World rank: #{n}", es:"Ranking mundial: n.º {n}" },
   "lb.sent": { fr:"Score envoyé !", en:"Score sent!", es:"¡Puntuación enviada!" },
   "lb.offline": { fr:"Envoi à la prochaine connexion", en:"Will be sent when you’re back online", es:"Se enviará cuando vuelvas a tener conexión" },
+  "toast.timeout": { fr:"Temps mort !", en:"Time out!", es:"¡Tiempo muerto!" },
+  "news.title": { fr:"Nouvelles", en:"News", es:"Noticias" },
   // ----- écran de fin -----
   "over.gap": { fr:"À {n} pts de ton record", en:"{n} pts short of your best", es:"A {n} pts de tu récord" },
   "over.tie": { fr:"Égalité avec ton record !", en:"You tied your best!", es:"¡Igualas tu récord!" },
@@ -214,3 +216,12 @@ const TEXTS = {
   "tr.parzival.n": { fr:"Parzival", en:"Parzival", es:"Parzival" },
   "tr.parzival.d": { fr:"1er au classement mondial au moins une fois", en:"Reach #1 in the world ranking at least once", es:"Sé n.º 1 del ranking mundial al menos una vez" },
 };
+
+/* Nouvelles du jeu : la plus récente en premier. icon : image du jeu affichée à côté (chrono…) */
+const NEWS = [
+  { id:'2026-10-06-dats-count', date:'2026-10-06', icon:'chrono',
+    title:{ fr:'Nouveau power-up : Dats Count', en:'New power-up: Dats Count', es:'Nuevo power-up: Dats Count' },
+    text:{ fr:'Attrape le chronomètre violet pour ralentir le jeu de 20 % : la vitesse baisse et l’accélération repart de plus bas. Il apparaît après 30 secondes de jeu, et ses effets se cumulent !',
+           en:'Grab the purple stopwatch to slow the game down by 20%: the speed drops and acceleration starts again from lower down. It shows up after 30 seconds of play, and its effects stack!',
+           es:'Atrapa el cronómetro morado para ralentizar el juego un 20 %: la velocidad baja y la aceleración vuelve a empezar desde más abajo. Aparece tras 30 segundos de juego, ¡y sus efectos se acumulan!' } }
+];
