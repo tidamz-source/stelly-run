@@ -464,8 +464,8 @@ body{
     <div id="dcount" hidden aria-label="Frisbees attrapés" data-i18n-aria="ui.discsCaught"><canvas id="icoCount"></canvas><span id="dcn">0</span></div>
   </div>
 </div>
-<script src="langues.js?v=5.65"></script>
-<script src="stelly.js?v=5.65"></script>
+<script src="langues.js?v=5.66"></script>
+<script src="stelly.js?v=5.66"></script>
 <script>
 /* ================= Langues ================= */
 // textes dans langues.js ; txt('clé', { n: 3 }) renvoie le texte dans la langue choisie (français si non traduit)
@@ -1439,7 +1439,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.65';
+const APP_VERSION = '5.66';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -1935,17 +1935,25 @@ function spawnObstacle(){
   else { let n = 1; if (Math.random() < .1 + .4*d) n = Math.random() < .35*d ? 3 : 2; const pw = th === 2 ? 14 : (ROUND[th] ? 16 : 12); o = { k:'cone', x:x0, n, w:n*pw+1, th, c }; }
   obs.push(o);
   const cx = x0 + o.w/2, fireOn = fireT > 0;
+  let arcEnd = -Infinity;   // dernier frisbee de l'arc au-dessus de l'obstacle
   if (Math.random() < (sockOn || fireOn ? .75 : .42)){
     const peak = sockOn ? 92 : (o.k === 'pyr3' ? 66 : (o.k === 'pyr' ? 56 : 46)), sp = Math.max(28, speed*(sockOn ? .1 : .07)), half = sp >= 36 ? 2 : 1;
     const gid = newGroup(2*half+1); for (let i=-half;i<=half;i++){ const hh = peak * (1 - Math.pow(i/(half+.7), 2)); discs.push({ x: cx + i*sp, y: GY - 30 - hh, g: gid }); }
+    arcEnd = cx + half*sp;
   }
-  const gap = gapFor() + o.w + (o.k === 'pyr' ? 30 : (o.k === 'pyr3' ? 45 : 0)); nextObs = gap;
+  let gap = gapFor() + o.w + (o.k === 'pyr' ? 30 : (o.k === 'pyr3' ? 45 : 0)); nextObs = gap;
   const mx = x0 + o.w + (gap - o.w)/2, roomy = gap - o.w > speed*.64 + 125;
   if (fireIn <= 0 && !fireOn && !items.length && gap - o.w > 190){ items.push({ k:'fire', x: mx, y: GY - 76 }); fireIn = 21 + Math.random()*9; return; }
   if (sockIn <= 0 && P.sockT <= 0 && !items.length && gap - o.w > 190){ items.push({ k:'sock', x: mx, y: GY - 88 }); sockIn = 15 + Math.random()*10; return; }
-  if (roomy && Math.random() < (sockOn || fireOn ? .8 : .45)){
+  if ((roomy || sockOn) && Math.random() < (sockOn || fireOn ? .8 : .45)){
     const rr = Math.random();
-    if (sockOn){ const gid = newGroup(5); for (let i=0;i<5;i++) discs.push({ x: mx + (i-2)*30, y: GY - 128, g: gid }); }
+    if (sockOn){
+      // rangée haute (chaussette) : assez loin de l'arc pour retomber et ressauter, et assez tôt pour repartir avant l'obstacle suivant
+      // si l'espace manque, l'obstacle suivant est repoussé d'autant (pendant les 7 s de la chaussette seulement)
+      const room = Math.max(spEff, 190)*.85, start = Math.max(mx - 60, arcEnd + room), need = start + 120 + room - x0;
+      if (need > gap){ gap = need; nextObs = gap; }
+      const gid = newGroup(5); for (let i=0;i<5;i++) discs.push({ x: start + i*30, y: GY - 128, g: gid });
+    }
     else if (rr < .34){ for (let i=0;i<4;i++) discs.push({ x: mx + (i-1.5)*30, y: GY - 16 }); }
     else if (rr < .67){ for (let i=0;i<3;i++) discs.push({ x: mx + (i-1)*30, y: GY - 72 }); }
     else { for (let i=0;i<4;i++) discs.push({ x: mx + (i-1.5)*30, y: GY - 20 - i*18 }); }
