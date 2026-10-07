@@ -397,7 +397,10 @@ body{
 #statsbody{ display:flex; gap:calc(var(--s)*6px); align-items:flex-start; max-height:calc(var(--s)*150px); overflow-y:auto; padding:0 calc(var(--s)*2px); }
 .sgrid{ display:grid; grid-template-columns:repeat(4, calc(var(--s)*44px)); gap:calc(var(--s)*3px); }
 .stile{ padding:calc(var(--s)*2px) calc(var(--s)*2px) calc(var(--s)*2.5px); background:#43234A; border:calc(var(--s)*1px) solid #5C3D63; border-radius:calc(var(--s)*2px); text-align:center; }
+.stile{ min-width:0; overflow:hidden; }
 .stile b{ display:block; font-family:var(--num); font-weight:400; font-size:max(calc(var(--s)*6px),11px); color:var(--white); line-height:1.15; white-space:nowrap; }
+.stile b.s1{ font-size:max(calc(var(--s)*4.8px),9px); }
+.stile b.s2{ font-size:max(calc(var(--s)*4px),8px); }   /* valeurs longues : texte réduit pour rester dans la tuile */
 .stile b.gold{ color:var(--yellow); }
 .stile span{ display:block; font-size:max(calc(var(--s)*3.6px),8px); font-weight:700; color:var(--purple-l); line-height:1.15; margin-top:calc(var(--s)*.5px); }
 .sdeaths{ width:calc(var(--s)*86px); padding:calc(var(--s)*3px) calc(var(--s)*4px); background:#FFF4D6; color:var(--plum); border:calc(var(--s)*1.5px) solid var(--plum); border-radius:calc(var(--s)*3px); box-shadow:0 calc(var(--s)*2px) 0 rgba(0,0,0,.4); }
@@ -523,8 +526,8 @@ body{
     <div id="dcount" hidden aria-label="Frisbees attrapés" data-i18n-aria="ui.discsCaught"><canvas id="icoCount"></canvas><span id="dcn">0</span></div>
   </div>
 </div>
-<script src="langues.js?v=5.76"></script>
-<script src="stelly.js?v=5.76"></script>
+<script src="langues.js?v=5.77"></script>
+<script src="stelly.js?v=5.77"></script>
 <script>
 /* ================= Langues ================= */
 // textes dans langues.js ; txt('clé', { n: 3 }) renvoie le texte dans la langue choisie (français si non traduit)
@@ -1502,7 +1505,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.76';
+const APP_VERSION = '5.77';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -1951,10 +1954,10 @@ const statsUI = (() => {
     const tiles = [
       ['stats.games', fmtN(d.games)], ['stats.discs', fmtN(d.discs), true], ['stats.rainbow', fmtN(d.rb)], ['stats.spent', fmtN(d.spent)],
       ['stats.ko', fmtN(st.ko)], ['stats.deer', fmtN(st.doe) + ' / ' + fmtN(st.stag)], ['stats.sharks', fmtN(d.sharks)], ['stats.dist', distTxt(st.dist)],
-      ['stats.streak', fmtN(st.streak), true], ['stats.missed', fmtN(st.missed)], ['stats.fires', fmtN(st.fires)], ['stats.socks', fmtN(st.socks)], ['stats.slows', fmtN(st.slows)],
+      ['stats.streak', 'x' + fmtN(st.streak), true], ['stats.missed', fmtN(st.missed)], ['stats.fires', fmtN(st.fires)], ['stats.socks', fmtN(st.socks)], ['stats.slows', fmtN(st.slows)],
       ['stats.combo', fmtN(st.combo)], ['stats.superC', fmtN(st.superC)], ['stats.mega', fmtN(st.mega)], ['stats.giga', fmtN(st.giga)]
     ];
-    let h = '<div class="sgrid">' + tiles.map(([k, v, gold]) => '<div class="stile"><b' + (gold ? ' class="gold"' : '') + '>' + esc(v) + '</b><span>' + esc(txt(k)) + '</span></div>').join('') + '</div>';
+    let h = '<div class="sgrid">' + tiles.map(([k, v, gold]) => '<div class="stile"><b class="' + (gold ? 'gold ' : '') + (String(v).length > 8 ? 's2' : (String(v).length > 6 ? 's1' : '')) + '">' + esc(v) + '</b><span>' + esc(txt(k)) + '</span></div>').join('') + '</div>';
     const deaths = Object.entries(st.deathBy).sort((a, b) => b[1] - a[1]);
     h += '<div class="sdeaths"><h3>' + esc(txt('stats.deaths')) + '</h3>';
     if (!deaths.length) h += '<div class="snone">' + esc(txt('stats.none')) + '</div>';
@@ -2372,7 +2375,7 @@ function update(dt){
     ui.bestline.textContent = P.newBest ? (P.prevBest > 0 ? txt('over.newBest', { n: fmtN(score - P.prevBest) }) : txt('ui.newRecord'))
       : (best - score > 0 ? txt('over.gap', { n: fmtN(best - score) }) : txt('over.tie'));
     ui.bestline.className = 'line' + (P.newBest ? ' new' : '');
-    const gm = TR.game(); $('ocoins').textContent = '+' + fmtN(gm.coins); $('ostreak').textContent = fmtN(bestStreak);
+    const gm = TR.game(); $('ocoins').textContent = '+' + fmtN(gm.coins); $('ostreak').textContent = 'x' + fmtN(bestStreak);
     overTrophies(gm.trophies, score > (TR.d.lbBest || 0));
     ui.hi.textContent = txt('ui.record') + ' ' + pad(best);
     ui.sockbar.hidden = true; ui.firebar.hidden = true; ui.over.hidden = false;
