@@ -247,6 +247,18 @@ body{
 .tr.lock.on{ background:#5C3463; }
 .tr .trstar{ top:calc(var(--s)*-5px); right:calc(var(--s)*-5px); width:calc(var(--s)*11px); height:calc(var(--s)*11px); animation:twinkle 1.4s ease-in-out infinite; }
 .tr .trstar polygon{ fill:var(--yellow); }
+/* trophées chromés : métal doré, deux bandes de lumière en diagonale, reflet qui passe de temps en temps */
+.tr.chrome, .otro .ic.chrome{
+  background:linear-gradient(135deg, #F6D278 0 9%, #EAAC5B 9% 30%, #F6D278 30% 46%, #EAAC5B 46% 55%, #F6D278 55% 61%, #EAAC5B 61% 84%, #D8913F 84% 100%); }
+.tr.chrome{ box-shadow:inset 0 calc(var(--s)*-2.5px) 0 #C47C30, inset 0 calc(var(--s)*1.5px) 0 #FFF1B8, inset calc(var(--s)*1.5px) 0 0 #FCE29A, 0 calc(var(--s)*2px) 0 rgba(0,0,0,.4); }
+.tr.chrome.on{ background:linear-gradient(135deg, #FFE7A0 0 9%, #F5BE6C 9% 30%, #FFE7A0 30% 46%, #F5BE6C 46% 55%, #FFE7A0 55% 61%, #F5BE6C 61% 84%, #E4A04C 84% 100%); }
+.tr.chrome::after, .otro .ic.chrome::after{ content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+  background:linear-gradient(135deg, transparent 0 42%, rgba(255,255,255,.75) 42% 47%, transparent 47% 50%, rgba(255,255,255,.5) 50% 52%, transparent 52%) 100% 100% / 300% 300% no-repeat;
+  animation:chromeshine 3.6s ease-in-out infinite; }
+.otro .ic.chrome{ position:relative; }
+.tr.chrome canvas, .otro .ic.chrome canvas{ position:relative; z-index:1; }
+.tr.chrome .trstar{ z-index:2; }
+@keyframes chromeshine{ 0%, 62%{ background-position:0 0; } 100%{ background-position:100% 100%; } }
 @keyframes twinkle{ 50%{ transform:scale(1.18) rotate(18deg); } }
 #trdots{ display:flex; gap:calc(var(--s)*3px); }
 #trdots i{ width:calc(var(--s)*4px); height:calc(var(--s)*4px); border-radius:50%; background:#5C3D63; border:calc(var(--s)*.8px) solid var(--plum); }
@@ -263,7 +275,7 @@ body{
 #trbub.up::after{ bottom:calc(var(--s)*-3.7px); }
 #trbub.down::after{ top:calc(var(--s)*-3.7px); transform:translateX(-50%) rotate(-135deg); }
 @keyframes bub{ from{ opacity:0; transform:scale(.6); } }
-@media (prefers-reduced-motion: reduce){ #trophies, #trophies.open{ transition-duration:.01s; } #trgrid.l, #trgrid.r, .tr .trstar, #trbub, #trbadge{ animation:none; } }
+@media (prefers-reduced-motion: reduce){ #trophies, #trophies.open{ transition-duration:.01s; } #trgrid.l, #trgrid.r, .tr .trstar, #trbub, #trbadge, .tr.chrome::after, .otro .ic.chrome::after{ animation:none; } }
 
 /* ----- Boutique ----- */
 #shopbtn{ position:absolute; top:0; height:100%; right:calc(100% + var(--s)*7px); aspect-ratio:1; padding:0; display:flex; align-items:center; justify-content:center; }
@@ -526,8 +538,8 @@ body{
     <div id="dcount" hidden aria-label="Frisbees attrapés" data-i18n-aria="ui.discsCaught"><canvas id="icoCount"></canvas><span id="dcn">0</span></div>
   </div>
 </div>
-<script src="langues.js?v=5.77"></script>
-<script src="stelly.js?v=5.77"></script>
+<script src="langues.js?v=5.79"></script>
+<script src="stelly.js?v=5.79"></script>
 <script>
 /* ================= Langues ================= */
 // textes dans langues.js ; txt('clé', { n: 3 }) renvoie le texte dans la langue choisie (français si non traduit)
@@ -1505,7 +1517,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.77';
+const APP_VERSION = '5.79';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -1542,11 +1554,14 @@ function iceToast(){
 function toast(msg, big){ ui.toast.textContent = msg; ui.toast.classList.toggle('big', !!big); ui.toast.classList.remove('show'); void ui.toast.offsetWidth; ui.toast.classList.add('show'); }
 
 /* ================= Trophées ================= */
-const TROPHY_IDS = ['crampons', 'pasdebol', 'taupe', 'amateur', 'combo5', 'soldes', 'vitrine', 'gym', 'beach', 'city', 'fields', 'forest', 'peuf', 'junior', 'force', 'crabe', 'marmotte', 'combo10', 'plumes', 'mains', 'requin', 'deer', 'globe', 'angry', 'bronze', 'senior', 'heros', 'voltige', 'fashion', 'cendrillon', 'tetedure', 'combo50', 'master', 'huck', 'elfe', 'bulldozer', 'hydrate', 'argent', 'picsou', 'chapelier', 'gmaster', 'combo100', 'or', 'prada', 'dressing', 'intouchable', 'cascadeuse', 'legende', 'accro', 'rainbow', 'greatest', 'parzival'];   // ordre d'affichage ; Parzival toujours en dernier, hors Greatest
+const TROPHY_IDS = ['crampons', 'pasdebol', 'taupe', 'amateur', 'combo5', 'soldes', 'vitrine', 'gym', 'beach', 'city', 'fields', 'forest', 'peuf', 'junior', 'force', 'crabe', 'marmotte', 'combo10', 'plumes', 'mains', 'requin', 'deer', 'globe', 'angry', 'bronze', 'senior', 'heros', 'voltige', 'fashion', 'cendrillon', 'tetedure', 'combo50', 'master', 'huck', 'elfe', 'bulldozer', 'hydrate', 'mcfly', 'argent', 'picsou', 'chapelier', 'gmaster', 'combo100', 'or', 'prada', 'dressing', 'intouchable', 'cascadeuse', 'legende', 'accro', 'rainbow', 'greatest', 'parzival'];   // ordre d'affichage ; Parzival toujours en dernier, hors Greatest
+// trophées chromés : cachés tant qu'ils ne sont pas débloqués, affichés après Parzival, hors compte et hors Greatest
+const CHROME_IDS = ['serial', 'rainbow2', 'platine', 'diamant'];
 // [id, nom, descriptif] : nom et descriptif suivent la langue choisie
-const TROPHIES = TROPHY_IDS.map(id => { const a = [id];
+const trEntry = id => { const a = [id];
   Object.defineProperty(a, 1, { get: () => txt('tr.' + id + '.n'), enumerable: true });
-  Object.defineProperty(a, 2, { get: () => txt('tr.' + id + '.d'), enumerable: true }); return a; });
+  Object.defineProperty(a, 2, { get: () => txt('tr.' + id + '.d'), enumerable: true }); return a; };
+const TROPHIES = TROPHY_IDS.map(trEntry), CHROMES = CHROME_IDS.map(trEntry), ALL_TROPHIES = TROPHIES.concat(CHROMES);
 // u : débloqués (date), s : déjà consultés ; compteurs cumulés sur toutes les parties. Jamais remis à zéro par une nouvelle version.
 const BIRD_KINDS = ['pigeon', 'gull', 'eagle', 'owl', 'crow', 'shuttle'];
 // toutes les morts possibles dans le jeu (Cascadeuse) : obstacles, pièges des trous et volants
@@ -1571,25 +1586,26 @@ const TR = (() => {
   function endStats(){ if (ended) return; ended = true; d.st.dist += Math.round(dist); if (bestStreak > d.st.streak) d.st.streak = bestStreak; }
   function unlock(id){
     if (d.u[id]) return; d.u[id] = Date.now();
-    if (!d.u.greatest && TROPHIES.every(([k]) => k === 'greatest' || k === 'parzival' || d.u[k])) d.u.greatest = Date.now();
+    if (!d.u.greatest && TROPHY_IDS.every(k => k === 'greatest' || k === 'parzival' || d.u[k])) d.u.greatest = Date.now();
     save(); refreshTrophyBadge();
   }
   const GAMES = [[1,'crampons'],[5,'amateur'],[10,'junior'],[50,'senior'],[100,'master'],[250,'gmaster'],[500,'legende'],[1000,'accro']];
   const ZONES = { 1:'gym', 2:'beach', 3:'peuf', 4:'city', 5:'forest', 6:'fields' };
   return {
     d, save, unlock,
-    fresh: () => TROPHIES.filter(([id]) => d.u[id] && !d.s[id]).length,
+    fresh: () => ALL_TROPHIES.filter(([id]) => d.u[id] && !d.s[id]).length,
     seen(id){ if (!d.u[id] || d.s[id]) return; d.s[id] = 1; save(); refreshTrophyBadge(); },
     // frisbee arc-en-ciel : une seule chance par partie (1/300), la probabilité grimpe à chaque partie sans l'attraper (pitié), plafonnée à 5 %
     rainbowAt(){ const p = Math.min(.05, (1/300)*(1 + d.rbMiss/100)); d.rbMiss++; return Math.random() < p ? 8 + Math.random()*30 : -1; },
-    rainbow(){ d.rb++; d.coins += 100; if (d.coins >= 5000) unlock('picsou'); d.rbMiss = 0; unlock('rainbow'); save(); },
-    start(){ ended = false; g = { socks:0, fires:0, smash:0, stomps:0, fire:false, miss:0, coins0: d.coins, t0: Date.now() }; d.games++; d.th |= 1; for (const [n, id] of GAMES) if (d.games >= n) unlock(id); save(); },
+    rainbow(){ d.rb++; d.coins += 100; if (d.coins >= 5000) unlock('picsou'); d.rbMiss = 0; unlock('rainbow'); if (d.rb >= 3) unlock('rainbow2'); save(); },
+    start(){ ended = false; g = { socks:0, fires:0, smash:0, stomps:0, fire:false, miss:0, slows:0, coins0: d.coins, t0: Date.now() }; d.games++; d.th |= 1; for (const [n, id] of GAMES) if (d.games >= n) unlock(id);
+      if (d.rb >= 3) unlock('rainbow2'); if (d.discs >= 25000) unlock('platine'); if (d.discs >= 50000) unlock('diamant'); save(); },   // rattrapage pour les compteurs déjà atteints
     zone(n){ d.th |= 1 << n; if (ZONES[n]) unlock(ZONES[n]); if ((d.th & 127) === 127) unlock('globe'); },
     disc(){
       d.discs++; d.coins++; if (d.coins >= 5000) unlock('picsou');
-      if (streak >= 5) unlock('combo5'); if (streak >= 10) unlock('combo10'); if (streak >= 50) unlock('combo50'); if (streak >= 100) unlock('combo100');
+      if (streak >= 5) unlock('combo5'); if (streak >= 10) unlock('combo10'); if (streak >= 50) unlock('combo50'); if (streak >= 100) unlock('combo100'); if (streak >= 200) unlock('serial');
       if (discCount >= 150) unlock('huck');
-      if (d.discs >= 1000) unlock('bronze'); if (d.discs >= 5000) unlock('argent'); if (d.discs >= 10000) unlock('or');
+      if (d.discs >= 1000) unlock('bronze'); if (d.discs >= 5000) unlock('argent'); if (d.discs >= 10000) unlock('or'); if (d.discs >= 25000) unlock('platine'); if (d.discs >= 50000) unlock('diamant');
     },
     die(kind){ d.st.deathBy[kind] = (d.st.deathBy[kind] || 0) + 1; d.st.deathTh[theme] = (d.st.deathTh[theme] || 0) + 1; endStats();
       if (t < 5) unlock('pasdebol'); if (kind === 'mole' || kind === 'hole') unlock('taupe'); if (kind === 'crab') unlock('crabe'); if (kind === 'marmot') unlock('marmotte');
@@ -1597,7 +1613,7 @@ const TR = (() => {
     deer(kind){ d.st[kind === 'stag' ? 'stag' : 'doe']++; d.deer |= kind === 'stag' ? 2 : 1; if (d.deer === 3) unlock('deer'); },
     tick(){ if (score >= 3000 && EQUIPPED.shoes && EQUIPPED.shoes.id === 'shoes-heels') unlock('cendrillon'); if (fireT > 0 && P.sockT > 0) unlock('heros'); if (score >= 10000 && !g.fire) unlock('intouchable'); },
     sock(){ d.st.socks++; if (++g.socks >= 3) unlock('elfe'); },
-    slow(){ d.st.slows++; },
+    slow(){ d.st.slows++; if (++g.slows >= 3) unlock('mcfly'); },
     miss(){ d.st.missed++; if (++g.miss >= 25) unlock('mains'); },
     fire(){ d.st.fires++; g.fire = true; if (++g.fires >= 3) unlock('hydrate'); },
     smash(n){ g.smash += n || 1; if (g.smash >= 30) unlock('bulldozer'); },   // chaque élément compte : rangée de 3 = 3, pyramide = 3, pyramide à 3 niveaux = 6
@@ -1611,7 +1627,7 @@ const TR = (() => {
     tried(it){ if (d.own[it.id] || d.tried[it.id]) return; d.tried[it.id] = 1; if (Object.keys(d.tried).filter(k => !d.own[k]).length >= 10) unlock('vitrine'); save(); },
     worn(){ if (SHOP_SLOTS.every(sl => EQUIPPED[sl])) unlock('fashion'); },
     // bilan de la partie : frisbees gagnés pour la boutique, trophées débloqués pendant la partie
-    game: () => ({ coins: d.coins - (g.coins0 != null ? g.coins0 : d.coins), trophies: TROPHY_IDS.filter(id => d.u[id] && d.u[id] >= (g.t0 || Infinity)) }),
+    game: () => ({ coins: d.coins - (g.coins0 != null ? g.coins0 : d.coins), trophies: TROPHY_IDS.concat(CHROME_IDS).filter(id => d.u[id] && d.u[id] >= (g.t0 || Infinity)) }),
     // fin de partie (mort ou abandon) : distance parcourue et meilleure série
     end(){ endStats(); save(); },
     shark(){ if (++d.sharks >= 10) unlock('requin'); }
@@ -1668,6 +1684,11 @@ function buildTrophyIcons(){
   for (const [id, n] of [['amateur','5'],['junior','10'],['senior','50'],['master','100'],['gmaster','250'],['legende','500'],['accro','1000']]) ic(id, g => { star(g); num(g, n); });
   for (const [id, n] of [['combo5','x5'],['combo10','x10'],['combo50','x50'],['combo100','x100']]) ic(id, g => { put(g, DISC, 16, 13); num(g, n); });
   ic('huck', g => { put(g, DISC, 16, 13); num(g, '150'); });
+  // Serial Catcher : pile de frisbees
+  ic('serial', g => { for (const y of [19, 13, 7]) put(g, DISC, 16, y); num(g, 'x200'); });
+  // Stelly McFly : chronomètre et traînées de feu
+  ic('mcfly', g => { for (const [y, a, b] of [[24, C.orange, C.yellow], [28, C.orange, C.yellow]]){ g.fillStyle = C.plum; g.fillRect(1, y-1, 14, 3); g.fillStyle = a; g.fillRect(2, y, 12, 1); g.fillStyle = b; g.fillRect(8, y, 6, 1); }
+    put(g, CHRONO[1], 16, 12); num(g, 'x3'); });
   ic('mains', g => { put(g, DISC, 18, 11); g.fillStyle = C.purpleL; for (const [x, y, w] of [[0,8,4],[1,11,3],[0,14,4]]) g.fillRect(x, y, w, 1); num(g, '25'); });
   ic('gym', g => put(g, SHUTTLE, 16, 16, 2));
   ic('beach', g => { g.fillStyle = C.plum; g.fillRect(2, 27, 28, 1); shade(g, 32, 32, (x, y) => ((x+.5-26)**2 + (y+.5-6)**2) <= 18, { base:C.yellow, out:C.plum, dark:C.orange, light:C.yellowL }); put(g, CASTLE, 12, 17); });
@@ -1703,6 +1724,13 @@ function buildTrophyIcons(){
   const BAG = ['....ooooo....','...oo...oo...','...o.....o...','ooooooooooooo','oLppppppppPdo','oLppppppppPdo','oLppYYYYppPdo','oLpYoooYYpPdo','oLppYYYYppPdo','oLppppppppPdo','oddddddddddddo'.slice(0,13),'ooooooooooooo'];
   const BAGC = map(BAG, { L:C.purpleL, p:C.purple, P:C.purpleD, d:C.purpleD, Y:C.yellow });
   const sparkle = (g, pts, col) => { g.fillStyle = col || C.white; for (const [x, y] of pts){ g.fillRect(x, y-1, 1, 3); g.fillRect(x-1, y, 3, 1); } };
+  // trophées chromés : Platine, Diamant (médaille et gemme), Double Rainbow
+  ic('platine', g => { medal(g, null, '#DCE4F4', '#7C8BB6', C.white); sparkle(g, [[4,17],[28,27]]); });
+  ic('diamant', g => { medal(g, null, '#EEF4FA', '#8FA4BC', C.white);
+    pm(g, ['..ooooooo..','.oWLLWLLmo.','oWLLWLLmmmo','ooooooooooo','.oLmmmmmDo.','..oLmmmDo..','...oLmDo...','....oDo....','.....o.....'], 11, 16, false,
+      Object.assign({}, PAL, { o:C.plum, W:C.white, L:'#BFF3FF', m:'#5FCBEA', D:'#2F8FB8' }));
+    sparkle(g, [[4,17],[28,26],[25,8]]); });
+  ic('rainbow2', g => { put(g, RBDISC, 15, 9); put(g, RBDISC, 17, 19); num(g, 'x3'); sparkle(g, [[4,27],[29,4]]); });
   ic('soldes', g => { put(g, BAGC, 14, 19, 2); g.fillStyle = C.plum; g.fillRect(19, 0, 13, 9); g.fillStyle = C.red; g.fillRect(20, 1, 11, 7); g.fillStyle = C.white; ['oo..o','oo.o.','..o..','.o.oo','o..oo'].forEach((r, y) => [...r].forEach((ch, x) => { if (ch === 'o') g.fillRect(23 + x, 2 + y, 1, 1); })); });
   ic('vitrine', g => { g.fillStyle = C.plum; g.fillRect(2, 5, 28, 22); g.fillStyle = '#BFE6F5'; g.fillRect(4, 7, 24, 18); g.fillStyle = C.white; for (let k=0;k<5;k++) g.fillRect(6+k, 9+k, 1, 1);
     const it = SI('glasses-coeur'); if (it) put(g, it.img, 16, 17); });
@@ -1734,28 +1762,31 @@ function refreshTrophyBadge(){
 }
 const trUI = (() => {
   const page = $('trophies'), grid = $('trgrid'), bub = $('trbub'), dots = $('trdots'), cnt = $('trcount');
-  const prev = $('trprev'), next = $('trnext'), PER = 15, NP = Math.ceil(TROPHIES.length / PER);
+  const prev = $('trprev'), next = $('trnext'), PER = 15;
+  const list = () => TROPHIES.concat(CHROMES.filter(([id]) => TR.d.u[id]));
+  let NP = 1;
   const STAR = '<svg viewBox="0 0 24 24"><polygon points="12,1.5 14.9,8.6 22.5,9.2 16.7,14.2 18.5,21.6 12,17.6 5.5,21.6 7.3,14.2 1.5,9.2 9.1,8.6"/></svg>';
   let pg = 0, icons = null, isOpen = false, curEl = null, hideT = 0;
   function render(dir){
-    const d = TR.d; grid.textContent = ''; hideBubble();
-    TROPHIES.slice(pg*PER, pg*PER + PER).forEach(([id, name]) => {
+    const d = TR.d, L = list(); NP = Math.ceil(L.length / PER); pg = Math.min(pg, NP - 1); grid.textContent = ''; hideBubble();
+    L.slice(pg*PER, pg*PER + PER).forEach(([id, name]) => {
       const el = document.createElement('button'), on = !!d.u[id];
-      el.className = 'tr' + (on ? '' : ' lock'); el.dataset.id = id;
+      el.className = 'tr' + (on ? '' : ' lock') + (CHROME_IDS.includes(id) ? ' chrome' : ''); el.dataset.id = id;
       el.setAttribute('aria-label', on ? name : txt('tr.lockedAria', { name }));
       const c = document.createElement('canvas'); c.width = 32; c.height = 32; c.getContext('2d').drawImage(icons[id], 0, 0); el.appendChild(c);
       if (on && !d.s[id]){ const s = document.createElement('span'); s.className = 'trstar'; s.innerHTML = STAR; el.appendChild(s); }
       grid.appendChild(el);
     });
     dots.innerHTML = Array.from({ length: NP }, (_, i) => '<i' + (i === pg ? ' class="on"' : '') + '></i>').join('');
-    cnt.textContent = TROPHIES.filter(([id]) => d.u[id]).length + ' / ' + TROPHIES.length;
+    const nc = CHROMES.filter(([id]) => d.u[id]).length;
+    cnt.textContent = TROPHIES.filter(([id]) => d.u[id]).length + ' / ' + TROPHIES.length + (nc ? ' + ' + nc : '');
     prev.disabled = pg === 0; next.disabled = pg === NP - 1;
     grid.classList.remove('l', 'r'); if (dir){ void grid.offsetWidth; grid.classList.add(dir > 0 ? 'r' : 'l'); }
   }
   function go(dir){ const n = Math.max(0, Math.min(NP - 1, pg + dir)); if (n === pg) return; pg = n; sfx.jump(); render(dir); }
   function hideBubble(){ bub.hidden = true; if (curEl) curEl.classList.remove('on'); curEl = null; }
   function showBubble(el){
-    const id = el.dataset.id, t = TROPHIES.find(x => x[0] === id);
+    const id = el.dataset.id, t = ALL_TROPHIES.find(x => x[0] === id);
     if (curEl === el){ hideBubble(); return; }
     hideBubble(); curEl = el; el.classList.add('on');
     bub.querySelector('b').textContent = t[1]; bub.querySelector('span').textContent = t[2];
@@ -1773,7 +1804,7 @@ const trUI = (() => {
   function open(){
     if (isOpen || state !== 'title') return;
     if (!icons) icons = buildTrophyIcons();
-    const firstNew = TROPHIES.findIndex(([id]) => TR.d.u[id] && !TR.d.s[id]);
+    const firstNew = list().findIndex(([id]) => TR.d.u[id] && !TR.d.s[id]);
     pg = firstNew >= 0 ? Math.floor(firstNew / PER) : 0;
     render(0); clearTimeout(hideT); page.hidden = false; void page.offsetWidth; page.classList.add('open'); isOpen = true;
     $('soundmenu').hidden = true; sfx.start();
@@ -2206,7 +2237,7 @@ function overTrophies(ids, compact){
   const lab = document.createElement('span'); lab.className = 'lab'; lab.textContent = txt(ids.length > 1 ? 'over.trophies' : 'over.trophy1', { n: ids.length }); box.appendChild(lab);
   if (compact) return;
   const I = overTrophies.ico || (overTrophies.ico = buildTrophyIcons());
-  ids.slice(0, 3).forEach((id, i) => { const d = document.createElement('div'); d.className = 'ic'; d.style.animationDelay = (.15 + i*.12) + 's';
+  ids.slice(0, 3).forEach((id, i) => { const d = document.createElement('div'); d.className = 'ic' + (CHROME_IDS.includes(id) ? ' chrome' : ''); d.style.animationDelay = (.15 + i*.12) + 's';
     const c = document.createElement('canvas'); c.width = 32; c.height = 32; c.getContext('2d').drawImage(I[id], 0, 0); d.appendChild(c); box.appendChild(d); });
   const nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = ids.map(id => txt('tr.' + id + '.n')).join(', '); box.appendChild(nm);
 }

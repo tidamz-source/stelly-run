@@ -222,6 +222,8 @@ const TEXTS = {
   "tr.bulldozer.d": { fr:"Renverser 30 obstacles en 1 partie", en:"Knock over 30 obstacles in 1 game", es:"Derriba 30 obstáculos en 1 partida" },
   "tr.hydrate.n": { fr:"Bien hydraté", en:"Well Hydrated", es:"Bien hidratada" },
   "tr.hydrate.d": { fr:"Boire 3 gourdes en 1 partie", en:"Drink 3 water bottles in 1 game", es:"Bebe 3 cantimploras en 1 partida" },
+  "tr.mcfly.n": { fr:"Stelly McFly", en:"Stelly McFly", es:"Stelly McFly" },
+  "tr.mcfly.d": { fr:"Ralentir le temps 3 fois en 1 partie", en:"Slow down time 3 times in 1 game", es:"Ralentiza el tiempo 3 veces en 1 partida" },
   "tr.argent.n": { fr:"Handler d’argent", en:"Silver Handler", es:"Handler de plata" },
   "tr.argent.d": { fr:"5 000 frisbees catchés", en:"Catch 5,000 frisbees", es:"Atrapa 5.000 frisbees" },
   "tr.picsou.n": { fr:"Picsou", en:"Scrooge", es:"Tío Gilito" },
@@ -252,6 +254,14 @@ const TEXTS = {
   "tr.greatest.d": { fr:"Débloquer tous les autres trophées", en:"Unlock all the other trophies", es:"Desbloquea todos los demás trofeos" },
   "tr.parzival.n": { fr:"Parzival", en:"Parzival", es:"Parzival" },
   "tr.parzival.d": { fr:"1er au classement mondial au moins une fois", en:"Reach #1 in the world ranking at least once", es:"Sé n.º 1 del ranking mundial al menos una vez" },
+  "tr.serial.n": { fr:"Serial Catcher", en:"Serial Catcher", es:"Serial Catcher" },
+  "tr.serial.d": { fr:"Attraper 200 disques d’affilée", en:"Catch 200 discs in a row", es:"Atrapa 200 discos seguidos" },
+  "tr.rainbow2.n": { fr:"Double Rainbow", en:"Double Rainbow", es:"Double Rainbow" },
+  "tr.rainbow2.d": { fr:"Attraper 3 frisbees arc-en-ciel", en:"Catch 3 rainbow frisbees", es:"Atrapa 3 frisbees arcoíris" },
+  "tr.platine.n": { fr:"Handler de platine", en:"Platinum Handler", es:"Handler de platino" },
+  "tr.platine.d": { fr:"25 000 frisbees catchés", en:"Catch 25,000 frisbees", es:"Atrapa 25.000 frisbees" },
+  "tr.diamant.n": { fr:"Handler de diamant", en:"Diamond Handler", es:"Handler de diamante" },
+  "tr.diamant.d": { fr:"50 000 frisbees catchés", en:"Catch 50,000 frisbees", es:"Atrapa 50.000 frisbees" },
 };
 
 /* Nouvelles du jeu : la plus récente en premier. icon : image du jeu affichée à côté (chrono…) */
