@@ -523,8 +523,8 @@ body{
     <div id="dcount" hidden aria-label="Frisbees attrapés" data-i18n-aria="ui.discsCaught"><canvas id="icoCount"></canvas><span id="dcn">0</span></div>
   </div>
 </div>
-<script src="langues.js?v=5.74"></script>
-<script src="stelly.js?v=5.74"></script>
+<script src="langues.js?v=5.75"></script>
+<script src="stelly.js?v=5.75"></script>
 <script>
 /* ================= Langues ================= */
 // textes dans langues.js ; txt('clé', { n: 3 }) renvoie le texte dans la langue choisie (français si non traduit)
@@ -1502,7 +1502,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.74';
+const APP_VERSION = '5.75';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
