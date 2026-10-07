@@ -523,8 +523,8 @@ body{
     <div id="dcount" hidden aria-label="Frisbees attrapés" data-i18n-aria="ui.discsCaught"><canvas id="icoCount"></canvas><span id="dcn">0</span></div>
   </div>
 </div>
-<script src="langues.js?v=5.72"></script>
-<script src="stelly.js?v=5.72"></script>
+<script src="langues.js?v=5.73"></script>
+<script src="stelly.js?v=5.73"></script>
 <script>
 /* ================= Langues ================= */
 // textes dans langues.js ; txt('clé', { n: 3 }) renvoie le texte dans la langue choisie (français si non traduit)
@@ -537,7 +537,7 @@ function txt(key, vars){
 }
 // séparateur des milliers : espace (fr), point (es), virgule (en)
 // (espace fine insécable en français : l'espace normale de la police pixel est aussi large qu'un chiffre)
-const fmtN = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, { fr:'\u202F', es:'.' }[LANG] || ',');
+const fmtN = n => String(n == null || (typeof n === 'number' && !isFinite(n)) ? 0 : n).replace(/\B(?=(\d{3})+(?!\d))/g, { fr:'\u202F', es:'.' }[LANG] || ',');
 // contrôle : textes non traduits (visibles dans la console du navigateur)
 { const miss = {}; for (const k in TEXTS) for (const l in LANGS) if (TEXTS[k][l] == null) (miss[l] = miss[l] || []).push(k);
   for (const l in miss) console.warn('[langues] ' + miss[l].length + ' texte(s) sans traduction ' + l + ' :', miss[l]); }
@@ -1502,7 +1502,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.72';
+const APP_VERSION = '5.73';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -1552,9 +1552,15 @@ const TR = (() => {
   const KEY = 'stellyrun_trophies';
   const d = { u:{}, s:{}, games:0, discs:0, sharks:0, th:0, birds:0, rbMiss:0, rb:0, deer:0, deaths:0, own:{}, eq:{}, spent:0, tried:{}, helmet:0 };
   // stats de la fiche joueur (à partir de la v5.69)
-  d.st = Object.assign({ combo:0, superC:0, mega:0, giga:0, ko:0, doe:0, stag:0, dist:0, streak:0, missed:0, fires:0, socks:0, slows:0, deathBy:{}, deathTh:{} }, d.st || {});
   { const raw = sealedLoad(KEY);   // version retouchée -> copie de secours -> données vierges
     try { const j = JSON.parse(raw); if (j && typeof j === 'object') Object.assign(d, j); } catch(e){} }
+  // stats de la fiche joueur : complétées APRÈS le chargement, pour que chaque nouveau compteur existe chez tous les joueurs
+  { const ST0 = { combo:0, superC:0, mega:0, giga:0, ko:0, doe:0, stag:0, dist:0, streak:0, missed:0, fires:0, socks:0, slows:0 };
+    const st = (d.st && typeof d.st === 'object') ? d.st : {};
+    for (const k in ST0) if (typeof st[k] !== 'number' || !isFinite(st[k])) st[k] = 0;   // répare aussi les compteurs abîmés (null)
+    if (!st.deathBy || typeof st.deathBy !== 'object') st.deathBy = {};
+    if (!st.deathTh || typeof st.deathTh !== 'object') st.deathTh = {};
+    d.st = st; }
   if (typeof d.coins !== 'number') d.coins = d.discs;   // monnaie de la boutique : frisbees attrapés (rétroactif)
   let g = { socks:0, fires:0, smash:0, stomps:0, fire:false, miss:0 };
   const save = () => sealedSave(KEY, JSON.stringify(d));
