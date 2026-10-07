@@ -523,8 +523,8 @@ body{
     <div id="dcount" hidden aria-label="Frisbees attrapés" data-i18n-aria="ui.discsCaught"><canvas id="icoCount"></canvas><span id="dcn">0</span></div>
   </div>
 </div>
-<script src="langues.js?v=5.73"></script>
-<script src="stelly.js?v=5.73"></script>
+<script src="langues.js?v=5.74"></script>
+<script src="stelly.js?v=5.74"></script>
 <script>
 /* ================= Langues ================= */
 // textes dans langues.js ; txt('clé', { n: 3 }) renvoie le texte dans la langue choisie (français si non traduit)
@@ -1502,7 +1502,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.73';
+const APP_VERSION = '5.74';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -1816,10 +1816,25 @@ const LB = (() => {
   }
   // un record en attente (envoyé hors connexion) repart dès que possible
   async function flushPending(){ const p = store('stellyrun_lbpending'); if (!p) return; try { const o = JSON.parse(p); await send(o.name, o.score, o.t, o.discs); } catch(e){} }
-  return { get, send, flushPending, id, name: () => store('stellyrun_name') || 'AAA', setName: n => store('stellyrun_name', n), last: () => last };
+  // stats cumulées du joueur, envoyées à la fin de chaque partie pour la page des stats mondiales (dernier état seulement)
+  function statsPayload(){
+    const d = TR.d, st = d.st, n = store('stellyrun_name');
+    return JSON.stringify({ name: n || '', games: d.games, discs: d.discs, rb: d.rb || 0, spent: d.spent || 0, sharks: d.sharks || 0, best: Math.max(best, d.lbBest || 0),
+      ko: st.ko, doe: st.doe, stag: st.stag, dist: st.dist, streak: st.streak, missed: st.missed, fires: st.fires, socks: st.socks, slows: st.slows,
+      combo: st.combo, superC: st.superC, mega: st.mega, giga: st.giga, deathBy: st.deathBy, deathTh: st.deathTh });
+  }
+  async function sendStats(){
+    const payload = statsPayload(); store('stellyrun_statspending', payload);
+    const sig = cyrb53(id + '|' + payload + '|' + LB_SECRET);
+    try { const r = await fetch(LB_URL, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body: JSON.stringify({ action:'stats', id, payload, v: APP_VERSION, sig }) });
+      const j = await r.json(); if (j && j.ok) store('stellyrun_statspending', ''); } catch(e){}
+  }
+  async function flushStats(){ if (store('stellyrun_statspending')) await sendStats(); }
+  return { get, send, flushPending, sendStats, flushStats, id, name: () => store('stellyrun_name') || 'AAA', setName: n => store('stellyrun_name', n), last: () => last };
 })();
 LB.flushPending();
-addEventListener('online', () => LB.flushPending());
+addEventListener('online', () => { LB.flushPending(); LB.flushStats(); });
+LB.flushStats();
 
 // saisie des 3 lettres sur l'écran de fin, quand le record personnel en ligne est battu
 const lbEntry = (() => {
@@ -1837,7 +1852,7 @@ const lbEntry = (() => {
   function hide(){ box.hidden = true; res.hidden = true; active = false; }
   async function submit(){
     if (!active) return; active = false;
-    const name = letters.join(''); LB.setName(name); TR.d.lbBest = score; TR.save();
+    const name = letters.join(''); LB.setName(name); LB.sendStats(); TR.d.lbBest = score; TR.save();
     box.hidden = true; res.hidden = false; res.textContent = txt('lb.sending');
     try { const r = await LB.send(name, score, meta.t, meta.discs); res.textContent = r && r.me ? txt('lb.rank', { n: fmtN(r.me.rank) }) : txt('lb.sent'); }
     catch(e){ res.textContent = txt('lb.offline'); }
@@ -2201,6 +2216,7 @@ function die(kind){
   TR.die(kind);
   P.prevBest = best; P.newBest = score > best;
   if (P.newBest){ best = score; sealedSave('stellyrun_best', String(best)); }
+  LB.sendStats();
 }
 function smash(o){
   for (const [img, x, y] of pieces(o)) debris.push({ img, x, y, vx: 200 + Math.random()*160, vy: -240 - Math.random()*140, rot:0, vr:(Math.random()-.5)*24 });
@@ -2853,7 +2869,7 @@ function press(){
 function release(){ P.hold = false; }
 function pause(){ if (state !== 'play') return; MUSIC.pause(); state = 'pause'; ui.pause.hidden = false; $('pausebtn').hidden = true; P.hold = false; $('resume').focus({ preventScroll:true }); }
 // abandon depuis la pause : la partie s'arrête, les points comptent pour le record, aucun trophée de mort
-function quitToHome(){ if (state !== 'pause') return; TR.end(); if (score > best){ best = score; sealedSave('stellyrun_best', String(best)); } TR.save(); ui.pause.hidden = true; goHome(); }
+function quitToHome(){ if (state !== 'pause') return; TR.end(); if (score > best){ best = score; sealedSave('stellyrun_best', String(best)); } TR.save(); LB.sendStats(); ui.pause.hidden = true; goHome(); }
 function resume(){ MUSIC.resume(); state = 'play'; ui.pause.hidden = true; $('pausebtn').hidden = false; last = 0; }
 let zoneTimer = 0;
 function setZone(n){ const z = $('zone'); z.textContent = THEME_NAMES[n]; z.hidden = false; z.classList.toggle('ice', n === 3); z.classList.remove('pop'); void z.offsetWidth; z.classList.add('pop'); clearTimeout(zoneTimer); zoneTimer = setTimeout(() => { z.hidden = true; }, 3000); }
