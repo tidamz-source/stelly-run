@@ -77,6 +77,11 @@ footer a{ color:var(--yellow); text-decoration:none; font-weight:600; }
   <main id="main"><p class="msg" id="loading">…</p></main>
   <footer><a href="./" id="play">Jouer à Stelly Run</a> · © Lutèce Games</footer>
 </div>
+<script>
+// si la page est ouverte dans l'appli Stelly Run installée (ancienne version de l'appli sur Android), on libère l'orientation
+(() => { try { if (matchMedia('(display-mode: fullscreen), (display-mode: standalone)').matches && screen.orientation && screen.orientation.lock)
+  screen.orientation.lock('any').catch(() => {}); } catch(e){} })();
+</script>
 <script src="langues.js?v=5.76"></script>
 <script>
 (() => {
