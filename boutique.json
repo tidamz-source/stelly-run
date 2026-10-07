@@ -373,6 +373,23 @@
      "dy": 3
     }
    ]
+  },
+  {
+   "id": "shoes-basket_rouges_montante_copie",
+   "slot": "shoes",
+   "key": "basket_rouges_montante_copie",
+   "price": 300,
+   "name": {
+    "fr": "Montantes Orange",
+    "en": "Orange High-Tops",
+    "es": "Orange rojas"
+   },
+   "farSrc": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAALCAYAAAByF90EAAAA2klEQVR4AZSPvw4BQRDG54S4iziRiNB5Ci1qT6C6Rqv1IpSeQ+MFNBQaUUiUaiInEVnzTXYldt2/zfyyO5lvf8mUKPsojgC+ksuIEAR2Ut0WHQL2wO4hEoEOy9sO5ekhotO8Idn3uo4bMkH3FM6uHgZpiMgEHuca4bMBvZ6JWL//Xj8iJPDZgB5gbcDvRKEjCqYXAvzJKcgADxyhIyr7Vc6lF2SAU1+hI7ovuxSvepzJLshe8RNBJaLteEP76Ei7yUHWwmp5gQVA5EWDPg3DJo1abaoEfmFY5H0AAAD//2ddAX0AAAAGSURBVAMANHZZB2xKY8QAAAAASUVORK5CYII=",
+   "fdx": -3,
+   "fdy": -4,
+   "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAALCAYAAAByF90EAAAA2klEQVR4AZSPvw4BQRDG54S4iziRiNB5Ci1qT6C6Rqv1IpSeQ+MFNBQaUUiUaiInEVnzTXYldt2/zfyyO5lvf8mUKPsojgC+ksuIEAR2Ut0WHQL2wO4hEoEOy9sO5ekhotO8Idn3uo4bMkH3FM6uHgZpiMgEHuca4bMBvZ6JWL//Xj8iJPDZgB5gbcDvRKEjCqYXAvzJKcgADxyhIyr7Vc6lF2SAU1+hI7ovuxSvepzJLshe8RNBJaLteEP76Ei7yUHWwmp5gQVA5EWDPg3DJo1abaoEfmFY5H0AAAD//2ddAX0AAAAGSURBVAMANHZZB2xKY8QAAAAASUVORK5CYII=",
+   "dx": -5,
+   "dy": -4
   }
  ]
 }
