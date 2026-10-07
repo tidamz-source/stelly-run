@@ -523,8 +523,8 @@ body{
     <div id="dcount" hidden aria-label="Frisbees attrapés" data-i18n-aria="ui.discsCaught"><canvas id="icoCount"></canvas><span id="dcn">0</span></div>
   </div>
 </div>
-<script src="langues.js?v=5.71"></script>
-<script src="stelly.js?v=5.71"></script>
+<script src="langues.js?v=5.72"></script>
+<script src="stelly.js?v=5.72"></script>
 <script>
 /* ================= Langues ================= */
 // textes dans langues.js ; txt('clé', { n: 3 }) renvoie le texte dans la langue choisie (français si non traduit)
@@ -1502,7 +1502,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.71';
+const APP_VERSION = '5.72';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -1552,7 +1552,7 @@ const TR = (() => {
   const KEY = 'stellyrun_trophies';
   const d = { u:{}, s:{}, games:0, discs:0, sharks:0, th:0, birds:0, rbMiss:0, rb:0, deer:0, deaths:0, own:{}, eq:{}, spent:0, tried:{}, helmet:0 };
   // stats de la fiche joueur (à partir de la v5.69)
-  d.st = Object.assign({ ko:0, doe:0, stag:0, dist:0, streak:0, missed:0, fires:0, socks:0, slows:0, deathBy:{}, deathTh:{} }, d.st || {});
+  d.st = Object.assign({ combo:0, superC:0, mega:0, giga:0, ko:0, doe:0, stag:0, dist:0, streak:0, missed:0, fires:0, socks:0, slows:0, deathBy:{}, deathTh:{} }, d.st || {});
   { const raw = sealedLoad(KEY);   // version retouchée -> copie de secours -> données vierges
     try { const j = JSON.parse(raw); if (j && typeof j === 'object') Object.assign(d, j); } catch(e){} }
   if (typeof d.coins !== 'number') d.coins = d.discs;   // monnaie de la boutique : frisbees attrapés (rétroactif)
@@ -1930,7 +1930,8 @@ const statsUI = (() => {
     const tiles = [
       ['stats.games', fmtN(d.games)], ['stats.discs', fmtN(d.discs), true], ['stats.rainbow', fmtN(d.rb)], ['stats.spent', fmtN(d.spent)],
       ['stats.ko', fmtN(st.ko)], ['stats.deer', fmtN(st.doe) + ' / ' + fmtN(st.stag)], ['stats.sharks', fmtN(d.sharks)], ['stats.dist', distTxt(st.dist)],
-      ['stats.streak', fmtN(st.streak), true], ['stats.missed', fmtN(st.missed)], ['stats.fires', fmtN(st.fires)], ['stats.socks', fmtN(st.socks)], ['stats.slows', fmtN(st.slows)]
+      ['stats.streak', fmtN(st.streak), true], ['stats.missed', fmtN(st.missed)], ['stats.fires', fmtN(st.fires)], ['stats.socks', fmtN(st.socks)], ['stats.slows', fmtN(st.slows)],
+      ['stats.combo', fmtN(st.combo)], ['stats.superC', fmtN(st.superC)], ['stats.mega', fmtN(st.mega)], ['stats.giga', fmtN(st.giga)]
     ];
     let h = '<div class="sgrid">' + tiles.map(([k, v, gold]) => '<div class="stile"><b' + (gold ? ' class="gold"' : '') + '>' + esc(v) + '</b><span>' + esc(txt(k)) + '</span></div>').join('') + '</div>';
     const deaths = Object.entries(st.deathBy).sort((a, b) => b[1] - a[1]);
@@ -2221,11 +2222,11 @@ function catchDisc(o){
     burst(o.x, o.y, 30, RB_COLS.concat([C.white]), 110, 160);
     for (let i=0;i<40;i++) confetti.push({ x:o.x, y:o.y, vx:(Math.random()-.5)*240, vy:-60-Math.random()*140, col:RB_COLS[i % 6], ph:Math.random()*6, t:0 }); }
   combo = (t - lastCatch < 1.3) ? Math.min(combo+1, 5) : 1; lastCatch = t;
-  if (o.g && groups[o.g]){ const G = groups[o.g]; G.got++; if (G.n >= 5 && G.got === G.n){ toast(txt('toast.combo')); bonus += 500; } }
+  if (o.g && groups[o.g]){ const G = groups[o.g]; G.got++; if (G.n >= 5 && G.got === G.n){ toast(txt('toast.combo')); bonus += 500; TR.d.st.combo++; } }
   streak++; if (streak > bestStreak) bestStreak = streak;
-  if (streak === 10){ bonus += 1000; toast(txt('toast.superCombo'), true); sfx.mile(); }
-  else if (streak === 50){ bonus += 5000; toast(txt('toast.megaCombo'), true); sfx.world(); }
-  else if (streak % 100 === 0){ bonus += 10000; toast(txt('toast.gigaCombo'), true); sfx.world(); flash = .15; }
+  if (streak === 10){ bonus += 1000; toast(txt('toast.superCombo'), true); sfx.mile(); TR.d.st.superC++; }
+  else if (streak === 50){ bonus += 5000; toast(txt('toast.megaCombo'), true); sfx.world(); TR.d.st.mega++; }
+  else if (streak % 100 === 0){ bonus += 10000; toast(txt('toast.gigaCombo'), true); sfx.world(); flash = .15; TR.d.st.giga++; }
   discCount++; $('dcn').textContent = discCount; TR.disc();
   const h = GY - o.y, tier = h >= 100 ? 2 : (h >= 56 ? 1 : 0);   // bas : attrapé en courant ; milieu : avec un saut ; haut : avec la chaussette
   const pts = Math.round(10*combo*ALT_MULT[tier]); bonus += pts; sfx.disc(combo);
