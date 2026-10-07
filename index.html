@@ -538,8 +538,8 @@ body{
     <div id="dcount" hidden aria-label="Frisbees attrapés" data-i18n-aria="ui.discsCaught"><canvas id="icoCount"></canvas><span id="dcn">0</span></div>
   </div>
 </div>
-<script src="langues.js?v=5.79"></script>
-<script src="stelly.js?v=5.79"></script>
+<script src="langues.js?v=5.80"></script>
+<script src="stelly.js?v=5.80"></script>
 <script>
 /* ================= Langues ================= */
 // textes dans langues.js ; txt('clé', { n: 3 }) renvoie le texte dans la langue choisie (français si non traduit)
@@ -1517,7 +1517,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.79';
+const APP_VERSION = '5.80';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -1589,17 +1589,20 @@ const TR = (() => {
     if (!d.u.greatest && TROPHY_IDS.every(k => k === 'greatest' || k === 'parzival' || d.u[k])) d.u.greatest = Date.now();
     save(); refreshTrophyBadge();
   }
+  // rattrapage des trophées dont le compteur est déjà atteint (à l'ouverture de l'appli et au début de chaque partie)
+  // la meilleure série (st.streak) n'est enregistrée que depuis la v5.69
+  function retro(){ if (d.rb >= 3) unlock('rainbow2'); if (d.discs >= 25000) unlock('platine'); if (d.discs >= 50000) unlock('diamant'); if (d.st.streak >= 200) unlock('serial'); }
   const GAMES = [[1,'crampons'],[5,'amateur'],[10,'junior'],[50,'senior'],[100,'master'],[250,'gmaster'],[500,'legende'],[1000,'accro']];
   const ZONES = { 1:'gym', 2:'beach', 3:'peuf', 4:'city', 5:'forest', 6:'fields' };
   return {
-    d, save, unlock,
+    d, save, unlock, retro,
     fresh: () => ALL_TROPHIES.filter(([id]) => d.u[id] && !d.s[id]).length,
     seen(id){ if (!d.u[id] || d.s[id]) return; d.s[id] = 1; save(); refreshTrophyBadge(); },
     // frisbee arc-en-ciel : une seule chance par partie (1/300), la probabilité grimpe à chaque partie sans l'attraper (pitié), plafonnée à 5 %
     rainbowAt(){ const p = Math.min(.05, (1/300)*(1 + d.rbMiss/100)); d.rbMiss++; return Math.random() < p ? 8 + Math.random()*30 : -1; },
     rainbow(){ d.rb++; d.coins += 100; if (d.coins >= 5000) unlock('picsou'); d.rbMiss = 0; unlock('rainbow'); if (d.rb >= 3) unlock('rainbow2'); save(); },
     start(){ ended = false; g = { socks:0, fires:0, smash:0, stomps:0, fire:false, miss:0, slows:0, coins0: d.coins, t0: Date.now() }; d.games++; d.th |= 1; for (const [n, id] of GAMES) if (d.games >= n) unlock(id);
-      if (d.rb >= 3) unlock('rainbow2'); if (d.discs >= 25000) unlock('platine'); if (d.discs >= 50000) unlock('diamant'); save(); },   // rattrapage pour les compteurs déjà atteints
+      retro(); save(); },
     zone(n){ d.th |= 1 << n; if (ZONES[n]) unlock(ZONES[n]); if ((d.th & 127) === 127) unlock('globe'); },
     disc(){
       d.discs++; d.coins++; if (d.coins >= 5000) unlock('picsou');
@@ -1826,7 +1829,7 @@ const trUI = (() => {
     if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)*1.5) go(dx < 0 ? 1 : -1); });
   return { open, close, go, isOpen: () => isOpen };
 })();
-refreshTrophyBadge();
+TR.retro(); refreshTrophyBadge();
 
 /* ================= Classement en ligne (Google Sheet) ================= */
 const LB_URL = 'https://script.google.com/macros/s/AKfycbwJCiKyJ7zyoGK7BEGem0crHldaZgvWSWcj6KE-rIQQlqkaoltC68gVqk7Hz5O8U0W6jQ/exec';
