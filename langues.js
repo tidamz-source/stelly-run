@@ -59,6 +59,7 @@ const TEXTS = {
   "toast.rainbow": { fr:"Frisbee arc-en-ciel !", en:"Rainbow frisbee!", es:"¡Frisbee arcoíris!" },
   "tr.title": { fr:"Trophées", en:"Trophies", es:"Trofeos" },
   "tr.locked": { fr:"Pas encore débloqué", en:"Not unlocked yet", es:"Aún no desbloqueado" },
+  "tr.secret": { fr:"Il y a encore des secrets à découvrir…", en:"There are still secrets to discover…", es:"Aún quedan secretos por descubrir…" },
   "tr.lockedAria": { fr:"{name} (verrouillé)", en:"{name} (locked)", es:"{name} (bloqueado)" },
   "shop.title": { fr:"Boutique", en:"Shop", es:"Tienda" },
   "shop.hats": { fr:"Chapeaux", en:"Hats", es:"Sombreros" },
