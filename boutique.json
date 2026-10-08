@@ -430,6 +430,34 @@
      "dy": -9
     }
    ]
+  },
+  {
+   "id": "glasses-speeders",
+   "slot": "glasses",
+   "key": "speeders",
+   "price": 1500,
+   "name": {
+    "fr": "Lunettes Course",
+    "en": "Speed",
+    "es": "Velocidad"
+   },
+   "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAALCAYAAAB7/H1+AAAA2ElEQVR4AZSQMQrCQBBFNzEoWAleQLCw8HZiZWGnhUg6z2Nn4w0EW220EMEqoLzAh9lJYjTw2NmdPy/LpuGPryiKdxNe0yq2otc8D00opx/UihVitaJrdxU8EinHDERiDqCTL4NgUDJqDz17dl4MA5RiZGBlz8sggB+0Eurx+s5SIW0SkvxFmmVZ0t/OiEekNE63XQBuGHW/bLgpszaii0w2j6R8CgpQg7Ct2XuslDf1+VKsIS/XuV97x6k/quwjMd02OdLR/pCQFcz4uiImQFCwF3VS9Xz+AwAA//81vh+2AAAABklEQVQDAFGpv4iTRNwjAAAAAElFTkSuQmCC",
+   "dx": -12,
+   "dy": -7
+  },
+  {
+   "id": "glasses-aviator",
+   "slot": "glasses",
+   "key": "aviator",
+   "price": 1200,
+   "name": {
+    "fr": "Aviateur",
+    "en": "Aviator",
+    "es": "Aviador"
+   },
+   "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAAOCAYAAADE84fzAAABIElEQVR4AbyQPU4DQQyFPXRQcAI6OooVB+AGSCCQkKhQKgroqKGCmo6GkooKBAdIkxwg2jq5RIqk3Phz1pvJbP4UaRPNix37+ZuJ96Shz6gYF43BD8J+aAzOQnYGL/S2rZUdnjKriNnxl9capSVoXCVtT08+7El6AfBlYKboIfJY1FBcq+XAJXu5lOO3s0rv+aflHnUqBhXL/K3ug1ql8hqciuvx4k4+/r/EI/Wrn1sCQwbmh8t9xE6/7WWLc3AMKTg7OZLf62/Mtvv89Y/ctMhvjfKrgq8zlv4qbOI3eOvmvLYKXoyiVzs48Pr0H3ozjsDDU3ZvO2ZnABFQpOagSk8YPHeFObyu1A+cQbuApkuLQJGmCw+94H6iuqhpmJ4JAAAA///qWZb8AAAABklEQVQDAGFoihZGhKQAAAAAAElFTkSuQmCC",
+   "dx": -10,
+   "dy": -10
   }
  ]
 }
