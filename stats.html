@@ -82,7 +82,7 @@ footer a{ color:var(--yellow); text-decoration:none; font-weight:600; }
 (() => { try { if (matchMedia('(display-mode: fullscreen), (display-mode: standalone)').matches && screen.orientation && screen.orientation.lock)
   screen.orientation.lock('any').catch(() => {}); } catch(e){} })();
 </script>
-<script src="langues.js?v=5.93"></script>
+<script src="langues.js?v=5.94"></script>
 <script>
 (() => {
 const LB_URL = 'https://script.google.com/macros/s/AKfycbwJCiKyJ7zyoGK7BEGem0crHldaZgvWSWcj6KE-rIQQlqkaoltC68gVqk7Hz5O8U0W6jQ/exec';
@@ -100,7 +100,8 @@ const PAGE = {
   terrains:{ fr:'Morts par terrain', en:'Deaths by terrain', es:'Muertes por terreno' },
   fame:{ fr:'Hall of Fame', en:'Hall of Fame', es:'Salón de la fama' },
   nobody:{ fr:'Personne pour l’instant', en:'Nobody yet', es:'Nadie por ahora' },
-  totalDeaths:{ fr:'morts au total', en:'deaths in total', es:'muertes en total' }
+  totalDeaths:{ fr:'morts au total', en:'deaths in total', es:'muertes en total' },
+  time:{ fr:'de jeu au total', en:'played in total', es:'jugadas en total' }
 };
 const FAME = [
   ['score', { fr:'Meilleurs scores', en:'Top scores', es:'Mejores puntuaciones' }, { fr:'record personnel', en:'personal best', es:'récord personal' }],
@@ -114,7 +115,8 @@ const FAME = [
   ['spent', { fr:'Fashion addict', en:'Fashion Addict', es:'Adicto a la moda' }, { fr:'dépensés en boutique', en:'spent in the shop', es:'gastados en la tienda' }],
   ['rb', { fr:'Chasseur d’arc-en-ciel', en:'Rainbow Hunter', es:'Cazador de arcoíris' }, { fr:'frisbees arc-en-ciel', en:'rainbow frisbees', es:'frisbees arcoíris' }],
   ['sharks', { fr:'Ami des requins', en:'Shark Buddy', es:'Amigo de los tiburones' }, { fr:'sauts de requin vus', en:'shark jumps seen', es:'saltos de tiburón vistos' }],
-  ['giga', { fr:'Giga-joueur', en:'Giga Player', es:'Giga jugador' }, { fr:'giga combos', en:'giga combos', es:'giga combos' }]
+  ['giga', { fr:'Giga-joueur', en:'Giga Player', es:'Giga jugador' }, { fr:'giga combos', en:'giga combos', es:'giga combos' }],
+  ['time', { fr:'No Life', en:'No Life', es:'No Life' }, { fr:'temps de jeu', en:'time played', es:'tiempo de juego' }]
 ];
 const TILES = [['games','stats.games'],['discs','stats.discs'],['rb','stats.rainbow'],['spent','stats.spent'],['ko','stats.ko'],['doe','stats.deer'],['sharks','stats.sharks'],['dist','stats.dist'],
   ['missed','stats.missed'],['fires','stats.fires'],['socks','stats.socks'],['slows','stats.slows'],['combo','stats.combo'],['superC','stats.superC'],['mega','stats.mega'],['giga','stats.giga']];
@@ -124,6 +126,8 @@ const pick = o => (o && (o[LANG] != null ? o[LANG] : o.fr)) || '';
 const T = (k, v) => { let s = PAGE[k] ? pick(PAGE[k]) : (TEXTS[k] ? pick(TEXTS[k]) : k); if (v) for (const x in v) s = s.split('{' + x + '}').join(v[x]); return s; };
 const fmt = n => String(Math.round(n || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, { fr:'\u202F', es:'.' }[LANG] || ',');
 const km = px => { const m = (px || 0)/30; return m >= 10000 ? (Math.round(m/100)/10).toLocaleString({ fr:'fr-FR', es:'es-ES' }[LANG] || 'en-US') + ' km' : fmt(m) + ' m'; };
+// temps de jeu (secondes) : « 12 h 34 min », « 7 min », « 1 234 h » au-delà de 100 h
+const dur = sec => { const m = Math.floor((sec || 0)/60), h = Math.floor(m/60); return h >= 100 ? fmt(h) + ' h' : (h ? h + ' h ' + String(m % 60).padStart(2, '0') + ' min' : m + ' min'); };
 const esc = v => String(v).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' })[c]);
 let data = null;
 function render(){
@@ -139,7 +143,8 @@ function render(){
   let h = '<section class="hero">'
     + '<div class="big"><b>' + fmt(t.games) + '</b><span>' + esc(T('stats.games')) + '</span></div>'
     + '<div class="big"><b>' + fmt(t.discs) + '</b><span>' + esc(T('stats.discs')) + '</span></div>'
-    + '<div class="big"><b>' + km(t.dist) + '</b><span>' + esc(T('stats.dist')) + '</span></div></section>';
+    + '<div class="big"><b>' + km(t.dist) + '</b><span>' + esc(T('stats.dist')) + '</span></div>'
+    + (t.time != null ? '<div class="big"><b>' + dur(t.time) + '</b><span>' + esc(T('time')) + '</span></div>' : '') + '</section>';
   h += '<h2>' + esc(T('all')) + '</h2><section class="grid">' + TILES.map(([k, lab]) => {
     const v = k === 'doe' ? fmt(t.doe) + ' / ' + fmt(t.stag) : (k === 'dist' ? km(t.dist) : fmt(t[k]));
     return '<div class="tile"><b>' + v + '</b><span>' + esc(T(lab)) + '</span></div>'; }).join('') + '</section>';
@@ -150,10 +155,10 @@ function render(){
     + '<div class="card"><h3>' + esc(T('deaths')) + '</h3>' + bars(data.deathBy, k => TEXTS['cause.' + k] ? T('cause.' + k) : k)
     + '<div class="fatal">' + fmt(t.morts) + ' ' + esc(T('totalDeaths')) + (th ? ' · ' + esc(T('stats.fatal')) + ' <b>' + esc(THEMES[th[0]] || '') + '</b>' : '') + '</div></div>'
     + '<div class="card"><h3>' + esc(T('terrains')) + '</h3>' + bars(data.deathTh, k => THEMES[k] || k) + '</div></section>';
-  h += '<h2>' + esc(T('fame')) + '</h2><section class="fame">' + FAME.map(([k, title, what]) => {
+  h += '<h2>' + esc(T('fame')) + '</h2><section class="fame">' + FAME.filter(([k]) => k !== 'time' || (data.leaders || {}).time).map(([k, title, what]) => {
     const list = (data.leaders || {})[k] || [];
     return '<div class="fcard"><h3>' + esc(pick(title)) + '</h3><p>' + esc(pick(what)) + '</p>'
-      + (list.length ? '<ol>' + list.map((p, i) => '<li><span class="rk">' + (i + 1) + '</span><span class="nm">' + esc(p.name || '???') + '</span><span class="v">' + (k === 'dist' ? km(p.v) : fmt(p.v)) + '</span></li>').join('') + '</ol>' : '<div class="empty">' + esc(T('nobody')) + '</div>')
+      + (list.length ? '<ol>' + list.map((p, i) => '<li><span class="rk">' + (i + 1) + '</span><span class="nm">' + esc(p.name || '???') + '</span><span class="v">' + (k === 'dist' ? km(p.v) : (k === 'time' ? dur(p.v) : fmt(p.v))) + '</span></li>').join('') + '</ol>' : '<div class="empty">' + esc(T('nobody')) + '</div>')
       + '</div>'; }).join('') + '</section>';
   main.innerHTML = h;
 }

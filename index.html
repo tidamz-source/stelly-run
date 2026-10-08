@@ -558,9 +558,9 @@ __ld(10); setTimeout(() => { const L = document.getElementById('loader'); if (L)
   </div>
 </div>
 <script>__ld(30);</script>
-<script src="langues.js?v=5.93"></script>
+<script src="langues.js?v=5.94"></script>
 <script>__ld(45);</script>
-<script src="stelly.js?v=5.93"></script>
+<script src="stelly.js?v=5.94"></script>
 <script>__ld(60);</script>
 <script>
 /* ================= Langues ================= */
@@ -1544,7 +1544,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.93';
+const APP_VERSION = '5.94';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -1602,7 +1602,7 @@ const TR = (() => {
   { const raw = sealedLoad(KEY);   // version retouchée -> copie de secours -> données vierges
     try { const j = JSON.parse(raw); if (j && typeof j === 'object') Object.assign(d, j); } catch(e){} }
   // stats de la fiche joueur : complétées APRÈS le chargement, pour que chaque nouveau compteur existe chez tous les joueurs
-  { const ST0 = { combo:0, superC:0, mega:0, giga:0, ko:0, doe:0, stag:0, dist:0, streak:0, missed:0, fires:0, socks:0, slows:0 };
+  { const ST0 = { combo:0, superC:0, mega:0, giga:0, ko:0, doe:0, stag:0, dist:0, streak:0, missed:0, fires:0, socks:0, slows:0, time:0 };
     const st = (d.st && typeof d.st === 'object') ? d.st : {};
     for (const k in ST0) if (typeof st[k] !== 'number' || !isFinite(st[k])) st[k] = 0;   // répare aussi les compteurs abîmés (null)
     if (!st.deathBy || typeof st.deathBy !== 'object') st.deathBy = {};
@@ -1612,7 +1612,7 @@ const TR = (() => {
   let g = { socks:0, fires:0, smash:0, stomps:0, fire:false, miss:0 };
   const save = () => sealedSave(KEY, JSON.stringify(d));
   let ended = false;
-  function endStats(){ if (ended) return; ended = true; d.st.dist += Math.round(dist); if (bestStreak > d.st.streak) d.st.streak = bestStreak; retro(); }
+  function endStats(){ if (ended) return; ended = true; d.st.dist += Math.round(dist); d.st.time += Math.round(t); if (bestStreak > d.st.streak) d.st.streak = bestStreak; retro(); }
   function unlock(id){
     if (d.u[id]) return; d.u[id] = Date.now();
     if (!d.u.greatest && TROPHY_IDS.every(k => k === 'greatest' || k === 'parzival' || d.u[k])) d.u.greatest = Date.now();
@@ -1908,7 +1908,7 @@ const LB = (() => {
   function statsPayload(){
     const d = TR.d, st = d.st, n = store('stellyrun_name');
     return JSON.stringify({ name: n || '', games: d.games, discs: d.discs, rb: d.rb || 0, spent: d.spent || 0, sharks: d.sharks || 0, best: Math.max(best, d.lbBest || 0),
-      ko: st.ko, doe: st.doe, stag: st.stag, dist: st.dist, streak: st.streak, missed: st.missed, fires: st.fires, socks: st.socks, slows: st.slows,
+      ko: st.ko, doe: st.doe, stag: st.stag, dist: st.dist, streak: st.streak, missed: st.missed, fires: st.fires, socks: st.socks, slows: st.slows, time: st.time,
       combo: st.combo, superC: st.superC, mega: st.mega, giga: st.giga, deathBy: st.deathBy, deathTh: st.deathTh });
   }
   async function sendStats(){
