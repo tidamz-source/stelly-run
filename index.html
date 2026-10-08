@@ -149,6 +149,12 @@ body{
 #toast.show{ animation:toast 1.1s ease-out both; }
 #toast.big{ font-size:calc(var(--s)*18px); -webkit-text-stroke:calc(var(--s)*2.2px) var(--plum); text-shadow:0 calc(var(--s)*3px) 0 var(--plum); }
 #toast.big.show{ animation-duration:1.6s; }
+/* combos (Super, Méga, Giga) : jaune, contour prune, relief violet, un losange de chaque côté ; trois tailles */
+#toast.combo{ display:flex; align-items:center; gap:calc(var(--s)*3.7px); color:var(--yellow); -webkit-text-stroke:0; letter-spacing:1px; font-size:calc(var(--s)*15.4px); text-shadow:calc(var(--s)*1px) 0 0 var(--plum), calc(var(--s)*-1px) 0 0 var(--plum), 0 calc(var(--s)*1px) 0 var(--plum), 0 calc(var(--s)*-1px) 0 var(--plum), calc(var(--s)*1px) calc(var(--s)*1px) 0 var(--plum), calc(var(--s)*-1px) calc(var(--s)*1px) 0 var(--plum), calc(var(--s)*1px) calc(var(--s)*-1px) 0 var(--plum), calc(var(--s)*-1px) calc(var(--s)*-1px) 0 var(--plum), 0 calc(var(--s)*2.6px) 0 var(--purple), calc(var(--s)*1px) calc(var(--s)*2.6px) 0 var(--purple), calc(var(--s)*-1px) calc(var(--s)*2.6px) 0 var(--purple), 0 calc(var(--s)*3.6px) 0 var(--plum), calc(var(--s)*1px) calc(var(--s)*3.6px) 0 var(--plum), calc(var(--s)*-1px) calc(var(--s)*3.6px) 0 var(--plum); --d:calc(var(--s)*3.6px); --o:calc(var(--s)*1px); }
+#toast.combo.c2{ font-size:calc(var(--s)*18px); gap:calc(var(--s)*4.3px); text-shadow:calc(var(--s)*1px) 0 0 var(--plum), calc(var(--s)*-1px) 0 0 var(--plum), 0 calc(var(--s)*1px) 0 var(--plum), 0 calc(var(--s)*-1px) 0 var(--plum), calc(var(--s)*1px) calc(var(--s)*1px) 0 var(--plum), calc(var(--s)*-1px) calc(var(--s)*1px) 0 var(--plum), calc(var(--s)*1px) calc(var(--s)*-1px) 0 var(--plum), calc(var(--s)*-1px) calc(var(--s)*-1px) 0 var(--plum), 0 calc(var(--s)*3.1px) 0 var(--purple), calc(var(--s)*1px) calc(var(--s)*3.1px) 0 var(--purple), calc(var(--s)*-1px) calc(var(--s)*3.1px) 0 var(--purple), 0 calc(var(--s)*4.1px) 0 var(--plum), calc(var(--s)*1px) calc(var(--s)*4.1px) 0 var(--plum), calc(var(--s)*-1px) calc(var(--s)*4.1px) 0 var(--plum); --d:calc(var(--s)*4.1px); }
+#toast.combo.c3{ font-size:calc(var(--s)*20.5px); gap:calc(var(--s)*4.9px); text-shadow:calc(var(--s)*1.5px) 0 0 var(--plum), calc(var(--s)*-1.5px) 0 0 var(--plum), 0 calc(var(--s)*1.5px) 0 var(--plum), 0 calc(var(--s)*-1.5px) 0 var(--plum), calc(var(--s)*1.5px) calc(var(--s)*1.5px) 0 var(--plum), calc(var(--s)*-1.5px) calc(var(--s)*1.5px) 0 var(--plum), calc(var(--s)*1.5px) calc(var(--s)*-1.5px) 0 var(--plum), calc(var(--s)*-1.5px) calc(var(--s)*-1.5px) 0 var(--plum), 0 calc(var(--s)*3.6px) 0 var(--purple), calc(var(--s)*1.5px) calc(var(--s)*3.6px) 0 var(--purple), calc(var(--s)*-1.5px) calc(var(--s)*3.6px) 0 var(--purple), 0 calc(var(--s)*5.1px) 0 var(--plum), calc(var(--s)*1.5px) calc(var(--s)*5.1px) 0 var(--plum), calc(var(--s)*-1.5px) calc(var(--s)*5.1px) 0 var(--plum); --d:calc(var(--s)*4.6px); --o:calc(var(--s)*1.5px); }
+#toast.combo::before, #toast.combo::after{ content:''; width:var(--d); height:var(--d); background:var(--yellow); box-shadow:0 0 0 var(--o) var(--plum); transform:rotate(45deg); flex:none; }
+#toast.combo.show{ animation-duration:1.6s; }
 @keyframes toast{
   0%{ opacity:0; transform:translate(-50%,-50%) scale(.5); }
   18%{ opacity:1; transform:translate(-50%,-50%) scale(1.12); }
@@ -187,6 +193,7 @@ body{
 @media (orientation: portrait) and (pointer: coarse){ #rotate{ display:flex; } }
 /* ----- Game over / pause ----- */
 #over,#pause{ display:flex; align-items:center; justify-content:center; background:rgba(23,57,31,.3); }
+#over.rec{ background:rgba(23,57,31,.08); }   /* record battu : voile allégé pour que les confettis ressortent */
 .panel{
   display:flex; flex-direction:column; align-items:center; gap:calc(var(--s)*3px);
   background:var(--plum); border:calc(var(--s)*1.5px) solid var(--yellow);
@@ -551,9 +558,9 @@ __ld(10); setTimeout(() => { const L = document.getElementById('loader'); if (L)
   </div>
 </div>
 <script>__ld(30);</script>
-<script src="langues.js?v=5.90"></script>
+<script src="langues.js?v=5.91"></script>
 <script>__ld(45);</script>
-<script src="stelly.js?v=5.90"></script>
+<script src="stelly.js?v=5.91"></script>
 <script>__ld(60);</script>
 <script>
 /* ================= Langues ================= */
@@ -1537,7 +1544,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.90';
+const APP_VERSION = '5.91';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -1555,6 +1562,7 @@ function reset(){
   Object.assign(P, { y:GY, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, land:0, sink:false, stomps:0 });
 }
 function startGame(){
+  confetti = []; P.confettiDone = false;
   lbEntry.submit(); lbEntry.hide(); trUI.close(); shopUI.close(); lbUI.close(); newsUI.close(); statsUI.close(); $('langbtn').hidden = true; $('langmenu').hidden = true; ensureAudio(); sfx.start(); reset(); TR.start(); rbAt = TR.rainbowAt(); state = 'play'; MUSIC.tempo = MUSIC.target = 1; MUSIC.fire = false; MUSIC.play(0, true);
   ui.title.hidden = true; ui.over.hidden = true; ui.pause.hidden = true; ui.hud.hidden = false;
   ui.hi.textContent = txt('ui.record') + ' ' + pad(best); ui.firebar.hidden = true; ui.sockbar.hidden = true; ui.dcount.hidden = false; $('pausebtn').hidden = false; clearTimeout(zoneTimer); $('zone').hidden = true;
@@ -1571,7 +1579,8 @@ function goHome(){
 function iceToast(){
   const el = $('icetoast'); el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
 }
-function toast(msg, big){ ui.toast.textContent = msg; ui.toast.classList.toggle('big', !!big); ui.toast.classList.remove('show'); void ui.toast.offsetWidth; ui.toast.classList.add('show'); }
+function toast(msg, big, combo){ ui.toast.textContent = msg; ui.toast.classList.toggle('big', !!big && !combo);
+  ui.toast.classList.toggle('combo', !!combo); ui.toast.classList.toggle('c2', combo === 2); ui.toast.classList.toggle('c3', combo === 3); ui.toast.classList.remove('show'); void ui.toast.offsetWidth; ui.toast.classList.add('show'); }
 
 /* ================= Trophées ================= */
 const TROPHY_IDS = ['crampons', 'pasdebol', 'taupe', 'amateur', 'combo5', 'soldes', 'vitrine', 'gym', 'beach', 'city', 'fields', 'forest', 'peuf', 'junior', 'force', 'crabe', 'marmotte', 'combo10', 'plumes', 'mains', 'requin', 'deer', 'globe', 'angry', 'bronze', 'senior', 'heros', 'voltige', 'fashion', 'cendrillon', 'tetedure', 'combo50', 'master', 'huck', 'elfe', 'bulldozer', 'hydrate', 'mcfly', 'argent', 'picsou', 'chapelier', 'gmaster', 'combo100', 'or', 'prada', 'dressing', 'intouchable', 'cascadeuse', 'legende', 'accro', 'marathon', 'rainbow', 'greatest', 'parzival'];   // ordre d'affichage ; Parzival toujours en dernier, hors Greatest
@@ -2328,9 +2337,9 @@ function catchDisc(o){
   combo = (t - lastCatch < 1.3) ? Math.min(combo+1, 5) : 1; lastCatch = t;
   if (o.g && groups[o.g]){ const G = groups[o.g]; G.got++; if (G.n >= 5 && G.got === G.n){ toast(txt('toast.combo')); bonus += 500; TR.d.st.combo++; } }
   streak++; if (streak > bestStreak) bestStreak = streak;
-  if (streak === 10){ bonus += 1000; toast(txt('toast.superCombo'), true); sfx.mile(); TR.d.st.superC++; }
-  else if (streak === 50){ bonus += 5000; toast(txt('toast.megaCombo'), true); sfx.world(); TR.d.st.mega++; }
-  else if (streak % 100 === 0){ bonus += 10000; toast(txt('toast.gigaCombo'), true); sfx.world(); flash = .15; TR.d.st.giga++; }
+  if (streak === 10){ bonus += 1000; toast(txt('toast.superCombo'), true, 1); sfx.mile(); TR.d.st.superC++; }
+  else if (streak === 50){ bonus += 5000; toast(txt('toast.megaCombo'), true, 2); sfx.world(); TR.d.st.mega++; }
+  else if (streak % 100 === 0){ bonus += 10000; toast(txt('toast.gigaCombo'), true, 3); sfx.world(); flash = .15; TR.d.st.giga++; }
   discCount++; $('dcn').textContent = discCount; TR.disc();
   const h = GY - o.y, tier = h >= 100 ? 2 : (h >= 56 ? 1 : 0);   // bas : attrapé en courant ; milieu : avec un saut ; haut : avec la chaussette
   const pts = Math.round(10*combo*ALT_MULT[tier]); bonus += pts; sfx.disc(combo);
@@ -2454,7 +2463,7 @@ function update(dt){
     ui.final.textContent = pad(score);
     ui.bestline.textContent = P.newBest ? (P.prevBest > 0 ? txt('over.newBest', { n: fmtN(score - P.prevBest) }) : txt('ui.newRecord'))
       : (best - score > 0 ? txt('over.gap', { n: fmtN(best - score) }) : txt('over.tie'));
-    ui.bestline.className = 'line' + (P.newBest ? ' new' : '');
+    ui.bestline.className = 'line' + (P.newBest ? ' new' : ''); ui.over.classList.toggle('rec', !!P.newBest);
     const gm = TR.game(); $('ocoins').textContent = '+' + fmtN(gm.coins); $('ostreak').textContent = 'x' + fmtN(bestStreak);
     overTrophies(gm.trophies, score > (TR.d.lbBest || 0));
     ui.hi.textContent = txt('ui.record') + ' ' + pad(best);
@@ -2473,8 +2482,14 @@ function update(dt){
     if (Math.random() < dt*6) addConfetti(1, true);
     if (!titleSlammed && titleT > 1.3){ titleSlammed = true; if (!reduced) shake = .25; flash = .1; addConfetti(50, false, W/2, lay.ry); }
   }
+  // record battu : pluie de confettis sur l'écran de fin, deux fois plus que l'accueil (gerbe au moment où le bilan s'affiche)
+  if (state === 'over' && P.newBest && !ui.over.hidden){
+    if (!P.confettiDone){ P.confettiDone = true; addConfetti(100, false, W/2, H*.35); }
+    if (Math.random() < dt*12) addConfetti(1, true);
+    if (Math.random() < dt*12) addConfetti(1, true);
+  }
   for (const c of confetti){ c.t += dt; c.vy = Math.min(c.vy + 140*dt, 38); c.vx *= Math.pow(.2, dt); c.x += (c.vx + Math.sin(c.t*4 + c.ph)*12)*dt; c.y += c.vy*dt; }
-  confetti = confetti.filter(c => c.y < H + 4 && state === 'title');
+  confetti = confetti.filter(c => c.y < H + 4 && (state === 'title' || state === 'over'));
   for (const d of debris){ d.vy += 900*dt; d.x += d.vx*dt - dx; d.y += d.vy*dt; d.rot += d.vr*dt; }
   debris = debris.filter(d => d.y < H + 40 && d.x > -40 && d.x < W + 60);
   for (const l of lines) l.x -= dx*2.2; lines = lines.filter(l => l.x + l.len > 0);
@@ -2857,6 +2872,7 @@ function draw(){
     if (P.sink) ctx.restore();
   }
 
+  if (state === 'over') for (const c of confetti){ ctx.fillStyle = c.col; const flip = Math.floor(c.t*8 + c.ph) % 2; ctx.fillRect(Math.round(c.x), Math.round(c.y), flip ? 2 : 1, flip ? 1 : 2); }
   for (const p of parts){ ctx.fillStyle = p.col; ctx.fillRect(Math.round(p.x), Math.round(p.y), p.s, p.s); }
   for (const p of pops){ if (p.t > .6 && Math.floor(p.t*20)%2) continue; ptext(p.s, p.x, p.y - p.t*22, p.col); }
   if (flash > 0){ ctx.globalAlpha = Math.min(1, flash/.12)*.7; ctx.fillStyle = C.white; ctx.fillRect(-4,-4,W+8,H+8); ctx.globalAlpha = 1; }
