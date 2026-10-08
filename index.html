@@ -551,9 +551,9 @@ __ld(10); setTimeout(() => { const L = document.getElementById('loader'); if (L)
   </div>
 </div>
 <script>__ld(30);</script>
-<script src="langues.js?v=5.87"></script>
+<script src="langues.js?v=5.88"></script>
 <script>__ld(45);</script>
-<script src="stelly.js?v=5.87"></script>
+<script src="stelly.js?v=5.88"></script>
 <script>__ld(60);</script>
 <script>
 /* ================= Langues ================= */
@@ -1524,6 +1524,7 @@ function sealedGet(key){ try { const v = localStorage.getItem(key), h = localSto
 function sealedSave(key, v){ sealedSet(key, v); sealedSet(key + '_bk', v); }
 function sealedLoad(key){ const v = sealedGet(key); return v != null ? v : sealedGet(key + '_bk'); }
 let best = 0; { const v = sealedLoad('stellyrun_best'); best = v != null ? (+v || 0) : 0; if (v != null) sealedSave('stellyrun_best', String(best)); }
+let lastPat = '';   // dernier motif de disques posé
 let shake = 0, flash = 0, overT = 0, bgX = 0, nextObs = 0, sockIn = 0, fireIn = 0, lastCatch = -9, combo = 0, milestone = 500;
 let graceT = 0, theme = 0, prevTheme = 0, transT = 0, fireT = 0, boost = 1, deathKind = 'hit', titleSlammed = false;
 let groups = {}, gidN = 0, discCount = 0, streak = 0, bestStreak = 0, koCount = 0;
@@ -1532,7 +1533,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.87';
+const APP_VERSION = '5.88';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -1545,7 +1546,7 @@ function showTitleRecord(){ ui.trec.hidden = best <= 0; ui.trec.textContent = tx
 
 function reset(){
   t = 0; dist = 0; bonus = 0; zoneIdx = 0; zoneT = 12 + Math.random()*6; deer = []; flyers = []; flyIn = 4 + Math.random()*3; birdWait = false; groups = {}; discCount = 0; streak = 0; bestStreak = 0; koCount = 0; $('dcn').textContent = '0'; speed = 235; spEff = 190; obs = []; discs = []; items = []; parts = []; pops = []; debris = []; lines = [];
-  nextObs = 170; sockIn = itemDelay('sock', true); fireIn = itemDelay('fire', true); slowMul = 1; slowIn = 5 + Math.random()*15; slowFx = 0; safeT = 0; lastCatch = -9; combo = 0; milestone = 500; shownScore = -1;
+  nextObs = 170; lastPat = ''; sockIn = itemDelay('sock', true); fireIn = itemDelay('fire', true); slowMul = 1; slowIn = 5 + Math.random()*15; slowFx = 0; safeT = 0; lastCatch = -9; combo = 0; milestone = 500; shownScore = -1;
   theme = 0; prevTheme = 0; transT = 0; fireT = 0; graceT = 0; boost = 1; shark = null;
   Object.assign(P, { y:GY, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, land:0, sink:false, stomps:0 });
 }
@@ -2185,8 +2186,7 @@ function spawnObstacle(){
   obs.push(o);
   const cx = x0 + o.w/2, fireOn = fireT > 0;
   let arcEnd = -Infinity;   // dernier frisbee de l'arc au-dessus de l'obstacle
-  // pas d'arc si des frisbees sont déjà au-dessus de l'obstacle (rangée haute de la chaussette qui passe au-dessus)
-  if (Math.random() < (sockOn || fireOn ? .75 : .42) && !items.some(it => Math.abs(it.x - cx) < 110) && !discs.some(dd => Math.abs(dd.x - cx) < 100)){
+  if (Math.random() < (sockOn || fireOn ? .75 : .42) && !items.some(it => Math.abs(it.x - cx) < 110)){
     // arc haut seulement si la chaussette durera encore quand Stelly arrivera dessus
     const arcSock = sockOn && sockLasts(cx + 80);
     const peak = arcSock ? 92 : (o.k === 'pyr3' ? 66 : (o.k === 'pyr' ? 56 : 46)), sp = Math.max(28, speed*(arcSock ? .1 : .07)), half = sp >= 36 ? 2 : 1;
@@ -2201,20 +2201,19 @@ function spawnObstacle(){
   if (fireIn <= 0 && !fireOn && !items.length && free && clear){ const lv = itemLevel(); items.push({ k:'fire', x: ix, y: GY - [30, 76][lv], lv }); fireIn = itemDelay('fire'); return; }
   if (sockIn <= 0 && P.sockT <= 0 && !items.length && free && clear){ const lv = itemLevel(); items.push({ k:'sock', x: ix - 9, y: GY - [40, 88][lv], lv }); sockIn = itemDelay('sock'); return; }
   if ((roomy || sockOn) && Math.random() < (sockOn || fireOn ? .8 : .45)){
-    const rr = Math.random();
-    if (sockOn){
+    // jamais deux fois d'affilée le même motif entre les obstacles (rangée de 5 de la chaussette, rangée au sol, rangée haute, diagonale)
+    if (sockOn && lastPat !== 'row'){
       // rangée haute (chaussette) : assez loin de l'arc pour retomber et ressauter, et assez tôt pour repartir avant l'obstacle suivant
-      // l'obstacle suivant peut passer sous la rangée, mais jamais juste avant (Stelly prend son élan) : sinon il est glissé sous la rangée
-      // et jamais par-dessus la rangée haute précédente (qui peut maintenant passer au-dessus de cet obstacle)
-      const room = Math.max(spEff, 190)*.85, prevRow = discs.reduce((m, dd) => dd.y < GY - 120 ? Math.max(m, dd.x) : m, -Infinity);
-      const start = Math.max(mx - 60, arcEnd + room, prevRow + 60), nx = x0 + gap;
+      // si l'espace manque, l'obstacle suivant est repoussé d'autant (pendant les 7 s de la chaussette seulement)
+      const room = Math.max(spEff, 190)*.85, start = Math.max(mx - 60, arcEnd + room), need = start + 120 + room - x0;
       // rangée haute seulement si la chaussette durera jusqu'au dernier frisbee
-      if (sockLasts(start + 120)){ if (nx > start - 110 && nx < start + 20){ gap = start + 30 - x0; nextObs = gap; }
-        const gid = newGroup(5); for (let i=0;i<5;i++) discs.push({ x: start + i*30, y: GY - 128, g: gid }); }
+      if (sockLasts(start + 120)){ if (need > gap){ gap = need; nextObs = gap; }
+        const gid = newGroup(5); for (let i=0;i<5;i++) discs.push({ x: start + i*30, y: GY - 128, g: gid }); lastPat = 'row'; }
     }
-    else if (rr < .34){ for (let i=0;i<4;i++) discs.push({ x: mx + (i-1.5)*30, y: GY - 16 }); }
-    else if (rr < .67){ for (let i=0;i<3;i++) discs.push({ x: mx + (i-1)*30, y: GY - 72 }); }
-    else { for (let i=0;i<4;i++) discs.push({ x: mx + (i-1.5)*30, y: GY - 20 - i*18 }); }
+    else { const opts = ['low', 'mid', 'diag'].filter(k => k !== lastPat), k = opts[Math.floor(Math.random()*opts.length)]; lastPat = k;
+      if (k === 'low') for (let i=0;i<4;i++) discs.push({ x: mx + (i-1.5)*30, y: GY - 16 });
+      else if (k === 'mid') for (let i=0;i<3;i++) discs.push({ x: mx + (i-1)*30, y: GY - 72 });
+      else for (let i=0;i<4;i++) discs.push({ x: mx + (i-1.5)*30, y: GY - 20 - i*18 }); }
   }
 }
 // altitude du centre de l'oiseau au-dessus du sol : [minimum, écart aléatoire]
