@@ -277,7 +277,12 @@ const TEXTS = {
 
 /* Nouvelles du jeu : la plus récente en premier. icon : image du jeu affichée à côté (chrono…) */
 const NEWS = [
-  { id:'2026-10-09-trophees-secrets', date:'2026-10-09', icon:'trophee',
+  { id:'2026-10-09-boutique', date:'2026-10-09', icon:'cintre',
+    title:{ fr:'Du nouveau dans la boutique', en:'New in the shop', es:'Novedades en la tienda' },
+    text:{ fr:'Une dizaine de nouveaux accessoires t’attendent dans la boutique.',
+           en:'A dozen new accessories are waiting for you in the shop.',
+           es:'Una decena de accesorios nuevos te esperan en la tienda.' } },
+  { id:'2026-10-09-trophees-secrets', date:'2026-10-07', icon:'trophee',
     title:{ fr:'Trophées secrets', en:'Secret trophies', es:'Trofeos secretos' },
     text:{ fr:'De nouveaux trophées mystères viennent d’arriver.',
            en:'New mystery trophies have just arrived.',
