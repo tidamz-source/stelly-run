@@ -539,8 +539,8 @@ body{
     <div id="dcount" hidden aria-label="Frisbees attrapés" data-i18n-aria="ui.discsCaught"><canvas id="icoCount"></canvas><span id="dcn">0</span></div>
   </div>
 </div>
-<script src="langues.js?v=5.82"></script>
-<script src="stelly.js?v=5.82"></script>
+<script src="langues.js?v=5.83"></script>
+<script src="stelly.js?v=5.83"></script>
 <script>
 /* ================= Langues ================= */
 // textes dans langues.js ; txt('clé', { n: 3 }) renvoie le texte dans la langue choisie (français si non traduit)
@@ -1518,7 +1518,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.82';
+const APP_VERSION = '5.83';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -1557,7 +1557,7 @@ function toast(msg, big){ ui.toast.textContent = msg; ui.toast.classList.toggle(
 /* ================= Trophées ================= */
 const TROPHY_IDS = ['crampons', 'pasdebol', 'taupe', 'amateur', 'combo5', 'soldes', 'vitrine', 'gym', 'beach', 'city', 'fields', 'forest', 'peuf', 'junior', 'force', 'crabe', 'marmotte', 'combo10', 'plumes', 'mains', 'requin', 'deer', 'globe', 'angry', 'bronze', 'senior', 'heros', 'voltige', 'fashion', 'cendrillon', 'tetedure', 'combo50', 'master', 'huck', 'elfe', 'bulldozer', 'hydrate', 'mcfly', 'argent', 'picsou', 'chapelier', 'gmaster', 'combo100', 'or', 'prada', 'dressing', 'intouchable', 'cascadeuse', 'legende', 'accro', 'rainbow', 'greatest', 'parzival'];   // ordre d'affichage ; Parzival toujours en dernier, hors Greatest
 // trophées chromés : cachés tant qu'ils ne sont pas débloqués, affichés après Parzival, hors compte et hors Greatest
-const CHROME_IDS = ['serial', 'rainbow2', 'platine', 'diamant'];
+const CHROME_IDS = ['serial', 'firecatch', 'rainbow2', 'platine', 'diamant'];
 // [id, nom, descriptif] : nom et descriptif suivent la langue choisie
 const trEntry = id => { const a = [id];
   Object.defineProperty(a, 1, { get: () => txt('tr.' + id + '.n'), enumerable: true });
@@ -1592,7 +1592,7 @@ const TR = (() => {
   }
   // rattrapage des trophées dont le compteur est déjà atteint (à l'ouverture de l'appli et au début de chaque partie)
   // la meilleure série (st.streak) n'est enregistrée que depuis la v5.69
-  function retro(){ if (d.rb >= 3) unlock('rainbow2'); if (d.discs >= 25000) unlock('platine'); if (d.discs >= 50000) unlock('diamant'); if (d.st.streak >= 200) unlock('serial'); }
+  function retro(){ if (d.rb >= 3) unlock('rainbow2'); if (d.discs >= 25000) unlock('platine'); if (d.discs >= 50000) unlock('diamant'); if (d.st.streak >= 200) unlock('serial'); if (d.st.streak >= 300) unlock('firecatch'); }
   const GAMES = [[1,'crampons'],[5,'amateur'],[10,'junior'],[50,'senior'],[100,'master'],[250,'gmaster'],[500,'legende'],[1000,'accro']];
   const ZONES = { 1:'gym', 2:'beach', 3:'peuf', 4:'city', 5:'forest', 6:'fields' };
   return {
@@ -1607,7 +1607,7 @@ const TR = (() => {
     zone(n){ d.th |= 1 << n; if (ZONES[n]) unlock(ZONES[n]); if ((d.th & 127) === 127) unlock('globe'); },
     disc(){
       d.discs++; d.coins++; if (d.coins >= 5000) unlock('picsou');
-      if (streak >= 5) unlock('combo5'); if (streak >= 10) unlock('combo10'); if (streak >= 50) unlock('combo50'); if (streak >= 100) unlock('combo100'); if (streak >= 200) unlock('serial');
+      if (streak >= 5) unlock('combo5'); if (streak >= 10) unlock('combo10'); if (streak >= 50) unlock('combo50'); if (streak >= 100) unlock('combo100'); if (streak >= 200) unlock('serial'); if (streak >= 300) unlock('firecatch');
       if (discCount >= 150) unlock('huck');
       if (d.discs >= 1000) unlock('bronze'); if (d.discs >= 5000) unlock('argent'); if (d.discs >= 10000) unlock('or'); if (d.discs >= 25000) unlock('platine'); if (d.discs >= 50000) unlock('diamant');
     },
@@ -1619,7 +1619,7 @@ const TR = (() => {
     sock(){ d.st.socks++; if (++g.socks >= 3) unlock('elfe'); },
     slow(){ d.st.slows++; if (++g.slows >= 3) unlock('mcfly'); },
     miss(){ d.st.missed++; if (++g.miss >= 25) unlock('mains'); },
-    fire(){ d.st.fires++; g.fire = true; if (++g.fires >= 3) unlock('hydrate'); },
+    fire(){ d.st.fires++; g.fire = true; if (++g.fires >= 3) unlock('hydrate');  },
     smash(n){ g.smash += n || 1; if (g.smash >= 30) unlock('bulldozer'); },   // chaque élément compte : rangée de 3 = 3, pyramide = 3, pyramide à 3 niveaux = 6
     // les volants comptent comme des oiseaux (stats, trophées, espèces d'Angry Birds)
     stomp(sp, tier){ d.st.ko++;
@@ -1689,7 +1689,9 @@ function buildTrophyIcons(){
   for (const [id, n] of [['combo5','x5'],['combo10','x10'],['combo50','x50'],['combo100','x100']]) ic(id, g => { put(g, DISC, 16, 13); num(g, n); });
   ic('huck', g => { put(g, DISC, 16, 13); num(g, '150'); });
   // Serial Catcher : pile de frisbees
-  ic('serial', g => { for (const y of [19, 13, 7]) put(g, DISC, 16, y); num(g, 'x200'); });
+  ic('serial', g => { for (const y of [17, 10]) put(g, DISC, 16, y); num(g, 'x200'); });
+  // Fire Catcher : 3 disques l'un au-dessus de l'autre
+  ic('firecatch', g => { for (const y of [19, 13, 7]) put(g, DISC, 16, y); num(g, 'x300'); });
   // Stelly McFly : chronomètre et traînées de feu
   ic('mcfly', g => { for (const [y, a, b] of [[24, C.orange, C.yellow], [28, C.orange, C.yellow]]){ g.fillStyle = C.plum; g.fillRect(1, y-1, 14, 3); g.fillStyle = a; g.fillRect(2, y, 12, 1); g.fillStyle = b; g.fillRect(8, y, 6, 1); }
     put(g, CHRONO[1], 16, 12); num(g, 'x3'); });
@@ -2164,17 +2166,17 @@ function spawnObstacle(){
   const mx = x0 + o.w + (gap - o.w)/2, roomy = gap - o.w > speed*.64 + 125;
   // objet seul dans un espace libre (aucun frisbee à moins de 80 px), position variable, au sol ou à hauteur de saut
   const free = gap - o.w > 190, ix = x0 + o.w + 70 + Math.random()*Math.max(0, gap - o.w - 140), clear = !discs.some(dd => Math.abs(dd.x - ix) < 80);
-  if (slowIn <= 0 && !items.length && free && clear){ const lv = itemLevel(); items.push({ k:'slow', x: ix, y: GY - [26, 72][lv], lv }); slowIn = 35 + Math.random()*15; return; }
+  if (slowIn <= 0 && !items.length && free && clear){ const lv = itemLevel(); items.push({ k:'slow', x: ix, y: GY - [26, 72][lv], lv }); slowIn = 30 + Math.random()*15; return; }
   if (fireIn <= 0 && !fireOn && !items.length && free && clear){ const lv = itemLevel(); items.push({ k:'fire', x: ix, y: GY - [30, 76][lv], lv }); fireIn = itemDelay('fire'); return; }
   if (sockIn <= 0 && P.sockT <= 0 && !items.length && free && clear){ const lv = itemLevel(); items.push({ k:'sock', x: ix - 9, y: GY - [40, 88][lv], lv }); sockIn = itemDelay('sock'); return; }
   if ((roomy || sockOn) && Math.random() < (sockOn || fireOn ? .8 : .45)){
     const rr = Math.random();
     if (sockOn){
       // rangée haute (chaussette) : assez loin de l'arc pour retomber et ressauter, et assez tôt pour repartir avant l'obstacle suivant
-      // si l'espace manque, l'obstacle suivant est repoussé d'autant (pendant les 7 s de la chaussette seulement)
-      const room = Math.max(spEff, 190)*.85, start = Math.max(mx - 60, arcEnd + room), need = start + 120 + room - x0;
+      // l'obstacle suivant peut passer sous la rangée, mais jamais juste avant (Stelly prend son élan) : sinon il est glissé sous la rangée
+      const room = Math.max(spEff, 190)*.85, start = Math.max(mx - 60, arcEnd + room), nx = x0 + gap;
       // rangée haute seulement si la chaussette durera jusqu'au dernier frisbee
-      if (sockLasts(start + 120)){ if (need > gap){ gap = need; nextObs = gap; }
+      if (sockLasts(start + 120)){ if (nx > start - 110 && nx < start + 20){ gap = start + 30 - x0; nextObs = gap; }
         const gid = newGroup(5); for (let i=0;i<5;i++) discs.push({ x: start + i*30, y: GY - 128, g: gid }); }
     }
     else if (rr < .34){ for (let i=0;i<4;i++) discs.push({ x: mx + (i-1.5)*30, y: GY - 16 }); }
@@ -2303,7 +2305,7 @@ function update(dt){
   if (state === 'title') titleT += dt;
   if (state === 'play'){
     t += dt; { const target = Math.max(235, 235 * Math.pow(1.10, Math.floor(t/5)) * slowMul); speed = speed < target ? Math.min(target, speed + target*.25*dt) : Math.max(target, speed - speed*.16*dt); }   // ralentissement du chrono : progressif, environ 1,5 s pour perdre 20 %
-    slowFx = Math.max(0, slowFx - dt); if (t > 30) slowIn -= dt;
+    slowFx = Math.max(0, slowFx - dt); if (t > 25) slowIn -= dt;
     boost = lerp(boost, fireT > 0 ? 1.6 : 1, Math.min(1, dt*4));
     spEff = speed * boost; sockIn -= dt; if (t > 13) fireIn -= dt;
   } else if (state === 'over'){ spEff *= Math.pow(.004, dt); overT += dt; }
@@ -2384,7 +2386,7 @@ function update(dt){
   }
   if (state === 'play'){
     for (const o of discs){
-      if (fireT > 0 && o.x - P.x < 220 && o.x - P.x > -40){ const k = Math.min(1, dt*9); o.x += (P.x - o.x)*k; o.y += (P.y - 28 - o.y)*k; }
+      if (o.mag || (fireT > 0 && o.x - P.x < 220 && o.x - P.x > -40)){ o.mag = true; const k = Math.min(1, dt*9); o.x += (P.x - o.x)*k; o.y += (P.y - 28 - o.y)*k; }
       if (Math.abs(o.x - P.x) < 17 && o.y > P.y-56 && o.y < P.y+2) catchDisc(o);
     }
     for (const s of items){

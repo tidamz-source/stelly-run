@@ -257,6 +257,8 @@ const TEXTS = {
   "tr.parzival.d": { fr:"1er au classement mondial au moins une fois", en:"Reach #1 in the world ranking at least once", es:"Sé n.º 1 del ranking mundial al menos una vez" },
   "tr.serial.n": { fr:"Serial Catcher", en:"Serial Catcher", es:"Serial Catcher" },
   "tr.serial.d": { fr:"Attraper 200 disques d’affilée", en:"Catch 200 discs in a row", es:"Atrapa 200 discos seguidos" },
+  "tr.firecatch.n": { fr:"Fire Catcher", en:"Fire Catcher", es:"Fire Catcher" },
+  "tr.firecatch.d": { fr:"Attraper 300 disques d’affilée", en:"Catch 300 discs in a row", es:"Atrapa 300 discos seguidos" },
   "tr.rainbow2.n": { fr:"Double Rainbow", en:"Double Rainbow", es:"Double Rainbow" },
   "tr.rainbow2.d": { fr:"Attraper 3 frisbees arc-en-ciel", en:"Catch 3 rainbow frisbees", es:"Atrapa 3 frisbees arcoíris" },
   "tr.platine.n": { fr:"Handler de platine", en:"Platinum Handler", es:"Handler de platino" },
