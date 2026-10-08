@@ -551,9 +551,9 @@ __ld(10); setTimeout(() => { const L = document.getElementById('loader'); if (L)
   </div>
 </div>
 <script>__ld(30);</script>
-<script src="langues.js?v=5.85"></script>
+<script src="langues.js?v=5.86"></script>
 <script>__ld(45);</script>
-<script src="stelly.js?v=5.85"></script>
+<script src="stelly.js?v=5.86"></script>
 <script>__ld(60);</script>
 <script>
 /* ================= Langues ================= */
@@ -848,7 +848,7 @@ FLY_SPECS.shuttle = { w:16, h:13, hw:6, hh:4, k:[1.6,1.9] };
 const FLY_BY_THEME = ['pigeon', 'shuttle', 'gull', 'eagle', 'pigeon', 'owl', 'crow'];   // gymnase : volants de badminton
 
 /* ================= Police pixel (points) ================= */
-const FONT = {'^':['010','111','010','010','010'],'0':['111','101','101','101','111'],'1':['010','110','010','010','111'],'2':['111','001','111','100','111'],
+const FONT = {'K':['101','101','110','101','101'],'^':['010','111','010','010','010'],'0':['111','101','101','101','111'],'1':['010','110','010','010','111'],'2':['111','001','111','100','111'],
 '3':['111','001','011','001','111'],'4':['101','101','111','001','001'],'5':['111','100','111','001','111'],
 '6':['111','100','111','101','111'],'7':['111','001','010','010','010'],'8':['111','101','111','101','111'],
 '9':['111','101','111','001','111'],'+':['000','010','111','010','000'],'x':['000','101','010','101','000'],' ':['000','000','000','000','000']};
@@ -1532,7 +1532,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.85';
+const APP_VERSION = '5.86';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -1569,9 +1569,9 @@ function iceToast(){
 function toast(msg, big){ ui.toast.textContent = msg; ui.toast.classList.toggle('big', !!big); ui.toast.classList.remove('show'); void ui.toast.offsetWidth; ui.toast.classList.add('show'); }
 
 /* ================= Trophées ================= */
-const TROPHY_IDS = ['crampons', 'pasdebol', 'taupe', 'amateur', 'combo5', 'soldes', 'vitrine', 'gym', 'beach', 'city', 'fields', 'forest', 'peuf', 'junior', 'force', 'crabe', 'marmotte', 'combo10', 'plumes', 'mains', 'requin', 'deer', 'globe', 'angry', 'bronze', 'senior', 'heros', 'voltige', 'fashion', 'cendrillon', 'tetedure', 'combo50', 'master', 'huck', 'elfe', 'bulldozer', 'hydrate', 'mcfly', 'argent', 'picsou', 'chapelier', 'gmaster', 'combo100', 'or', 'prada', 'dressing', 'intouchable', 'cascadeuse', 'legende', 'accro', 'rainbow', 'greatest', 'parzival'];   // ordre d'affichage ; Parzival toujours en dernier, hors Greatest
+const TROPHY_IDS = ['crampons', 'pasdebol', 'taupe', 'amateur', 'combo5', 'soldes', 'vitrine', 'gym', 'beach', 'city', 'fields', 'forest', 'peuf', 'junior', 'force', 'crabe', 'marmotte', 'combo10', 'plumes', 'mains', 'requin', 'deer', 'globe', 'angry', 'bronze', 'senior', 'heros', 'voltige', 'fashion', 'cendrillon', 'tetedure', 'combo50', 'master', 'huck', 'elfe', 'bulldozer', 'hydrate', 'mcfly', 'argent', 'picsou', 'chapelier', 'gmaster', 'combo100', 'or', 'prada', 'dressing', 'intouchable', 'cascadeuse', 'legende', 'accro', 'marathon', 'rainbow', 'greatest', 'parzival'];   // ordre d'affichage ; Parzival toujours en dernier, hors Greatest
 // trophées chromés : cachés tant qu'ils ne sont pas débloqués, affichés après Parzival, hors compte et hors Greatest
-const CHROME_IDS = ['serial', 'firecatch', 'rainbow2', 'platine', 'diamant'];
+const CHROME_IDS = ['serial', 'firecatch', 'rainbow2', 'platine', 'diamant', 'obsidienne', 'adamantium', 'getalife'];
 // [id, nom, descriptif] : nom et descriptif suivent la langue choisie
 const trEntry = id => { const a = [id];
   Object.defineProperty(a, 1, { get: () => txt('tr.' + id + '.n'), enumerable: true });
@@ -1598,7 +1598,7 @@ const TR = (() => {
   let g = { socks:0, fires:0, smash:0, stomps:0, fire:false, miss:0 };
   const save = () => sealedSave(KEY, JSON.stringify(d));
   let ended = false;
-  function endStats(){ if (ended) return; ended = true; d.st.dist += Math.round(dist); if (bestStreak > d.st.streak) d.st.streak = bestStreak; }
+  function endStats(){ if (ended) return; ended = true; d.st.dist += Math.round(dist); if (bestStreak > d.st.streak) d.st.streak = bestStreak; retro(); }
   function unlock(id){
     if (d.u[id]) return; d.u[id] = Date.now();
     if (!d.u.greatest && TROPHY_IDS.every(k => k === 'greatest' || k === 'parzival' || d.u[k])) d.u.greatest = Date.now();
@@ -1606,7 +1606,13 @@ const TR = (() => {
   }
   // rattrapage des trophées dont le compteur est déjà atteint (à l'ouverture de l'appli et au début de chaque partie)
   // la meilleure série (st.streak) n'est enregistrée que depuis la v5.69
-  function retro(){ if (d.rb >= 3) unlock('rainbow2'); if (d.discs >= 25000) unlock('platine'); if (d.discs >= 50000) unlock('diamant'); if (d.st.streak >= 200) unlock('serial'); if (d.st.streak >= 300) unlock('firecatch'); }
+  function retro(){ for (const [n, id] of GAMES) if (d.games >= n) unlock(id);
+    for (const [n, id] of [[1000,'bronze'],[5000,'argent'],[10000,'or']]) if (d.discs >= n) unlock(id);
+    for (const [n, id] of [[5,'combo5'],[10,'combo10'],[50,'combo50'],[100,'combo100']]) if (d.st.streak >= n) unlock(id);
+    if (d.coins >= 5000) unlock('picsou');
+    if (d.rb >= 3) unlock('rainbow2'); if (d.discs >= 25000) unlock('platine'); if (d.discs >= 50000) unlock('diamant'); if (d.discs >= 100000) unlock('obsidienne'); if (d.discs >= 200000) unlock('adamantium'); if (d.st.streak >= 200) unlock('serial'); if (d.st.streak >= 300) unlock('firecatch');
+    if (d.games >= 1500) unlock('getalife'); if (d.st.dist >= MARATHON) unlock('marathon'); }
+  const MARATHON = 42195 * 30;   // 42,195 km (30 px = 1 m) ; la distance cumulée est enregistrée depuis la v5.69
   const GAMES = [[1,'crampons'],[5,'amateur'],[10,'junior'],[50,'senior'],[100,'master'],[250,'gmaster'],[500,'legende'],[1000,'accro']];
   const ZONES = { 1:'gym', 2:'beach', 3:'peuf', 4:'city', 5:'forest', 6:'fields' };
   return {
@@ -1623,13 +1629,13 @@ const TR = (() => {
       d.discs++; d.coins++; if (d.coins >= 5000) unlock('picsou');
       if (streak >= 5) unlock('combo5'); if (streak >= 10) unlock('combo10'); if (streak >= 50) unlock('combo50'); if (streak >= 100) unlock('combo100'); if (streak >= 200) unlock('serial'); if (streak >= 300) unlock('firecatch');
       if (discCount >= 150) unlock('huck');
-      if (d.discs >= 1000) unlock('bronze'); if (d.discs >= 5000) unlock('argent'); if (d.discs >= 10000) unlock('or'); if (d.discs >= 25000) unlock('platine'); if (d.discs >= 50000) unlock('diamant');
+      if (d.discs >= 1000) unlock('bronze'); if (d.discs >= 5000) unlock('argent'); if (d.discs >= 10000) unlock('or'); if (d.discs >= 25000) unlock('platine'); if (d.discs >= 50000) unlock('diamant'); if (d.discs >= 100000) unlock('obsidienne'); if (d.discs >= 200000) unlock('adamantium');
     },
     die(kind){ d.st.deathBy[kind] = (d.st.deathBy[kind] || 0) + 1; d.st.deathTh[theme] = (d.st.deathTh[theme] || 0) + 1; endStats();
       if (t < 5) unlock('pasdebol'); if (kind === 'mole' || kind === 'hole') unlock('taupe'); if (kind === 'crab') unlock('crabe'); if (kind === 'marmot') unlock('marmotte');
       const i = DEATH_KINDS.indexOf(kind); if (i >= 0){ d.deaths |= 1 << i; if (d.deaths === (1 << DEATH_KINDS.length) - 1) unlock('cascadeuse'); } save(); },
     deer(kind){ d.st[kind === 'stag' ? 'stag' : 'doe']++; d.deer |= kind === 'stag' ? 2 : 1; if (d.deer === 3) unlock('deer'); },
-    tick(){ if (score >= 3000 && EQUIPPED.shoes && EQUIPPED.shoes.id === 'shoes-heels') unlock('cendrillon'); if (fireT > 0 && P.sockT > 0) unlock('heros'); if (score >= 10000 && !g.fire) unlock('intouchable'); },
+    tick(){ if (score >= 3000 && EQUIPPED.shoes && EQUIPPED.shoes.id === 'shoes-heels') unlock('cendrillon'); if (fireT > 0 && P.sockT > 0) unlock('heros'); if (score >= 10000 && !g.fire) unlock('intouchable'); if (!d.u.marathon && d.st.dist + dist >= MARATHON) unlock('marathon'); },
     sock(){ d.st.socks++; if (++g.socks >= 3) unlock('elfe'); },
     slow(){ d.st.slows++; if (++g.slows >= 3) unlock('mcfly'); },
     miss(){ d.st.missed++; if (++g.miss >= 25) unlock('mains'); },
@@ -1750,6 +1756,16 @@ function buildTrophyIcons(){
     pm(g, ['..ooooooo..','.oWLLWLLmo.','oWLLWLLmmmo','ooooooooooo','.oLmmmmmDo.','..oLmmmDo..','...oLmDo...','....oDo....','.....o.....'], 11, 16, false,
       Object.assign({}, PAL, { o:C.plum, W:C.white, L:'#BFF3FF', m:'#5FCBEA', D:'#2F8FB8' }));
     sparkle(g, [[4,17],[28,26],[25,8]]); });
+  // Obsidienne et Adamantium : la médaille du diamant, gemme noire / gemme d'acier
+  const GEM = ['..ooooooo..','.oWLLWLLmo.','oWLLWLLmmmo','ooooooooooo','.oLmmmmmDo.','..oLmmmDo..','...oLmDo...','....oDo....','.....o.....'];
+  ic('obsidienne', g => { medal(g, null, '#6E5A86', '#3B2C4E', '#A58BC6');
+    pm(g, GEM, 11, 16, false, Object.assign({}, PAL, { o:C.plum, W:'#C9B8E8', L:'#6E5A86', m:'#2B1F38', D:'#120B18' })); sparkle(g, [[4,17],[28,26],[25,8]], '#E5D8FF'); });
+  ic('adamantium', g => { medal(g, null, '#B9C6CF', '#5E6E7A', '#F2F6F8');
+    pm(g, GEM, 11, 16, false, Object.assign({}, PAL, { o:C.plum, W:C.white, L:'#E3EAEE', m:'#94A4AF', D:'#56646E' })); sparkle(g, [[4,17],[28,26],[25,8]]); });
+  // Get a Life : la série des parties (étoile + nombre)
+  ic('getalife', g => { star(g); num(g, '1500'); });
+  // Marathon : chaussure de course et 42K
+  ic('marathon', g => { put(g, SHOE_C, 16, 12, 2); num(g, '42K'); });
   // cadenas des trophées secrets pas encore obtenus
   ic('secret', g => pm(g, ['....oooooooo....','...oSSSSSSSSo...','..oSSooooooSSo..','..oSSo....oSSo..','..oSSo....oSSo..','..oSSo....oSSo..','..oSSo....oSSo..','oooooooooooooooo','oLLLLLLLLLLLLLLo','oLMMMMMMMMMMMMDo','oLMMMMMooMMMMMDo','oLMMMMoKKoMMMMDo','oLMMMMoKKoMMMMDo','oLMMMMMoKoMMMMDo','oLMMMMMoKoMMMMDo','oLMMMMMMoMMMMMDo','oDDDDDDDDDDDDDDo','oooooooooooooooo'], 8, 7, false, Object.assign({}, PAL, { o:C.plum, S:'#A895AE', L:'#C3B2C8', M:'#8E7C93', D:'#6A5872', K:C.plum })));
   ic('rainbow2', g => { put(g, RBDISC, 15, 9); put(g, RBDISC, 17, 19); num(g, 'x3'); sparkle(g, [[4,27],[29,4]]); });

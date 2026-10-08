@@ -249,6 +249,8 @@ const TEXTS = {
   "tr.legende.d": { fr:"Jouer 500 parties", en:"Play 500 games", es:"Juega 500 partidas" },
   "tr.accro.n": { fr:"Accro aux disques", en:"Disc Addict", es:"Adicto a los discos" },
   "tr.accro.d": { fr:"Jouer 1 000 parties", en:"Play 1,000 games", es:"Juega 1.000 partidas" },
+  "tr.marathon.n": { fr:"Marathon", en:"Marathon", es:"Maratón" },
+  "tr.marathon.d": { fr:"Parcourir 42,195 km au total", en:"Run 42.195 km in total", es:"Recorre 42,195 km en total" },
   "tr.rainbow.n": { fr:"Over the Rainbow", en:"Over the Rainbow", es:"Over the Rainbow" },
   "tr.rainbow.d": { fr:"Attraper le frisbee arc-en-ciel", en:"Catch the rainbow frisbee", es:"Atrapa el frisbee arcoíris" },
   "tr.greatest.n": { fr:"Greatest", en:"Greatest", es:"Greatest" },
@@ -265,6 +267,12 @@ const TEXTS = {
   "tr.platine.d": { fr:"25 000 frisbees catchés", en:"Catch 25,000 frisbees", es:"Atrapa 25.000 frisbees" },
   "tr.diamant.n": { fr:"Handler de diamant", en:"Diamond Handler", es:"Handler de diamante" },
   "tr.diamant.d": { fr:"50 000 frisbees catchés", en:"Catch 50,000 frisbees", es:"Atrapa 50.000 frisbees" },
+  "tr.obsidienne.n": { fr:"Obsidienne", en:"Obsidian", es:"Obsidiana" },
+  "tr.obsidienne.d": { fr:"100 000 frisbees catchés", en:"Catch 100,000 frisbees", es:"Atrapa 100.000 frisbees" },
+  "tr.adamantium.n": { fr:"Adamantium", en:"Adamantium", es:"Adamantium" },
+  "tr.adamantium.d": { fr:"200 000 frisbees catchés", en:"Catch 200,000 frisbees", es:"Atrapa 200.000 frisbees" },
+  "tr.getalife.n": { fr:"Get a Life", en:"Get a Life", es:"Get a Life" },
+  "tr.getalife.d": { fr:"Jouer 1 500 parties", en:"Play 1,500 games", es:"Juega 1.500 partidas" },
 };
 
 /* Nouvelles du jeu : la plus récente en premier. icon : image du jeu affichée à côté (chrono…) */
