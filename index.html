@@ -551,9 +551,9 @@ __ld(10); setTimeout(() => { const L = document.getElementById('loader'); if (L)
   </div>
 </div>
 <script>__ld(30);</script>
-<script src="langues.js?v=5.84"></script>
+<script src="langues.js?v=5.85"></script>
 <script>__ld(45);</script>
-<script src="stelly.js?v=5.84"></script>
+<script src="stelly.js?v=5.85"></script>
 <script>__ld(60);</script>
 <script>
 /* ================= Langues ================= */
@@ -1532,7 +1532,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.84';
+const APP_VERSION = '5.85';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -2169,7 +2169,8 @@ function spawnObstacle(){
   obs.push(o);
   const cx = x0 + o.w/2, fireOn = fireT > 0;
   let arcEnd = -Infinity;   // dernier frisbee de l'arc au-dessus de l'obstacle
-  if (Math.random() < (sockOn || fireOn ? .75 : .42) && !items.some(it => Math.abs(it.x - cx) < 110)){
+  // pas d'arc si des frisbees sont déjà au-dessus de l'obstacle (rangée haute de la chaussette qui passe au-dessus)
+  if (Math.random() < (sockOn || fireOn ? .75 : .42) && !items.some(it => Math.abs(it.x - cx) < 110) && !discs.some(dd => Math.abs(dd.x - cx) < 100)){
     // arc haut seulement si la chaussette durera encore quand Stelly arrivera dessus
     const arcSock = sockOn && sockLasts(cx + 80);
     const peak = arcSock ? 92 : (o.k === 'pyr3' ? 66 : (o.k === 'pyr' ? 56 : 46)), sp = Math.max(28, speed*(arcSock ? .1 : .07)), half = sp >= 36 ? 2 : 1;
@@ -2188,7 +2189,9 @@ function spawnObstacle(){
     if (sockOn){
       // rangée haute (chaussette) : assez loin de l'arc pour retomber et ressauter, et assez tôt pour repartir avant l'obstacle suivant
       // l'obstacle suivant peut passer sous la rangée, mais jamais juste avant (Stelly prend son élan) : sinon il est glissé sous la rangée
-      const room = Math.max(spEff, 190)*.85, start = Math.max(mx - 60, arcEnd + room), nx = x0 + gap;
+      // et jamais par-dessus la rangée haute précédente (qui peut maintenant passer au-dessus de cet obstacle)
+      const room = Math.max(spEff, 190)*.85, prevRow = discs.reduce((m, dd) => dd.y < GY - 120 ? Math.max(m, dd.x) : m, -Infinity);
+      const start = Math.max(mx - 60, arcEnd + room, prevRow + 60), nx = x0 + gap;
       // rangée haute seulement si la chaussette durera jusqu'au dernier frisbee
       if (sockLasts(start + 120)){ if (nx > start - 110 && nx < start + 20){ gap = start + 30 - x0; nextObs = gap; }
         const gid = newGroup(5); for (let i=0;i<5;i++) discs.push({ x: start + i*30, y: GY - 128, g: gid }); }
