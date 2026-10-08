@@ -551,9 +551,9 @@ __ld(10); setTimeout(() => { const L = document.getElementById('loader'); if (L)
   </div>
 </div>
 <script>__ld(30);</script>
-<script src="langues.js?v=5.89"></script>
+<script src="langues.js?v=5.90"></script>
 <script>__ld(45);</script>
-<script src="stelly.js?v=5.89"></script>
+<script src="stelly.js?v=5.90"></script>
 <script>__ld(60);</script>
 <script>
 /* ================= Langues ================= */
@@ -795,6 +795,8 @@ const STUMP = mk(16, 15, g => {
   g.fillStyle = '#7E5530'; [[5,6],[5,7],[9,8],[9,9],[11,6],[7,11],[7,12]].forEach(([x,y]) => g.fillRect(x, y, 1, 1));
   for (let y=0;y<15;y++) for (let x=0;x<16;x++){ const d = Math.hypot((x+.5-8)/4.6, (y+.5-3.4)/1.5); if (d <= 1){ g.fillStyle = d > .66 ? '#C9975C' : (d > .33 ? '#EBC88F' : '#DCB37A'); g.fillRect(x, y, 1, 1); } }
 });
+// disposition des piles (centre x, centre y, rayon) : sert à les dessiner et à les faire éclater élément par élément
+const PILE3 = [[7,15,6.6],[19,15,6.6],[13,7.2,6.2]], PILE6 = [[7,34,6.6],[19,34,6.6],[31,34,6.6],[13,23,6.4],[25,23,6.4],[19,12.4,6.2]];
 const LOGPYR = roundThings(26, 22, [[7,15,6.6],[19,15,6.6],[13,7.2,6.2]], 'log');
 const LOG3 = roundThings(38, 41, [[7,34,6.6],[19,34,6.6],[31,34,6.6],[13,23,6.4],[25,23,6.4],[19,12.4,6.2]], 'log');
 const BALE1 = roundThings(16, 15, [[8,8,7]], 'bale');
@@ -802,6 +804,8 @@ const BALEPYR = roundThings(26, 22, [[7,15,6.6],[19,15,6.6],[13,7.2,6.2]], 'bale
 const BALE3 = roundThings(38, 41, [[7,34,6.6],[19,34,6.6],[31,34,6.6],[13,23,6.4],[25,23,6.4],[19,12.4,6.2]], 'bale');
 const SNOW3 = snowballs(38, 41, [[7,34,6.6],[19,34,6.6],[31,34,6.6],[13,23,6.4],[25,23,6.4],[19,12.4,6.2]]);
 const BIGSNOW = snowballs(26, 22, [[7,15,6.6],[19,15,6.6],[13,7.2,6.2]]);
+// un élément seul de chaque pile (boule de neige, bout de rondin, botte de foin), pour l'éclatement
+const PILE_PIECE = { 3: snowballs(16, 16, [[8,8,6.6]]), 5: roundThings(16, 16, [[8,8,6.6]], 'log'), 6: roundThings(16, 16, [[8,8,6.6]], 'bale') };
 
 /* ================= Marmotte et créatures volantes ================= */
 const MARMOT = ['.....ow.....','....owwo....','...oRRRRo...','..oRRRRRRo..','..oSSSSSSo..','.obbbbbbbbo.','.obkbbbbkbo.','.obbbccbbbo.','.obbcwwcbbo.','.oBbbbbbbBo.'];
@@ -1533,7 +1537,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.89';
+const APP_VERSION = '5.90';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -2245,11 +2249,13 @@ function hitboxes(o){
   if (o.k === 'pyr') return o.th === 2 ? [[o.x+2, o.x+34, GY-22]] : (ROUND[o.th] ? [[o.x+2, o.x+24, GY-11],[o.x+8, o.x+18, GY-19]].map(h => o.th === 5 ? [h[0], h[1], h[2] + 5] : h) : [[o.x+3, o.x+10, GY-12],[o.x+16, o.x+23, GY-12],[o.x+9, o.x+17, GY-24]]);
   return [];
 }
-function pieces(o){
-  if (o.k === 'pyr3'){ if (o.th === 2) return [[CASTLE3, o.x, GY-46]]; if (ROUND[o.th]) return [[ROUND[o.th][2], o.x, GY-41 + (o.th === 5 ? 5 : 0)]];
+function pieces(o, burst){
+  // piles de neige, de rondins et de foin : elles éclatent élément par élément, comme les cônes (les châteaux restent d'un bloc)
+  const split = (L, top, whole) => !burst ? [[whole, o.x, top]] : L.map(([cx, cy]) => [PILE_PIECE[o.th], o.x + cx - 8, top + cy - 8]);
+  if (o.k === 'pyr3'){ if (o.th === 2) return [[CASTLE3, o.x, GY-46]]; if (ROUND[o.th]) return split(PILE6, GY-41 + (o.th === 5 ? 5 : 0), ROUND[o.th][2]);
     const cn = coneImg(o), b = GY - cn.height, x = o.x + coneDx(o); return [[cn, x, b],[cn, x+13, b],[cn, x+26, b],[cn, x+6, b-12],[cn, x+19, b-12],[cn, x+13, b-24]]; }
   if (o.k === 'cone') return Array.from({length:o.n}, (_,i) => o.th === 2 ? [CASTLE, o.x+i*14, GY-20] : (ROUND[o.th] ? [ROUND[o.th][0], o.x+i*16, GY-15 + (o.th === 5 ? 2 : 0)] : [coneImg(o), o.x+i*12 + coneDx(o), GY - coneImg(o).height]));
-  if (o.k === 'pyr') return o.th === 2 ? [[FORT, o.x, GY-32]] : (ROUND[o.th] ? [[ROUND[o.th][1], o.x, GY-22 + (o.th === 5 ? 5 : 0)]] : [[coneImg(o), o.x + coneDx(o), GY - coneImg(o).height],[coneImg(o), o.x+13 + coneDx(o), GY - coneImg(o).height],[coneImg(o), o.x+6 + coneDx(o), GY - coneImg(o).height - 12]]);
+  if (o.k === 'pyr') return o.th === 2 ? [[FORT, o.x, GY-32]] : (ROUND[o.th] ? split(PILE3, GY-22 + (o.th === 5 ? 5 : 0), ROUND[o.th][1]) : [[coneImg(o), o.x + coneDx(o), GY - coneImg(o).height],[coneImg(o), o.x+13 + coneDx(o), GY - coneImg(o).height],[coneImg(o), o.x+6 + coneDx(o), GY - coneImg(o).height - 12]]);
   return [];
 }
 
@@ -2295,7 +2301,7 @@ function die(kind){
   LB.sendStats();
 }
 function smash(o){
-  for (const [img, x, y] of pieces(o)) debris.push({ img, x, y, vx: 200 + Math.random()*160, vy: -240 - Math.random()*140, rot:0, vr:(Math.random()-.5)*24 });
+  for (const [img, x, y] of pieces(o, true)) debris.push({ img, x, y, vx: 200 + Math.random()*160, vy: -240 - Math.random()*140, rot:0, vr:(Math.random()-.5)*24 });
   if (o.th === 2) burst(o.x + o.w/2, GY-10, 14, [C.sand, C.sandL, C.sandD], 90, 260);
   if (o.th === 3) burst(o.x + o.w/2, GY-12, 14, [C.white, '#DCE9F5', '#BFD3E6'], 90, 240);
   if (o.th === 5) burst(o.x + o.w/2, GY-12, 14, ['#B5844A', '#D9B27A', '#5A3A1C'], 90, 240);
