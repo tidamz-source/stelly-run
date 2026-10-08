@@ -558,9 +558,9 @@ __ld(10); setTimeout(() => { const L = document.getElementById('loader'); if (L)
   </div>
 </div>
 <script>__ld(30);</script>
-<script src="langues.js?v=5.92"></script>
+<script src="langues.js?v=5.93"></script>
 <script>__ld(45);</script>
-<script src="stelly.js?v=5.92"></script>
+<script src="stelly.js?v=5.93"></script>
 <script>__ld(60);</script>
 <script>
 /* ================= Langues ================= */
@@ -1544,7 +1544,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.92';
+const APP_VERSION = '5.93';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -2282,7 +2282,7 @@ function flame(x, y, n, spread, cols){
 const CONF_COLS = [C.yellow, C.purpleL, C.white, C.orange, C.g1, C.purple];
 function addConfetti(n, fromTop, cx, cy){
   for (let i=0;i<n;i++) confetti.push({ x: fromTop ? Math.random()*W : cx, y: fromTop ? -Math.random()*40 : cy, vx:(Math.random()-.5)*(fromTop?20:220), vy: fromTop ? 20+Math.random()*25 : -60-Math.random()*120,
-    col:CONF_COLS[i%CONF_COLS.length], ph:Math.random()*6, t:0 });
+    col:CONF_COLS[Math.floor(Math.random()*CONF_COLS.length)], ph:Math.random()*6, t:0 });   // couleur au hasard : la pluie arrive un confetti à la fois
 }
 
 /* ================= Mise à jour ================= */
