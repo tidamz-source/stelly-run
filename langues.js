@@ -277,6 +277,11 @@ const TEXTS = {
 
 /* Nouvelles du jeu : la plus récente en premier. icon : image du jeu affichée à côté (chrono…) */
 const NEWS = [
+  { id:'2026-10-09-trophees-secrets', date:'2026-10-09', icon:'trophee',
+    title:{ fr:'Trophées secrets', en:'Secret trophies', es:'Trofeos secretos' },
+    text:{ fr:'De nouveaux trophées mystères viennent d’arriver.',
+           en:'New mystery trophies have just arrived.',
+           es:'Acaban de llegar nuevos trofeos misteriosos.' } },
   { id:'2026-10-06-fast-count', date:'2026-10-06', icon:'chrono',
     title:{ fr:'Nouveau power-up : Fast Count', en:'New power-up: Fast Count', es:'Nuevo power-up: Fast Count' },
     text:{ fr:'Attrape le chronomètre violet pour ralentir le jeu de 20 % : la vitesse baisse et l’accélération repart de plus bas.',
