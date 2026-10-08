@@ -551,9 +551,9 @@ __ld(10); setTimeout(() => { const L = document.getElementById('loader'); if (L)
   </div>
 </div>
 <script>__ld(30);</script>
-<script src="langues.js?v=5.88"></script>
+<script src="langues.js?v=5.89"></script>
 <script>__ld(45);</script>
-<script src="stelly.js?v=5.88"></script>
+<script src="stelly.js?v=5.89"></script>
 <script>__ld(60);</script>
 <script>
 /* ================= Langues ================= */
@@ -1533,7 +1533,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.88';
+const APP_VERSION = '5.89';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -2419,7 +2419,8 @@ function update(dt){
   if (state === 'play'){
     for (const o of discs){
       if (o.mag || (fireT > 0 && o.x - P.x < 220 && o.x - P.x > -40)){ o.mag = true; const k = Math.min(1, dt*9); o.x += (P.x - o.x)*k; o.y += (P.y - 28 - o.y)*k; }
-      if (Math.abs(o.x - P.x) < 17 && o.y > P.y-56 && o.y < P.y+2) catchDisc(o);
+      // un disque aimanté se stabilise un peu derrière Stelly (défilement rapide pendant l'invincibilité) : on l'attrape dès qu'il est proche
+      if ((Math.abs(o.x - P.x) < 17 && o.y > P.y-56 && o.y < P.y+2) || (o.mag && Math.abs(o.x - P.x) < 55 && Math.abs(o.y - (P.y - 28)) < 45)) catchDisc(o);
     }
     for (const s of items){
       if (s.k === 'slow' && !s.got && Math.abs(s.x - P.x) < 16 && s.y + 8 > P.y-56 && s.y - 8 < P.y+2){
