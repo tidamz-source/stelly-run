@@ -113,6 +113,60 @@ dialog input{ width:100%; background:var(--plum); border:2px solid var(--line); 
 #pubList{ padding-left:18px; margin:0 0 8px; max-height:40vh; overflow:auto; }
 .msg{ min-height:1.4em; color:var(--lilac); }
 .msg.err{ color:#FFB3AE; } .msg.ok{ color:#9AE8A6; }
+/* onglets */
+#tabs{ display:flex; gap:6px; margin-left:10px; }
+.tab{ background:none; border:2px solid var(--line); border-radius:6px; padding:5px 14px; cursor:pointer; color:var(--lilac); }
+.tab:hover{ border-color:var(--purple); }
+.tab.on{ background:var(--purple); border-color:var(--lilac); color:var(--ink); font-weight:700; }
+main[hidden]{ display:none !important; }
+
+/* onglet Vignettes */
+main.vig{ grid-template-columns:minmax(320px,1fr) auto 320px; }
+#vlist h2{ margin-top:4px; }
+#vlist h3{ font-size:14px; color:var(--lilac); margin:10px 0 6px; font-weight:500; }
+#vlist .hint{ color:var(--lilac); font-size:13px; margin:-4px 0 10px; }
+.vgrid{ display:grid; grid-template-columns:repeat(auto-fill, 52px); gap:6px; margin-bottom:12px; }
+.vt{ position:relative; width:52px; height:52px; padding:0; border:2px solid var(--line); border-radius:6px; background:var(--cream); cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.vt:hover{ border-color:var(--purple); }
+.vt canvas{ width:44px; height:44px; }
+.vt.sel{ border-color:var(--star); box-shadow:0 0 0 2px var(--star); }
+.vt.custom::before{ content:''; position:absolute; left:3px; top:3px; width:7px; height:7px; border-radius:50%; background:var(--purple); box-shadow:0 0 0 1px var(--cream); }
+.vt.mod::after{ content:'●'; position:absolute; top:-9px; right:-4px; color:var(--star); font-size:14px; text-shadow:0 0 2px #000; }
+#vcenter{ display:flex; flex-direction:column; gap:10px; }
+#vhead b{ display:block; font-size:19px; color:var(--star); }
+#vhead span{ color:var(--lilac); font-size:14px; }
+#vtools, #vrefbar{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+#vtools .sep, #vrefbar .sep{ width:2px; height:24px; background:var(--line); margin:0 2px; }
+#vtools .btn, #vrefbar .btn{ padding:6px 10px; }
+#vtools label, #vrefbar label{ color:var(--lilac); font-size:14px; display:flex; align-items:center; gap:6px; }
+#vrefbar .lab{ color:var(--lilac); font-weight:500; }
+#vstage{ align-self:flex-start; padding:12px; background:repeating-conic-gradient(#3A1640 0 25%, #341339 0 50%) 0 0/16px 16px; border:2px solid var(--line); border-radius:8px; }
+#vstage.drop{ outline:3px dashed var(--star); outline-offset:-6px; }
+#ved{ display:block; cursor:crosshair; touch-action:none; box-shadow:0 0 0 2px var(--line); }
+#vcolors{ display:flex; gap:8px; align-items:flex-start; }
+#vcur{ width:40px; height:40px; border:2px solid var(--lilac); border-radius:6px; flex:none; }
+#vpicker{ width:40px; height:40px; flex:none; }
+#vsws{ display:grid; grid-template-columns:repeat(16, 22px); gap:3px; }
+#vpos{ color:var(--lilac); font-size:13px; min-height:18px; }
+#vempty{ color:var(--lilac); padding:30px 0; }
+#vprev{ display:flex; flex-wrap:wrap; gap:16px; align-items:flex-end; }
+#vprev figure{ margin:0; text-align:center; }
+#vprev figcaption{ font-size:13px; color:var(--lilac); margin-top:9px; }
+#vprev .x1{ width:32px; height:32px; background:var(--cream); border-radius:3px; display:block; margin:0 auto; }
+#vright .note{ color:var(--lilac); font-size:13px; line-height:1.45; }
+/* tuiles comme dans le jeu (échelle 2) */
+.gtr{ position:relative; width:76px; height:76px; display:flex; align-items:center; justify-content:center; background:#FFF4D6; border:3px solid #2E0E30; border-radius:6px;
+  box-shadow:inset 0 -5px 0 #EBD8A6, inset 0 3px 0 #fff, 0 4px 0 rgba(0,0,0,.4); }
+.gtr canvas{ width:64px; height:64px; position:relative; z-index:1; }
+.gtr.lock{ background:#43234A; box-shadow:inset 0 -5px 0 #351A3A, 0 4px 0 rgba(0,0,0,.4); }
+.gtr.lock canvas{ filter:grayscale(1) brightness(.62) contrast(.85); opacity:.6; }
+.gtr.lock.secret canvas{ filter:none; opacity:.9; }
+.gtr.chrome{ background:linear-gradient(135deg, #F6D278 0 9%, #EAAC5B 9% 30%, #F6D278 30% 46%, #EAAC5B 46% 55%, #F6D278 55% 61%, #EAAC5B 61% 84%, #D8913F 84% 100%);
+  box-shadow:inset 0 -5px 0 #C47C30, inset 0 3px 0 #FFF1B8, inset 3px 0 0 #FCE29A, 0 4px 0 rgba(0,0,0,.4); }
+.gtr.chrome::after{ content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+  background:linear-gradient(135deg, transparent 0 42%, rgba(255,255,255,.75) 42% 47%, transparent 47% 50%, rgba(255,255,255,.5) 50% 52%, transparent 52%) 100% 100% / 300% 300% no-repeat;
+  animation:vshine 3.6s ease-in-out infinite; }
+@keyframes vshine{ 0%, 62%{ background-position:0 0; } 100%{ background-position:100% 100%; } }
 @media (max-width:1100px){
   main{ grid-template-columns:1fr; }
   main > section{ overflow:visible; }
@@ -123,7 +177,8 @@ dialog input{ width:100%; background:var(--plum); border:2px solid var(--line); 
 </head>
 <body>
 <header>
-  <h1>Atelier<small>accessoires de Stelly Run</small></h1>
+  <h1>Atelier<small>Stelly Run</small></h1>
+  <nav id="tabs"><button class="tab on" data-tab="acc">Accessoires</button><button class="tab" data-tab="vig">Vignettes</button></nav>
   <span id="state">Chargement…</span>
   <button class="btn" id="download" disabled title="Copie de boutique.json sur cet appareil, sans rien publier">Télécharger</button>
   <button class="btn main" id="publish" disabled>Publier</button>
@@ -149,7 +204,7 @@ dialog input{ width:100%; background:var(--plum); border:2px solid var(--line); 
 </dialog>
 <div id="banner"><span id="bannerTxt"></span><button class="btn" id="revert">Revenir à la version en ligne</button></div>
 
-<main>
+<main id="acc">
   <section id="left">
     <div class="block">
       <div id="slots"></div>
@@ -216,7 +271,65 @@ dialog input{ width:100%; background:var(--plum); border:2px solid var(--line); 
   </section>
 </main>
 
-<script src="stelly.js?v=5.100"></script>
+<main id="vig" class="vig" hidden>
+  <section id="vlist">
+    <h2>Trophées</h2>
+    <p class="hint">Point violet : icône retouchée. Point jaune : pas encore publié.</p>
+    <div class="vgrid" id="vgT"></div>
+    <h2>Trophées secrets</h2>
+    <div class="vgrid" id="vgS"></div>
+    <h2>Vignettes de la boutique</h2>
+    <div id="vgB"></div>
+  </section>
+  <section id="vcenter">
+    <p id="vempty">Chargement des icônes du jeu…</p>
+    <div id="vedit" hidden>
+      <div id="vhead"><b id="vname"></b><span id="vinfo"></span></div>
+      <div id="vtools" style="margin-top:10px">
+        <button class="btn" data-vtool="pen" title="Crayon (B)">Crayon</button>
+        <button class="btn" data-vtool="eraser" title="Gomme (E), ou clic droit">Gomme</button>
+        <button class="btn" data-vtool="fill" title="Remplissage (G)">Remplir</button>
+        <button class="btn" data-vtool="pick" title="Pipette (I), ou Alt + clic">Pipette</button>
+        <span class="sep"></span>
+        <button class="btn" id="vundo" title="Annuler (Ctrl+Z)">Annuler</button>
+        <button class="btn" id="vredo" title="Rétablir (Ctrl+Y)">Rétablir</button>
+        <span class="sep"></span>
+        <label><input type="checkbox" id="vgrid" checked> Grille</label>
+        <span class="sep"></span>
+        <button class="btn" id="vclear" title="Effacer tous les pixels">Tout effacer</button>
+      </div>
+      <div id="vrefbar" style="margin-top:8px">
+        <span class="lab">Modèle</span>
+        <button class="btn" id="vrefLoad" title="Image affichée sous le dessin, jamais publiée ; tu peux aussi la glisser sur la zone de dessin ou la coller (Ctrl+V)">Charger une image</button>
+        <input type="file" id="vrefFile" accept="image/*" hidden>
+        <label>Opacité <input type="range" id="vrefOp" min="5" max="100" value="50"></label>
+        <button class="btn" id="vrefUse" title="Réduit le modèle en 32 × 32 et le pose comme dessin (annulable)">Utiliser comme dessin</button>
+        <button class="btn danger" id="vrefDel">Retirer</button>
+      </div>
+      <div id="vstage" style="margin-top:10px"><canvas id="ved"></canvas></div>
+      <div id="vpos"></div>
+      <div id="vcolors"><canvas id="vcur" width="1" height="1"></canvas><input type="color" id="vpicker" value="#2e0e30" title="Autre couleur"><div id="vsws"></div></div>
+      <div class="row">
+        <button class="btn" id="vonline" title="Annule tes retouches sur cette icône depuis la dernière publication">Revenir à la version en ligne</button>
+        <button class="btn danger" id="vreset"></button>
+      </div>
+    </div>
+  </section>
+  <section id="vright">
+    <div class="block">
+      <h2>Aperçu dans le jeu</h2>
+      <div id="vprev"></div>
+    </div>
+    <div class="block note">
+      <p>Les icônes font 32 × 32 pixels. Les retouches des trophées vont dans <b>trophees.json</b>, celles des vignettes dans <b>boutique.json</b> ; le bouton <b>Publier</b> envoie tout en une fois.</p>
+      <p>Le fond des tuiles (crème, doré, cadenas) est géré par le jeu : seul le dessin se retouche ici.</p>
+      <p>Raccourcis : B crayon, E gomme, G remplir, I pipette, flèches pour décaler le dessin, Ctrl+Z / Ctrl+Y.</p>
+    </div>
+  </section>
+</main>
+
+<script src="langues.js?v=6.3"></script>
+<script src="stelly.js?v=6.3"></script>
 <script>
 (() => {
 'use strict';
@@ -344,7 +457,10 @@ function bodyIcon(s){ const b = shirtBody(s); if (!b) return; s.item.src = b.img
 function saveDraft(){ try { localStorage.setItem(DRAFT_KEY, JSON.stringify({ saved:Date.now(), data:DATA })); } catch(e){ console.warn('[atelier] brouillon non enregistré', e); } }
 function refreshState(){
   const mod = DATA.items.filter(it => !same(it, onlineOf(it.id))).length, del = ONLINE.items.filter(o => !DATA.items.some(x => x.id === o.id)).length;
-  $('state').innerHTML = mod || del ? '<b>' + (mod + del) + ' article' + (mod + del > 1 ? 's' : '') + ' modifié' + (mod + del > 1 ? 's' : '') + '</b> par rapport à la version en ligne' : 'Identique à la version en ligne';
+  const n = mod + del, tn = tchanges().length, parts = [];
+  if (n) parts.push(n + ' article' + (n > 1 ? 's' : '') + ' modifié' + (n > 1 ? 's' : ''));
+  if (tn) parts.push(tn + ' icône' + (tn > 1 ? 's' : '') + ' de trophée modifiée' + (tn > 1 ? 's' : ''));
+  $('state').innerHTML = parts.length ? '<b>' + parts.join(', ') + '</b> par rapport à la version en ligne' : 'Identique à la version en ligne';
   document.querySelectorAll('.item').forEach(b => { const it = DATA.items.find(x => x.id === b.dataset.id); b.querySelector('.mod').textContent = it && !same(it, onlineOf(it.id)) ? '●' : ''; });
 }
 
@@ -568,7 +684,7 @@ $('refDel').onclick = () => { if (SES){ REFS.delete(SES.item); refBar(); draw();
 $('stage').addEventListener('dragover', e => { e.preventDefault(); $('stage').classList.add('drop'); });
 $('stage').addEventListener('dragleave', () => $('stage').classList.remove('drop'));
 $('stage').addEventListener('drop', e => { e.preventDefault(); $('stage').classList.remove('drop'); loadRef(e.dataTransfer.files[0]); });
-addEventListener('paste', e => { const f = [...(e.clipboardData || {}).files || []].find(f => /^image\//.test(f.type)); if (f && !/INPUT/.test(document.activeElement.tagName)){ e.preventDefault(); loadRef(f); } });
+addEventListener('paste', e => { if (TAB !== 'acc') return; const f = [...(e.clipboardData || {}).files || []].find(f => /^image\//.test(f.type)); if (f && !/INPUT/.test(document.activeElement.tagName)){ e.preventDefault(); loadRef(f); } });
 
 /* ================= Tourner, retourner ================= */
 function bbox(c){
@@ -783,12 +899,13 @@ $('download').onclick = () => {
 };
 $('revert').onclick = () => {
   if (!confirm('Abandonner le brouillon et revenir à la version en ligne ?')) return;
-  try { localStorage.removeItem(DRAFT_KEY); } catch(e){}
-  DATA = JSON.parse(JSON.stringify(ONLINE)); $('banner').classList.remove('show'); SES = null;
+  try { localStorage.removeItem(DRAFT_KEY); localStorage.removeItem(TDRAFT_KEY); } catch(e){}
+  DATA = JSON.parse(JSON.stringify(ONLINE)); TDATA = JSON.parse(JSON.stringify(TONLINE)); $('banner').classList.remove('show'); SES = null;
+  if (V.ready){ vrenderLists(); if (V.sel) vselect(V.sel.k, V.sel.id); } refreshState();
   renderSlots(); renderList(); refreshChecks(); const f = DATA.items.find(x => x.slot === slot); if (f) select(f.id);
 };
 addEventListener('keydown', e => {
-  if (/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) || !SES) return;
+  if (TAB !== 'acc' || /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) || !SES) return;
   const k = e.key.toLowerCase();
   if ((e.ctrlKey || e.metaKey) && k === 'z'){ e.preventDefault(); e.shiftKey ? undoRedo(SES.redo, SES.hist) : undoRedo(SES.hist, SES.redo); return; }
   if ((e.ctrlKey || e.metaKey) && k === 'y'){ e.preventDefault(); undoRedo(SES.redo, SES.hist); return; }
@@ -835,7 +952,7 @@ async function checkImages(){
   return '';
 }
 // numéros de version : APP_VERSION et ?v= des scripts (index.html), VERSION (sw.js), ?v= de stelly.js (atelier.html)
-function bump(index, sw, atelier){
+function bump(index, sw, atelier, stats){
   const m = index.match(/const APP_VERSION = '(\d+)\.(\d+)';/);
   if (!m) throw new Error('APP_VERSION introuvable dans index.html : publication annulée.');
   const old = m[1] + '.' + m[2], nv = m[1] + '.' + (+m[2] + 1);
@@ -844,12 +961,16 @@ function bump(index, sw, atelier){
   index = sub(index, /langues\.js\?v=[\d.]+/, 'langues.js?v=' + nv, 'index.html');
   index = sub(index, /stelly\.js\?v=[\d.]+/, 'stelly.js?v=' + nv, 'index.html');
   sw = sub(sw, /const VERSION = 'stelly-run-v[\d.]+';/, "const VERSION = 'stelly-run-v" + nv + "';", 'sw.js');
-  atelier = atelier.replace(/stelly\.js\?v=[\d.]+/g, 'stelly.js?v=' + nv);
-  return { old, nv, index, sw, atelier };
+  atelier = atelier.replace(/stelly\.js\?v=[\d.]+/g, 'stelly.js?v=' + nv).replace(/langues\.js\?v=[\d.]+/g, 'langues.js?v=' + nv);
+  stats = stats.replace(/langues\.js\?v=[\d.]+/g, 'langues.js?v=' + nv);
+  return { old, nv, index, sw, atelier, stats };
 }
-function commitMessage(v, ch){
+function commitMessage(v, ch, tch){
   const part = (t, l) => l.length ? t + ' ' + l.map(nm).join(', ') : '';
-  return 'v' + v + ' : boutique (' + [part('ajout :', ch.add), part('retouche :', ch.mod), part('retrait :', ch.del)].filter(Boolean).join(' ; ') + ')';
+  const out = [];
+  if (ch.n) out.push('boutique (' + [part('ajout :', ch.add), part('retouche :', ch.mod), part('retrait :', ch.del)].filter(Boolean).join(' ; ') + ')');
+  if (tch.length) out.push('icônes de trophées (' + tch.map(trName).join(', ') + ')');
+  return 'v' + v + ' : ' + out.join(' ; ');
 }
 
 let PREP = null;
@@ -858,21 +979,22 @@ async function openPublish(){
   if (SES && SES.dirty.size) commit(SES);
   if (!token()){ openToken(); return; }
   PREP = null; $('pubGo').disabled = true; $('pubDlg').showModal();
-  const ch = changes(), ul = $('pubList'); ul.innerHTML = '';
+  const ch = changes(), tch = tchanges(), ul = $('pubList'); ul.innerHTML = '';
   const li = (t, it) => { const e = document.createElement('li'); e.textContent = t + ' : ' + nm(it) + ' (' + SLOT_ONE[it.slot] + ')'; ul.appendChild(e); };
   ch.add.forEach(it => li('Ajout', it)); ch.mod.forEach(it => li('Retouche', it)); ch.del.forEach(it => li('Retrait', it));
-  if (!ch.n){ pubMsg('Rien à publier : la boutique est identique à la version en ligne.'); return; }
+  tch.forEach(id => { const e = document.createElement('li'); e.textContent = (TDATA.icons[id] ? 'Icône retouchée' : 'Icône d\'origine rétablie') + ' : ' + trName(id) + ' (trophée)'; ul.appendChild(e); });
+  if (!ch.n && !tch.length){ pubMsg('Rien à publier : la boutique et les icônes sont identiques à la version en ligne.'); return; }
   const p = problems(); if (p.length){ pubMsg(p.length + ' point(s) à corriger avant de publier : ' + p.map(x => x.txt).join(' ; '), 'err'); return; }
   try {
     pubMsg('Vérification des images…');
     const bad = await checkImages(); if (bad) throw new Error(bad);
     pubMsg('Lecture du dépôt…');
     const head = (await gh('/git/ref/heads/' + BRANCH, { where:'branche' })).object.sha;
-    const [index, sw, atelier, remote] = await Promise.all([raw('index.html', head), raw('sw.js', head), raw('atelier.html', head), raw('boutique.json', head)]);
-    const b = bump(index, sw, atelier);
+    const [index, sw, atelier, remote, stats] = await Promise.all([raw('index.html', head), raw('sw.js', head), raw('atelier.html', head), raw('boutique.json', head), raw('stats.html', head)]);
+    const b = bump(index, sw, atelier, stats);
     let warn = '';
     try { if (!same(JSON.parse(remote), ONLINE)) warn = ' Attention : la boutique en ligne a changé depuis l\'ouverture de l\'atelier (autre appareil ?) ; publier remplacera ces changements.'; } catch(e){}
-    PREP = { head, ch, ...b };
+    PREP = { head, ch, tch, ...b };
     pubMsg('Prêt : version ' + b.old + ' → ' + b.nv + ', un seul commit sur ' + BRANCH + '.' + warn, warn ? 'err' : 'ok');
     $('pubGo').disabled = false;
   } catch(e){ pubMsg(e.message, 'err'); if (e.status === 401) { forgetToken(); } }
@@ -882,13 +1004,15 @@ async function doPublish(){
   try {
     pubMsg('Envoi sur GitHub…');
     const base = await gh('/git/commits/' + P.head, { where:'commit' });
-    const files = [['boutique.json', JSON.stringify(DATA, null, 1) + '\n'], ['index.html', P.index], ['sw.js', P.sw], ['atelier.html', P.atelier]];
+    const files = [['boutique.json', JSON.stringify(DATA, null, 1) + '\n'], ['index.html', P.index], ['sw.js', P.sw], ['atelier.html', P.atelier], ['stats.html', P.stats]];
+    if (P.tch.length) files.push(['trophees.json', JSON.stringify(TDATA, null, 1) + '\n']);
     const tree = await gh('/git/trees', { method:'POST', where:'arbre', body:{ base_tree:base.tree.sha, tree:files.map(([path, content]) => ({ path, mode:'100644', type:'blob', content })) } });
-    const c = await gh('/git/commits', { method:'POST', where:'commit', body:{ message:commitMessage(P.nv, P.ch), tree:tree.sha, parents:[P.head] } });
+    const c = await gh('/git/commits', { method:'POST', where:'commit', body:{ message:commitMessage(P.nv, P.ch, P.tch), tree:tree.sha, parents:[P.head] } });
     await gh('/git/refs/heads/' + BRANCH, { method:'PATCH', where:'ref', body:{ sha:c.sha } });
     ONLINE = JSON.parse(JSON.stringify(DATA)); ONLINE_IDS = new Set(ONLINE.items.map(x => x.id));
-    try { localStorage.removeItem(DRAFT_KEY); } catch(e){}
-    $('banner').classList.remove('show'); refreshState(); renderProps();
+    TONLINE = JSON.parse(JSON.stringify(TDATA));
+    try { localStorage.removeItem(DRAFT_KEY); localStorage.removeItem(TDRAFT_KEY); } catch(e){}
+    $('banner').classList.remove('show'); refreshState(); renderProps(); if (V.ready) vrenderLists();
     pubMsg('Publié en v' + P.nv + '. Le jeu sera à jour d\'ici une à deux minutes (le temps que GitHub Pages reconstruise le site).', 'ok');
     $('pubList').innerHTML = '';
   } catch(e){ pubMsg(e.message, 'err'); if (e.status === 401) forgetToken(); }
@@ -909,6 +1033,214 @@ $('pubGo').onclick = doPublish;
 $('pubClose').onclick = () => $('pubDlg').close();
 $('pubToken').onclick = openToken;
 
+/* ================= Onglet Vignettes : icônes des trophées et vignettes de la boutique ================= */
+// trophées : retouches dans trophees.json { icons: { id: PNG 32 × 32 } } ; sans retouche, le jeu garde l'icône dessinée par son code
+// boutique : vignette dessinée -> iconSrc de l'article (sinon le jeu la calcule à partir du dessin de l'accessoire)
+const TDRAFT_KEY = 'stellyrun_atelier_trophees', VN = 32, VZ = 14;
+let TONLINE = { icons:{} }, TDATA = { icons:{} }, TAB = 'acc';
+const V = { sel:null, orig:{}, ids:[], chrome:[], hist:[], redo:[], tool:'pen', color:C.plum, ref:null, refOp:.5, ready:false, loading:null, mvT:0 };
+const VC = document.createElement('canvas'); VC.width = VC.height = VN; const vg = VC.getContext('2d', { willReadFrequently:true });
+const ved = $('ved'); ved.width = ved.height = VN*VZ;
+const trText = (id, k) => { const t = typeof TEXTS === 'object' && TEXTS['tr.' + id + '.' + k]; return t ? t.fr : ''; };
+function trName(id){ return id === 'secret' ? 'Cadenas des secrets' : trText(id, 'n') || id; }
+function tchanges(){ return [...new Set([...Object.keys(TDATA.icons), ...Object.keys(TONLINE.icons)])].filter(id => TDATA.icons[id] !== TONLINE.icons[id]); }
+function saveTDraft(){ try { localStorage.setItem(TDRAFT_KEY, JSON.stringify({ saved:Date.now(), data:TDATA })); } catch(e){ console.warn('[atelier] brouillon des icônes non enregistré', e); } }
+const pxOf = c => c.getContext('2d').getImageData(0, 0, VN, VN).data;
+
+// icônes d'origine : le jeu est chargé en coulisse (index.html?atelier), sans rien écrire ni envoyer
+function loadOrig(){
+  if (V.loading) return V.loading;
+  return V.loading = new Promise(res => {
+    const f = document.createElement('iframe'); f.src = 'index.html?atelier=1'; f.tabIndex = -1; f.setAttribute('aria-hidden', 'true');
+    f.style.cssText = 'position:fixed;left:-10000px;top:0;width:844px;height:390px;border:0;visibility:hidden';
+    const t0 = Date.now();
+    const poll = () => {
+      let SA = null; try { SA = f.contentWindow && f.contentWindow.StellyAtelier; } catch(e){}
+      if (SA){ const I = SA.icons(); V.ids = SA.trophies; V.chrome = SA.chrome;
+        for (const id of [...SA.trophies, ...SA.chrome, 'secret']) if (I[id]) V.orig[id] = mk(VN, VN, g => g.drawImage(I[id], 0, 0));
+        f.remove(); res(true); return; }
+      if (Date.now() - t0 > 30000){ f.remove(); V.loading = null; res(false); return; }
+      setTimeout(poll, 200);
+    };
+    f.onload = poll; document.body.appendChild(f);
+  });
+}
+async function autoShop(it){ const src = it.frames && it.frames.length ? it.frames[0].src : it.src; const im = src && await loadImg(src); return im ? iconOf(im) : mk(VN, VN); }
+async function current(k, id){
+  if (k === 'tr'){ const src = TDATA.icons[id]; if (src){ const im = await loadImg(src); if (im) return mk(VN, VN, g => g.drawImage(im, 0, 0, VN, VN)); } return V.orig[id] || mk(VN, VN); }
+  const it = DATA.items.find(x => x.id === id); if (!it) return mk(VN, VN);
+  if (it.iconSrc){ const im = await loadImg(it.iconSrc); if (im) return iconOf(im); }
+  return autoShop(it);
+}
+const itemOf = id => DATA.items.find(x => x.id === id);
+const vmod = (k, id) => k === 'tr' ? TDATA.icons[id] !== TONLINE.icons[id] : (it => !!it && (it.iconSrc || null) !== ((onlineOf(id) || {}).iconSrc || null))(itemOf(id));
+const vcustom = (k, id) => k === 'tr' ? !!TDATA.icons[id] : !!(itemOf(id) || {}).iconSrc;
+
+/* ----- listes ----- */
+function vtile(k, id, label, box){
+  const b = document.createElement('button'); b.className = 'vt'; b.dataset.k = k; b.dataset.id = id; b.title = label;
+  const c = document.createElement('canvas'); c.width = c.height = VN; b.appendChild(c);
+  b.onclick = () => vselect(k, id); box.appendChild(b); vthumb(k, id);
+}
+async function vthumb(k, id){
+  const b = document.querySelector('.vt[data-k="' + k + '"][data-id="' + CSS.escape(id) + '"]'); if (!b) return;
+  const cv = await current(k, id), g = b.querySelector('canvas').getContext('2d'); g.imageSmoothingEnabled = false; g.clearRect(0, 0, VN, VN); g.drawImage(cv, 0, 0);
+  b.classList.toggle('mod', vmod(k, id)); b.classList.toggle('custom', vcustom(k, id)); b.classList.toggle('sel', !!V.sel && V.sel.k === k && V.sel.id === id);
+}
+function vrenderLists(){
+  const T = $('vgT'), S = $('vgS'), B = $('vgB'); T.innerHTML = ''; S.innerHTML = ''; B.innerHTML = '';
+  for (const id of V.ids) vtile('tr', id, trName(id), T);
+  for (const id of [...V.chrome, 'secret']) vtile('tr', id, trName(id), S);
+  for (const sl of SLOTS){ const its = DATA.items.filter(x => x.slot === sl); if (!its.length) continue;
+    const h = document.createElement('h3'); h.textContent = SLOT_NAME[sl]; B.appendChild(h);
+    const g = document.createElement('div'); g.className = 'vgrid'; B.appendChild(g);
+    for (const it of its) vtile('shop', it.id, nm(it), g); }
+}
+
+/* ----- édition ----- */
+async function vselect(k, id){
+  if (k === 'shop' && !itemOf(id)) return;
+  V.sel = { k, id }; V.hist = []; V.redo = [];
+  const cv = await current(k, id); vg.clearRect(0, 0, VN, VN); vg.drawImage(cv, 0, 0);
+  const it = k === 'shop' ? itemOf(id) : null, sec = V.chrome.includes(id) || id === 'secret';
+  $('vname').textContent = k === 'tr' ? trName(id) : nm(it);
+  $('vinfo').textContent = k === 'tr' ? (id === 'secret' ? 'Icône affichée à la place des trophées secrets pas encore trouvés' : trText(id, 'd') + (sec ? ' · trophée secret' : ''))
+    : 'Vignette de boutique · ' + SLOT_ONE[it.slot] + ' · ' + it.price + ' disques';
+  $('vreset').textContent = k === 'tr' ? 'Revenir à l\'icône d\'origine' : 'Revenir à la vignette automatique';
+  $('vreset').title = k === 'tr' ? 'Supprime la retouche : le jeu reprend l\'icône dessinée par son code' : 'Supprime la vignette dessinée : le jeu la recalcule à partir du dessin de l\'accessoire';
+  $('vempty').hidden = true; $('vedit').hidden = false;
+  document.querySelectorAll('.vt').forEach(b => b.classList.toggle('sel', b.dataset.k === k && b.dataset.id === id));
+  vcollect(); vdraw(); vpreview();
+}
+function vsnap(){ V.hist.push(vg.getImageData(0, 0, VN, VN)); if (V.hist.length > 100) V.hist.shift(); V.redo = []; }
+function vundo(from, to){ if (!V.sel || !from.length) return; to.push(vg.getImageData(0, 0, VN, VN)); vg.putImageData(from.pop(), 0, 0); vdraw(); vcommit(); }
+// enregistre l'icône dans le brouillon ; identique à l'original -> la retouche est supprimée
+async function vcommit(){
+  if (!V.sel) return; const { k, id } = V.sel, px = vg.getImageData(0, 0, VN, VN).data;
+  if (k === 'tr'){ const o = V.orig[id];
+    if (o && samePx(pxOf(o), px)) delete TDATA.icons[id]; else TDATA.icons[id] = VC.toDataURL('image/png');
+    saveTDraft(); }
+  else { const it = itemOf(id); if (!it) return; const a = await autoShop(it);
+    if (samePx(pxOf(a), px)) delete it.iconSrc; else it.iconSrc = VC.toDataURL('image/png');
+    saveDraft(); thumb(it, true); if (SES && SES.item === it) drawIcon(); }
+  refreshState(); vthumb(k, id); vpreview();
+}
+function vdraw(){
+  const g = ved.getContext('2d'), W = ved.width; g.clearRect(0, 0, W, W);
+  if (V.ref){ const r = V.ref, k = Math.min(VN / r.width, VN / r.height), w = r.width*k, h = r.height*k;
+    g.globalAlpha = V.refOp; g.imageSmoothingEnabled = true; g.drawImage(r, (VN - w) / 2*VZ, (VN - h) / 2*VZ, w*VZ, h*VZ); g.globalAlpha = 1; }
+  g.imageSmoothingEnabled = false; g.drawImage(VC, 0, 0, W, W);
+  if ($('vgrid').checked){ g.strokeStyle = 'rgba(255,255,255,.13)'; g.lineWidth = 1; g.beginPath();
+    for (let i = 1; i < VN; i++){ g.moveTo(i*VZ + .5, 0); g.lineTo(i*VZ + .5, W); g.moveTo(0, i*VZ + .5); g.lineTo(W, i*VZ + .5); } g.stroke(); }
+}
+function vpreview(){
+  if (!V.sel) return; const { k, id } = V.sel, box = $('vprev'); box.innerHTML = '';
+  const tile = (cls, lab) => { const f = document.createElement('figure'), t = document.createElement('div'), c = document.createElement('canvas');
+    t.className = 'gtr' + (cls ? ' ' + cls : ''); c.width = c.height = VN; c.getContext('2d').drawImage(VC, 0, 0); t.appendChild(c); f.appendChild(t);
+    const fc = document.createElement('figcaption'); fc.textContent = lab; f.appendChild(fc); box.appendChild(f); };
+  if (k === 'tr'){ if (id === 'secret') tile('lock secret', 'Secret pas encore trouvé');
+    else if (V.chrome.includes(id)) tile('chrome', 'Obtenu');
+    else { tile('', 'Obtenu'); tile('lock', 'Pas encore obtenu'); } }
+  else tile('', 'En boutique');
+  const f = document.createElement('figure'), c = document.createElement('canvas'); c.width = c.height = VN; c.className = 'x1'; c.getContext('2d').drawImage(VC, 0, 0);
+  f.appendChild(c); f.insertAdjacentHTML('beforeend', '<figcaption>Taille réelle</figcaption>'); box.appendChild(f);
+}
+// couleurs : charte du jeu + couleurs déjà présentes dans l'icône
+function vchoose(c){ V.color = c.toUpperCase(); $('vpicker').value = V.color.toLowerCase(); const g = $('vcur').getContext('2d'); g.fillStyle = V.color; g.fillRect(0, 0, 1, 1);
+  document.querySelectorAll('#vsws .sw').forEach(b => b.classList.toggle('sel', b.dataset.c === V.color)); }
+function vcollect(){
+  const out = [...CHARTE], has = new Set(out), d = vg.getImageData(0, 0, VN, VN).data;
+  for (let i = 0; i < d.length; i += 4) if (d[i + 3] > 200){ const c = hex([d[i], d[i + 1], d[i + 2]]); if (!has.has(c) && out.length < 128){ has.add(c); out.push(c); } }
+  const box = $('vsws'); box.innerHTML = '';
+  out.forEach((c, i) => { const b = document.createElement('button'); b.className = 'sw' + (i < CHARTE.length ? ' ch' : ''); b.style.background = c; b.dataset.c = c; b.title = c; b.onclick = () => vchoose(c); box.appendChild(b); });
+  vchoose(V.color);
+}
+function vsetTool(t){ V.tool = t; document.querySelectorAll('[data-vtool]').forEach(b => b.classList.toggle('on', b.dataset.vtool === t)); }
+const vpos = e => { const r = ved.getBoundingClientRect(); return [Math.floor((e.clientX - r.left) / r.width*VN), Math.floor((e.clientY - r.top) / r.height*VN)]; };
+const vin = (x, y) => x >= 0 && y >= 0 && x < VN && y < VN;
+function vplot(x, y, er){ if (!vin(x, y)) return; if (er) vg.clearRect(x, y, 1, 1); else { vg.fillStyle = V.color; vg.fillRect(x, y, 1, 1); } }
+function vline(a, b, er){ let [x0, y0] = a; const [x1, y1] = b, dx = Math.abs(x1 - x0), dy = -Math.abs(y1 - y0), sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1; let e = dx + dy;
+  for (;;){ vplot(x0, y0, er); if (x0 === x1 && y0 === y1) break; const e2 = 2*e; if (e2 >= dy){ e += dy; x0 += sx; } if (e2 <= dx){ e += dx; y0 += sy; } } }
+function vpick(x, y){ if (!vin(x, y)) return; const d = vg.getImageData(x, y, 1, 1).data; if (d[3]) vchoose(hex(d)); }
+function vfill(x, y){
+  if (!vin(x, y)) return false;
+  const im = vg.getImageData(0, 0, VN, VN), d = im.data, i0 = (y*VN + x)*4, t = [d[i0], d[i0 + 1], d[i0 + 2], d[i0 + 3]], c = parseInt(V.color.slice(1), 16), nc = [c >> 16 & 255, c >> 8 & 255, c & 255, 255];
+  if (t.every((v, i) => v === nc[i])) return false;
+  const st = [[x, y]], seen = new Uint8Array(VN*VN);
+  while (st.length){ const [px, py] = st.pop(); if (!vin(px, py)) continue; const j = py*VN + px; if (seen[j]) continue; seen[j] = 1; const q = j*4;
+    if (d[q] !== t[0] || d[q + 1] !== t[1] || d[q + 2] !== t[2] || d[q + 3] !== t[3]) continue;
+    d[q] = nc[0]; d[q + 1] = nc[1]; d[q + 2] = nc[2]; d[q + 3] = 255; st.push([px + 1, py], [px - 1, py], [px, py + 1], [px, py - 1]); }
+  vg.putImageData(im, 0, 0); return true;
+}
+function vshift(dx, dy){ const im = vg.getImageData(0, 0, VN, VN); vg.clearRect(0, 0, VN, VN); vg.putImageData(im, dx, dy); }
+let vdown = null;
+ved.addEventListener('contextmenu', e => e.preventDefault());
+ved.addEventListener('pointerdown', e => {
+  if (!V.sel) return; e.preventDefault(); ved.setPointerCapture(e.pointerId);
+  const p = vpos(e), er = e.button === 2 || V.tool === 'eraser';
+  if (e.altKey || (V.tool === 'pick' && e.button !== 2)){ vpick(p[0], p[1]); return; }
+  vsnap();
+  if (V.tool === 'fill' && !er){ if (vfill(p[0], p[1])){ vdraw(); vcommit(); } else V.hist.pop(); return; }
+  vdown = { p, er }; vplot(p[0], p[1], er); vdraw();
+});
+ved.addEventListener('pointermove', e => { const p = vpos(e); $('vpos').textContent = vin(p[0], p[1]) ? 'x ' + p[0] + ' · y ' + p[1] : '';
+  if (!vdown) return; vline(vdown.p, p, vdown.er); vdown.p = p; vdraw(); });
+const vup = () => { if (!vdown) return; vdown = null; vcollect(); vcommit(); };
+ved.addEventListener('pointerup', vup); ved.addEventListener('pointercancel', vup);
+ved.addEventListener('pointerleave', () => { $('vpos').textContent = ''; });
+document.querySelectorAll('[data-vtool]').forEach(b => b.onclick = () => vsetTool(b.dataset.vtool));
+$('vundo').onclick = () => vundo(V.hist, V.redo);
+$('vredo').onclick = () => vundo(V.redo, V.hist);
+$('vgrid').onchange = vdraw;
+$('vpicker').oninput = e => vchoose(e.target.value);
+$('vclear').onclick = () => { if (!V.sel) return; vsnap(); vg.clearRect(0, 0, VN, VN); vdraw(); vcommit(); };
+async function vrestore(fn){ if (!V.sel) return; const { k, id } = V.sel; vsnap();
+  if (k === 'tr'){ fn(TDATA.icons, TONLINE.icons, id); saveTDraft(); }
+  else { const it = itemOf(id), o = onlineOf(id) || {}; const a = { [id]: it.iconSrc }, b = { [id]: o.iconSrc }; fn(a, b, id);
+    if (a[id]) it.iconSrc = a[id]; else delete it.iconSrc; saveDraft(); thumb(it, true); if (SES && SES.item === it) drawIcon(); }
+  const cv = await current(k, id); vg.clearRect(0, 0, VN, VN); vg.drawImage(cv, 0, 0);
+  refreshState(); vthumb(k, id); vcollect(); vdraw(); vpreview(); }
+$('vreset').onclick = () => vrestore((cur, onl, id) => { delete cur[id]; });
+$('vonline').onclick = () => vrestore((cur, onl, id) => { if (onl[id]) cur[id] = onl[id]; else delete cur[id]; });
+// modèle : image sous le dessin (jamais publiée), ou réduite en 32 × 32 comme point de départ
+function vsetRef(file){ const u = URL.createObjectURL(file); loadImg(u).then(im => { if (im){ V.ref = im; vdraw(); } }); }
+$('vrefLoad').onclick = () => $('vrefFile').click();
+$('vrefFile').onchange = e => { const f = e.target.files[0]; if (f) vsetRef(f); e.target.value = ''; };
+$('vrefOp').oninput = e => { V.refOp = e.target.value / 100; vdraw(); };
+$('vrefDel').onclick = () => { V.ref = null; vdraw(); };
+$('vrefUse').onclick = () => { if (!V.ref || !V.sel) return; vsnap(); const r = V.ref, k = Math.min(VN / r.width, VN / r.height), w = Math.max(1, Math.round(r.width*k)), h = Math.max(1, Math.round(r.height*k));
+  vg.clearRect(0, 0, VN, VN); vg.imageSmoothingEnabled = false; vg.drawImage(r, (VN - w) >> 1, (VN - h) >> 1, w, h); vcollect(); vdraw(); vcommit(); };
+const vst = $('vstage');
+vst.addEventListener('dragover', e => { e.preventDefault(); vst.classList.add('drop'); });
+vst.addEventListener('dragleave', () => vst.classList.remove('drop'));
+vst.addEventListener('drop', e => { e.preventDefault(); vst.classList.remove('drop'); const f = [...e.dataTransfer.files].find(f => /^image\//.test(f.type)); if (f) vsetRef(f); });
+addEventListener('paste', e => { if (TAB !== 'vig' || /INPUT/.test(document.activeElement.tagName)) return; const f = [...(e.clipboardData || {}).files || []].find(f => /^image\//.test(f.type)); if (f){ e.preventDefault(); vsetRef(f); } });
+addEventListener('keydown', e => {
+  if (TAB !== 'vig' || !V.sel || /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) return;
+  const k = e.key.toLowerCase();
+  if ((e.ctrlKey || e.metaKey) && k === 'z'){ e.preventDefault(); e.shiftKey ? vundo(V.redo, V.hist) : vundo(V.hist, V.redo); return; }
+  if ((e.ctrlKey || e.metaKey) && k === 'y'){ e.preventDefault(); vundo(V.redo, V.hist); return; }
+  const tk = { b:'pen', e:'eraser', g:'fill', i:'pick' }[k]; if (tk && !e.ctrlKey && !e.metaKey){ vsetTool(tk); return; }
+  const mv = { arrowleft:[-1, 0], arrowright:[1, 0], arrowup:[0, -1], arrowdown:[0, 1] }[k];
+  if (mv){ e.preventDefault(); vsnap(); vshift(mv[0], mv[1]); vdraw(); clearTimeout(V.mvT); V.mvT = setTimeout(vcommit, 300); }
+});
+
+/* ----- onglets ----- */
+async function vopen(){
+  if (SES && SES.dirty && SES.dirty.size) commit(SES);
+  if (V.ready){ vrenderLists(); if (V.sel) vselect(V.sel.k, V.sel.id); return; }
+  $('vempty').hidden = false; $('vempty').textContent = 'Chargement des icônes du jeu…';
+  if (!(await loadOrig())){ $('vempty').textContent = 'Impossible de charger les icônes du jeu (index.html). Recharge la page pour réessayer.'; return; }
+  V.ready = true; $('vempty').textContent = 'Choisis une icône à gauche.'; vrenderLists();
+}
+function setTab(t){
+  TAB = t; $('acc').hidden = t !== 'acc'; $('vig').hidden = t !== 'vig';
+  document.querySelectorAll('#tabs .tab').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
+  if (t === 'acc') fit(); else vopen();
+}
+document.querySelectorAll('#tabs .tab').forEach(b => b.onclick = () => setTab(b.dataset.tab));
+vsetTool('pen');
+
 /* ================= Démarrage ================= */
 (async () => {
   setTool('pen');
@@ -917,12 +1249,20 @@ $('pubToken').onclick = openToken;
   catch(e){ $('state').textContent = 'boutique.json illisible : vérifie qu\'il est bien à côté de cette page.'; return; }
   ONLINE_IDS = new Set(ONLINE.items.map(x => x.id));
   DATA = JSON.parse(JSON.stringify(ONLINE));
+  try { TONLINE = token() ? JSON.parse(await raw('trophees.json', BRANCH)) : null; } catch(e){ TONLINE = null; }
+  if (!TONLINE) try { const r = await fetch('trophees.json', { cache:'no-cache' }); TONLINE = r.ok ? await r.json() : null; } catch(e){ TONLINE = null; }
+  if (!TONLINE || typeof TONLINE.icons !== 'object') TONLINE = { icons:{} };
+  TDATA = JSON.parse(JSON.stringify(TONLINE));
+  try { const t = JSON.parse(localStorage.getItem(TDRAFT_KEY) || 'null');
+    if (t && t.data && t.data.icons && !same(t.data, TONLINE)){ TDATA = t.data;
+      $('bannerTxt').textContent = 'Brouillon repris (' + new Date(t.saved).toLocaleString('fr-FR', { dateStyle:'short', timeStyle:'short' }) + '). Il reste sur cet appareil tant qu\'il n\'est pas publié.';
+      $('banner').classList.add('show'); } } catch(e){}
   try { const d = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null');
     if (d && d.data && !same(d.data, ONLINE)){ DATA = d.data;
       $('bannerTxt').textContent = 'Brouillon repris (' + new Date(d.saved).toLocaleString('fr-FR', { dateStyle:'short', timeStyle:'short' }) + '). Il reste sur cet appareil tant qu\'il n\'est pas publié.';
       $('banner').classList.add('show'); } } catch(e){}
   $('download').disabled = false; $('publish').disabled = false;
-  renderSlots(); renderList(); refreshChecks();
+  renderSlots(); renderList(); refreshChecks(); refreshState();
   const first = DATA.items.find(x => x.slot === slot); if (first) await select(first.id);
 })();
 })();

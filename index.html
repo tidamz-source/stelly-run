@@ -600,9 +600,9 @@ __ld(10); setTimeout(() => { const L = document.getElementById('loader'); if (L)
   </div>
 </div>
 <script>__ld(30);</script>
-<script src="langues.js?v=6.2"></script>
+<script src="langues.js?v=6.3"></script>
 <script>__ld(45);</script>
-<script src="stelly.js?v=6.2"></script>
+<script src="stelly.js?v=6.3"></script>
 <script>__ld(60);</script>
 <script>
 /* ================= Langues ================= */
@@ -1556,6 +1556,8 @@ let slowMul = 1, slowIn = 1e9, slowFx = 0, slowX = 0, slowY = 0;
 // safeT : courte protection après un chrono (on traverse tout, sans rien détruire ni assommer)
 let safeT = 0;
 let state = 'title', clock = 0, titleT = 0, t = 0, dist = 0, bonus = 0, speed = 30, spEff = 30, score = 0, shownScore = -1;
+// page chargée par l'atelier (index.html?atelier) pour lire les icônes d'origine : aucune écriture, aucun envoi
+const ATELIER = /[?&]atelier\b/.test(location.search);
 // ----- anti-triche -----
 // empreinte rapide (cyrb53), identique dans le script du classement
 function cyrb53(str, seed = 0){
@@ -1570,7 +1572,7 @@ const SEAL_SALT = 'st3lly-seal-v1';
 const sealOf = v => cyrb53(v + '|' + SEAL_SALT);
 // appareil pas encore passé aux sceaux : ses anciennes données sont acceptées une dernière fois
 const SEAL_LEGACY = (() => { try { return !localStorage.getItem('stellyrun_sealed'); } catch(e){ return false; } })();
-function sealedSet(key, v){ try { localStorage.setItem(key, v); localStorage.setItem(key + '_h', sealOf(v)); localStorage.setItem('stellyrun_sealed', '1'); } catch(e){} }
+function sealedSet(key, v){ if (ATELIER) return; try { localStorage.setItem(key, v); localStorage.setItem(key + '_h', sealOf(v)); localStorage.setItem('stellyrun_sealed', '1'); } catch(e){} }
 // renvoie la valeur si elle est intacte ; null si elle a été modifiée ; une ancienne valeur sans sceau est acceptée une fois
 function sealedGet(key){ try { const v = localStorage.getItem(key), h = localStorage.getItem(key + '_h'); if (v == null) return null; if (h === sealOf(v) || (h == null && SEAL_LEGACY)) return v; } catch(e){} return null; }
 // avec copie de secours : une valeur retouchée est remplacée par la dernière valeur intacte
@@ -1586,7 +1588,9 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '6.2';
+const APP_VERSION = '6.3';
+// icônes de trophées retouchées dans l'atelier (trophees.json) : remplacent celles dessinées par le code
+const TR_OVR = {}; let TR_OVR_N = 0;
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -1722,7 +1726,7 @@ const TR = (() => {
 const CUP_MAP = ['...ooooooooo...','oooyYyyyyyyDooo','o.oyYyyyyyyDo.o','o.oyYyyyyyyDo.o','.ooyYyyyyyyDoo.','...oyYyyyyDo...',
   '....oyYyyDo....','.....oyyDo.....','......oDo......','......oyo......','....ooyyDoo....','...oyYyyyyDo...','...ooooooooo...'];
 const CUP_PAL = { o:C.plum, y:C.yellow, Y:C.yellowL, D:C.orange };
-function buildTrophyIcons(){
+function buildTrophyIcons(raw){
   const I = {};
   const ic = (id, fn) => { I[id] = mk(32, 32, fn); };
   const put = (g, img, cx, cy, sc, rot) => { sc = sc || 1; const w = img.width*sc, h = img.height*sc;
@@ -1857,8 +1861,15 @@ function buildTrophyIcons(){
       const v = (x + .5 - 11)**2/30 + (y + .5 - 10)**2/38; if (v < 1){ g.fillStyle = v < .35 ? C.white : '#FFF2A8'; g.fillRect(x, y, 1, 1); } }
     g.fillStyle = C.white; for (const [x, y] of [[26,5],[4,22],[27,27]]){ g.fillRect(x, y-1, 1, 3); g.fillRect(x-1, y, 3, 1); } });
   ic('greatest', g => { put(g, CUP, 16, 17, 2); g.fillStyle = C.white; for (const [x, y] of [[3,4],[28,8],[5,26]]){ g.fillRect(x, y-1, 1, 3); g.fillRect(x-1, y, 3, 1); } });
+  if (!raw) for (const id in TR_OVR) I[id] = TR_OVR[id];
+  I.ovrN = TR_OVR_N;
   return I;
 }
+if (!ATELIER) fetch('trophees.json', { cache:'no-cache' }).then(r => r.ok ? r.json() : null).then(j => {
+  const ic = j && j.icons; if (!ic || typeof ic !== 'object') return;
+  return Promise.all(Object.keys(ic).map(id => new Promise(res => { const im = new Image(); im.onload = () => { TR_OVR[id] = mk(32, 32, g => g.drawImage(im, 0, 0, 32, 32)); res(); }; im.onerror = res; im.src = ic[id]; })))
+    .then(() => { TR_OVR_N++; });
+}).catch(() => {});
 { const c = $('icoTrophy'), m = CUP_MAP; c.width = m[0].length; c.height = m.length; pm(c.getContext('2d'), m, 0, 0, false, Object.assign({}, PAL, CUP_PAL)); }
 
 /* ----- Bouton, pastille et page des trophées ----- */
@@ -1911,7 +1922,7 @@ const trUI = (() => {
   }
   function open(){
     if (isOpen || state !== 'title') return;
-    if (!icons || (!icons.lookReady && SHOP.length)) icons = buildTrophyIcons();   // les icônes des looks attendent le chargement de la boutique
+    if (!icons || (!icons.lookReady && SHOP.length) || icons.ovrN !== TR_OVR_N) icons = buildTrophyIcons();   // les icônes des looks attendent le chargement de la boutique
     const firstNew = list().findIndex(([id]) => TR.d.u[id] && !TR.d.s[id]);
     pg = firstNew >= 0 ? Math.floor(firstNew / PER) : 0;
     render(0); clearTimeout(hideT); page.hidden = false; void page.offsetWidth; page.classList.add('open'); isOpen = true;
@@ -1974,9 +1985,7 @@ const LB = (() => {
   async function flushStats(){ if (store('stellyrun_statspending')) await sendStats(); }
   return { get, send, flushPending, sendStats, flushStats, id, name: () => store('stellyrun_name') || 'AAA', setName: n => store('stellyrun_name', n), last: () => last };
 })();
-LB.flushPending();
-addEventListener('online', () => { LB.flushPending(); LB.flushStats(); });
-LB.flushStats();
+if (!ATELIER){ LB.flushPending(); LB.flushStats(); addEventListener('online', () => { LB.flushPending(); LB.flushStats(); }); }
 
 // saisie des 3 lettres sur l'écran de fin, quand le record personnel en ligne est battu
 const lbEntry = (() => {
@@ -2051,7 +2060,7 @@ const newsUI = (() => {
   // icônes des articles : chrono, médaille Diamant (trophées), cintre (boutique)
   let trIcons = null;
   const HANGER = mk(20, 13, g => pm(g, ['.........www........','........w...w.......','............w.......','...........w........','..........w.........','.........ww.........','........wyyw........','......wwy..yww......','....wwyy....yyww....','..wwyy........yyww..','wwyy............yyww','wyyyyyyyyyyyyyyyyyyw','wwwwwwwwwwwwwwwwwwww'], 0, 0, false, Object.assign({}, PAL, { w:C.plum, y:C.yellow })));
-  const ICONS = { chrono: () => CHRONO[0], trophee: () => (trIcons = trIcons || buildTrophyIcons()).diamant, cintre: () => HANGER,
+  const ICONS = { chrono: () => CHRONO[0], trophee: () => (trIcons = trIcons && trIcons.ovrN === TR_OVR_N ? trIcons : buildTrophyIcons()).diamant, cintre: () => HANGER,
     reglages: () => mk(22, 22, g => { g.imageSmoothingEnabled = false; g.drawImage($('icoSet'), 0, 0, 22, 22); }) };   // roue dentée des Réglages, x2
   function render(){
     list.textContent = '';
@@ -2178,7 +2187,7 @@ const SYNC = (() => {
   setInterval(() => { if (pending && state !== 'play'){ const p = pending; pending = null; apply(p); } }, 1000);
   let busy = null, again = false, lastT = 0;
   async function now(){
-    if (!d.sy) return false;
+    if (!d.sy || ATELIER) return false;
     if (busy){ again = true; return busy; }
     busy = (async () => {
       let ok = false;
@@ -2330,7 +2339,9 @@ fetch('boutique.json', { cache:'no-cache' }).then(r => r.json())
     if (it.iconSrc) load(it.iconSrc, x => { const k = Math.max(1, Math.floor(28 / Math.max(x.width, x.height))); it.iconImg = mk(32, 32, g => g.drawImage(x, (32 - x.width*k) >> 1, (32 - x.height*k) >> 1, x.width*k, x.height*k)); });
     Promise.all(extra).then(res);
   }; im.onerror = res; im.src = it.src;
-})))).then(() => { for (const it of SHOP) if (it.img) it.ico = shopIcon(it); applyEquip(); if (TR.d.coins >= 5000) TR.unlock('picsou'); });
+})))).then(() => { for (const it of SHOP) if (it.img) it.ico = shopIcon(it); applyEquip(); if (TR.d.coins >= 5000) TR.unlock('picsou');
+    // pont pour l'atelier : liste des trophées et icônes d'origine (sans les retouches)
+    if (ATELIER) window.StellyAtelier = { trophies: TROPHY_IDS.slice(), chrome: CHROME_IDS.slice(), icons: () => buildTrophyIcons(true) }; });
 
 const shopUI = (() => {
   const page = $('shop'), grid = $('shgrid'), bub = $('shbub'), buy = $('shbuy'), prev = $('shprev'), pctx = prev.getContext('2d');
@@ -2512,7 +2523,7 @@ function overTrophies(ids, compact){
   if (!ids.length) return;
   const lab = document.createElement('span'); lab.className = 'lab'; lab.textContent = txt(ids.length > 1 ? 'over.trophies' : 'over.trophy1', { n: ids.length }); box.appendChild(lab);
   if (compact) return;
-  const I = overTrophies.ico || (overTrophies.ico = buildTrophyIcons());
+  const I = overTrophies.ico && overTrophies.ico.ovrN === TR_OVR_N ? overTrophies.ico : (overTrophies.ico = buildTrophyIcons());
   ids.slice(0, 3).forEach((id, i) => { const d = document.createElement('div'); d.className = 'ic' + (CHROME_IDS.includes(id) ? ' chrome' : ''); d.style.animationDelay = (.15 + i*.12) + 's';
     const c = document.createElement('canvas'); c.width = 32; c.height = 32; c.getContext('2d').drawImage(I[id], 0, 0); d.appendChild(c); box.appendChild(d); });
   const nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = ids.map(id => txt('tr.' + id + '.n')).join(', '); box.appendChild(nm);
@@ -3265,7 +3276,7 @@ __ld(85);
 <script>
 /* ================= PWA ================= */
 (() => {
-  if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  if ('serviceWorker' in navigator && !/[?&]atelier\b/.test(location.search)) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
   const btn = document.getElementById('install');
   const standalone = matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches || navigator.standalone;
   const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);

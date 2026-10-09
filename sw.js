@@ -1,12 +1,13 @@
 /* Stelly Run : service worker
    Pour publier une mise à jour du jeu : modifier VERSION ci-dessous. */
-const VERSION = 'stelly-run-v6.2';
+const VERSION = 'stelly-run-v6.3';
 const FILES = [
   './',
   './index.html',
   './langues.js',
   './stelly.js',
   './boutique.json',
+  './trophees.json',
   './manifest.webmanifest',
   './icons/icon-192.png',
   './icons/icon-512.png',
@@ -41,7 +42,7 @@ self.addEventListener('fetch', e => {
       .catch(() => caches.match('./index.html')));
     return;
   }
-  // Les scripts (textes des langues) et boutique.json : réseau d'abord aussi, pour rester synchronisés avec la page
+  // Les scripts (textes des langues), boutique.json et trophees.json : réseau d'abord aussi, pour rester synchronisés avec la page
   if (/\.(js|json)$/.test(new URL(req.url).pathname)){
     e.respondWith(fetch(req).then(res => { const copy = res.clone(); caches.open(VERSION).then(c => c.put(req, copy)); return res; })
       .catch(() => caches.match(req, { ignoreSearch: true })));
