@@ -392,46 +392,6 @@
    "dy": -4
   },
   {
-   "id": "hat-crown",
-   "slot": "hat",
-   "key": "crown",
-   "price": 2500,
-   "name": {
-    "fr": "Couronne",
-    "en": "Crown",
-    "es": "Corona"
-   },
-   "dx": -10,
-   "dy": -8,
-   "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAASCAYAAABb0P4QAAABw0lEQVR4AYySsUoDQRCG51JaaGNhayUcYiI+gKVgYRcUfAMrqwjBUgKmshJLBQXFziKgnb1iTvQg+gIWVoqK1Tnf3G1ye54mId/e7Mw//+3ubUVG+M2N1xIYQSpDDTG6WBiTaHtZiIeZ/mWYaCPI/Vs3WLn9lOpOx2LN86cGxB5myJshqySnYShJu8nUthr1lgQyjVdHRB6IKwSFLQVrcSxBoyW9xgQakZfd9KkjOVfXaVDsr5RsKaEJ6gfTEl13tU//asoqyVEDzSbFftuyFuR8v2uHngmFRmd2th7K+1HbVupM6UHLCjFlDmZIor5RM1OMwJkhgs7VIQ/P1HR6vnlTM0yV6YgRpLN0XD2JBdKZjmxfj6Ko08rgHrpVPj2KHH9/UPsX00xtSXXmMn+dBoYs2zncPH/J5sOrm1psBlmGGppsamfvYm/LfBjOcm92UsCJeOYNqAGrK27bM7xrhXZNqos1AYyAZiAGaoAZN4CcwzOcb8aWRwg0lUENEHsfSxN9w/xH4a1AUxnUQPttJ/QSQ9+QCQXOkJUCOaAZiIFVAaunh5zDMySJAFPgCgHmQAwYAVp68vwypIgQMC2DGqAt8gMAAP//GToGQQAAAAZJREFUAwBj2TG2+fYsNwAAAABJRU5ErkJggg==",
-   "frames": [
-    {
-     "n": 1,
-     "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAASCAYAAABb0P4QAAABw0lEQVR4AYySsUoDQRCG51JaaGNhayUcYiI+gKVgYRcUfAMrqwjBUgKmshJLBQXFziKgnb1iTvQg+gIWVoqK1Tnf3G1ye54mId/e7Mw//+3ubUVG+M2N1xIYQSpDDTG6WBiTaHtZiIeZ/mWYaCPI/Vs3WLn9lOpOx2LN86cGxB5myJshqySnYShJu8nUthr1lgQyjVdHRB6IKwSFLQVrcSxBoyW9xgQakZfd9KkjOVfXaVDsr5RsKaEJ6gfTEl13tU//asoqyVEDzSbFftuyFuR8v2uHngmFRmd2th7K+1HbVupM6UHLCjFlDmZIor5RM1OMwJkhgs7VIQ/P1HR6vnlTM0yV6YgRpLN0XD2JBdKZjmxfj6Ko08rgHrpVPj2KHH9/UPsX00xtSXXmMn+dBoYs2zncPH/J5sOrm1psBlmGGppsamfvYm/LfBjOcm92UsCJeOYNqAGrK27bM7xrhXZNqos1AYyAZiAGaoAZN4CcwzOcb8aWRwg0lUENEHsfSxN9w/xH4a1AUxnUQPttJ/QSQ9+QCQXOkJUCOaAZiIFVAaunh5zDMySJAFPgCgHmQAwYAVp68vwypIgQMC2DGqAt8gMAAP//GToGQQAAAAZJREFUAwBj2TG2+fYsNwAAAABJRU5ErkJggg==",
-     "dx": -10,
-     "dy": -8
-    },
-    {
-     "n": 2,
-     "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAVCAYAAABCIB6VAAACB0lEQVR4AZSSv0oDQRCHJwEbC20sFCsrIYiJ+ACWgqBdUPANUllFDNpJwFRWYqmgotgpBLSzV0xEA9EH0MJKURGLc769TLjLrZKE++5m588vM7ublh5+P8/nQbfpPQl3K0peT8J9I/MpirohJuwbFR8gNjmQCwAbH2D7iAn7EugSEDyb7pf6+pxg4wNfDb6YsCeRwwK5e6ulFm4+JbtZdTbFCjFQM/6kGcegE7D1cSYjQaVEhduCenNWgBx1BtG4rt0krZik6RKmxzfERsXGt9RoSKpYlmZxkDqRl63wq298FtdlCkGrx25vBaOOHq1FRw0ohvzumNSvalqvj4rTNT5ioN6A+uhWtYU16J7TnZobqVUgCJjoyXJG3vcrrnMTp4hcukScNcSEGT9fyAniCIKJkgzVyz0+MXGXp/sfFY8JhxXhG0EIV+F78bAhEK70zbboFnXmaUQSwoxD148PIgffH+T8i8sZXpXs+EX0GiaFGceUrp++ZOX+1ZbOdkItDzFyWkt3NmYnOibg9riQk+2JIQc+Iypkcbrt3A6v8G05465XdiYnYKImZGtigCg3xvx8vcJTpQYxJ04RxT6IAcmxQ1VHQjh6eHQBFPsgBqrjJqMWGxLCOEngZtA54ANEABvoEpiGGnyGV5ggiYgDVw/4E8AGBIFcaqL8KUwSBYC4D2JAbie/AAAA//+a8UTXAAAABklEQVQDAOm1V7zprW0TAAAAAElFTkSuQmCC",
-     "dx": -12,
-     "dy": -11
-    },
-    {
-     "n": 3,
-     "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAASCAYAAABb0P4QAAABw0lEQVR4AYySsUoDQRCG51JaaGNhayUcYiI+gKVgYRcUfAMrqwjBUgKmshJLBQXFziKgnb1iTvQg+gIWVoqK1Tnf3G1ye54mId/e7Mw//+3ubUVG+M2N1xIYQSpDDTG6WBiTaHtZiIeZ/mWYaCPI/Vs3WLn9lOpOx2LN86cGxB5myJshqySnYShJu8nUthr1lgQyjVdHRB6IKwSFLQVrcSxBoyW9xgQakZfd9KkjOVfXaVDsr5RsKaEJ6gfTEl13tU//asoqyVEDzSbFftuyFuR8v2uHngmFRmd2th7K+1HbVupM6UHLCjFlDmZIor5RM1OMwJkhgs7VIQ/P1HR6vnlTM0yV6YgRpLN0XD2JBdKZjmxfj6Ko08rgHrpVPj2KHH9/UPsX00xtSXXmMn+dBoYs2zncPH/J5sOrm1psBlmGGppsamfvYm/LfBjOcm92UsCJeOYNqAGrK27bM7xrhXZNqos1AYyAZiAGaoAZN4CcwzOcb8aWRwg0lUENEHsfSxN9w/xH4a1AUxnUQPttJ/QSQ9+QCQXOkJUCOaAZiIFVAaunh5zDMySJAFPgCgHmQAwYAVp68vwypIgQMC2DGqAt8gMAAP//GToGQQAAAAZJREFUAwBj2TG2+fYsNwAAAABJRU5ErkJggg==",
-     "dx": -10,
-     "dy": -8
-    },
-    {
-     "n": 4,
-     "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAATCAYAAACUef2IAAACCElEQVR4AZSSsUokQRCGa5a75IK75II7LrpIWMRd8QEMBUEzUfANjIwURSNF0MhIDBVUFDMFQTPBUHFXdGH1ATQwUlTEYOyveqqZHXsRl/17uv+q+rqmp0sS+b3d7qcR+0tWFFwkdP2spqjo59fFZqLg738HEisCuNfzQ+oz/cLc/M+eAcyOKCvgKJCcNefk39aUVOYP5OKhZhsSS8lH1FgzrJGC6aSnY1ayYLpdLku6NE1+iv9NTqTe7LOOQ9zlaw31iALnJaiEUXjVZKTRkGRiQZoTv8gVuVv0TzfiWdwtk0i9s0VKvN7g2XP+VVOK0dDqf6kf1zQROF3jEUMukEbqne3AOrphd6Wmr5oVCACD7oyW5XF9STs3uCvRN6Jj4Kzz0jMmMDRWFeAAkUEt+eBozU/dsRhc87Kzh+ET/KhgP/UjQORXfhzebAjyKzcCd0dUzHOR8A9gdqTr6yuRjdenkNBuojl/JqXScZi/hiE9gDkrc09vXmT88t6WOldQ5hAjJ1vqt7G5PQMYQ894rCrLnb9VeKY8yOJ02+44WsDnC2W9XpXeqiCDGsjWxBBQboz5+WcLuHu6oTEKEMUxEUMkt3xUjEwBnP94dIEojokYgsHG1DLPK4AxSeBm0DnCQ0AQc0SXqB2UnBYwhsHZgKuH2AQxRwARudTE9AFMEgUIeEzEELnt9A4AAP//lxKtxwAAAAZJREFUAwBeT0y4fwDitQAAAABJRU5ErkJggg==",
-     "dx": -10,
-     "dy": -9
-    }
-   ]
-  },
-  {
    "id": "glasses-speeders",
    "slot": "glasses",
    "key": "speeders",
@@ -458,6 +418,250 @@
    "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAKCAYAAABblxXYAAABAElEQVR4AZyQsY3CQBBFZ6+Aq+Cyyy6wrgA6QAKBhESEiAggI4YIYjISQiIiEBRAAgUgx9AEDZh5g8YYYxNg7feM//x9Wu+XPJ5E248Vff+zVxEiDk0Ncx+voO076fi+4utJHAy0DEiaGaLPCg9lvbQHKtG4Lr/TSqpZvLDeq6azgKQs3z32NSqJQelcg1pH5ruleMVvrNsUwAbkw+U56uG8N/sJyiAPjP5+ZNNcEba7jSdbelNRnkEKLQsQKtK7vEG7rerLL3NClDmlswOnzf+RD6lAwzDq2R1yJ4AQMKShoMqvcBkdhX1kXZ4HygYDY7rUBIa0LVzMguepmsKTGwAAAP//CKHh5QAAAAZJREFUAwDg+4YOU+2krQAAAABJRU5ErkJggg==",
    "dx": -10,
    "dy": -6
+  },
+  {
+   "id": "hat-crown",
+   "slot": "hat",
+   "key": "crown",
+   "price": 2500,
+   "name": {
+    "fr": "Couronne",
+    "en": "Crown",
+    "es": "Corona"
+   },
+   "dx": -10,
+   "dy": -9,
+   "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAQCAYAAAAWGF8bAAABqklEQVR4AZSSv0tCURTHzwtbIhRSByNyaA6UBqdmKQj6G6LBzaUtaigaggjcHKKxOYgKaa3ASf+FImjRQImWgtf9nLyXY1jZ437v+fU933feu3dCxntiRwPO/L7GEYw75wV5f75A6U/R74I0WCAivZeUPF4fqT/YLAd/kBaxgjFTACYCjqXk1ExP5le2XKhLedQ9XFZ5zgbBOG6J9Jo7CgoAcawFIvBsbsBTUSZUse5DQdKlsuxVJIBGBGi2vuXQk5Db8I8RhK9i1WJD5j6SCnGPb0zn25Iq7YcXeQ6WHkcNKwiGjHOeEn0VpcGFQ4scdZvsNhshDII+CZmmwBjhUIc3oqSHEkVFET6rdpdVzk9kLZoN3m7d9S5mZTK3RiXyE6qo9G9I/hvRgvZFNHpBfAVvxOHtgJgbwCnjkwNwiNNuOnwPK/g1patA9HDh0Kq1ygKoU7DTEVtBvY+vtSnyst25Ust2upkU8tw54splFaM5e6lJWkFiyR/f6wHVl2Y1Zts46Uv+bBlXuA0HmVX1p6tvau1mBfWTOXGPzHpbPKLcoQAfe+tP14t+AgAA//8NkE0MAAAABklEQVQDAOvvvxPyQcljAAAAAElFTkSuQmCC"
+  },
+  {
+   "id": "hat-tiare",
+   "slot": "hat",
+   "key": "tiare",
+   "price": 2200,
+   "name": {
+    "fr": "Tiare",
+    "en": "Tiara",
+    "es": "Tiara"
+   },
+   "dx": -11,
+   "dy": -4,
+   "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAMCAYAAACNzvbFAAABG0lEQVR4AYySPW4CMRCFn9OnTdIgJVVShNwgaZJwCGjgZNDAIfhp4AZAARVINEDLAcx7I2x5LRC2dqSdmedvn8f7gPLlS6WlUM8lZhG4BOr73SFmkwVKwfeg5HjUai/4+fsqBt+C6pjmcNAbGZBndwKvl9vUsXRsVZ9rUINNx3NzWJUD75+v5ni12KTwiiyF6qsKg8nV928dzfY/rq2P+lta1j6F1QLUy1kIAdl1XOaKg2UK0+jC0r4ca1/QSCioHVeJxHInEXODKNdc9QfsdnuWgbR/PJzCzOM4BDWhgHyhOYen50cECAtodRoxLrrYv+SUOegSyUCECsKC5uI0rwBizeUhUNaPp6XWoC4TqJ6ClOeR940hMxS6MwAAAP//6uuKNwAAAAZJREFUAwBjr5sVsr2e5AAAAABJRU5ErkJggg=="
+  },
+  {
+   "id": "shoes-cowboy",
+   "slot": "shoes",
+   "key": "cowboy",
+   "price": 1500,
+   "name": {
+    "fr": "Santiags",
+    "en": "Santiags",
+    "es": "Santiags"
+   },
+   "dx": -6,
+   "dy": -4,
+   "fdx": -4,
+   "fdy": -4,
+   "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAPCAYAAAACsSQRAAABBUlEQVR4AaySMYpCMRCGJ7vbLuyWe4KFvcAWFoqlWAh24hk8guIVPIOtnVhrYWFrIYhgY2GpYC3P+aKjz/iCr/CRP/MymfkyTPImz79EQ5Ca7BFCCL5T8etbkKbjV/M40pCE4M7/nwyaVcGiyX73mBV40pBg67zMA3oKAUVl2JhyQWLJ5n8pJNp5TusNp5ioqCQ5jj6vAe3ORmqNiV+Pl1tBpd8ff2PqzDwMiHuvHHT/PMqND0GWDICd+WodBQEhxjGZWtWCWLL5sAGIqpAYhBiX52EB4u1w7UgTkzRE17fRnS1ui4w/YNbwEOKrqfeHpDlA9CamS+UuhPhknaxHHkpwlizuBAAA//9ybXpeAAAABklEQVQDALUwdxjLt0cxAAAAAElFTkSuQmCC",
+   "farSrc": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAA7ElEQVR4AbSSMQ4BQRSG34oDUDqBxAUUCqJWSHTiDI5AXMEZtLo9gC0UWoVEJBqFkhus9w1vN3ZnZBsyv7fz9v/+md3ZmoR/qd5CWvzDYExf6jeaghSjr6U8gFNMy25HtrORUFHyfJTdhQ5wofWeVgkIwkSwE2pIP+EQZP3/wet4b4t4a7byYnmT8TRxpt35LmjQbrkT0Kb3uDJ4OK0LMghQITlersGADMY4H/XEIOamQgC7QAIcVfkgCODsOT6kwSmw1nysDqd84rkixF6kwW71ySbGHhHAs4f02WlksIP0L1IxXBgmn9TgfC8AAAD//+RfkPAAAAAGSURBVAMA/D1yGFgEN5AAAAAASUVORK5CYII="
+  },
+  {
+   "id": "shoes-bunny",
+   "slot": "shoes",
+   "key": "bunny",
+   "price": 1700,
+   "name": {
+    "fr": "Bunny",
+    "en": "Bunny",
+    "es": "Bunny"
+   },
+   "dx": -7,
+   "dy": -5,
+   "fdx": -7,
+   "fdy": -6,
+   "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAOCAYAAAAmL5yKAAAA80lEQVR4AZSSIRLCQAxFUxQKiUahcBwCzQnQGCz3wPQYYLkDdSBAMYNBYECBKnkZ0u6W6TJ09m+Sn+Rnd6cdSX+lpoGaaMEBSQmUz3Uh982BTivGURhPDj8loHmR13Fntrk9TnujfgpYVb3Z9DqU5BXCushnen85g8uaJ+Cujqw7HUtvOKIQwGMjhAJ2PB4HaFXVQOxQXnw6vgtYM4QjbHDOLTn1bQAC5Xm11fi/5SIIWOf1cjPbtvEengv9SoBkSoSJRZ4LwKceIJANFhMBEIiEgHOM53MBHmMRwGa6RUIa2wrFQv9zja//IBLiVG1QdWrlDQAA///S/gX4AAAABklEQVQDAKDhfxThVHm4AAAAAElFTkSuQmCC",
+   "farSrc": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAOCAYAAAAmL5yKAAAA7ElEQVR4AZSQIRLCQAxFsygUEo1C4TgEmhOga7DcA9NjgOUO1IEAxQwGgQEFquRlJu22w2yhs3+T/fn52W5P0l+pZaChseCApAzK16aQx/ZIp4lJFMZTI08ZaF3kfdpbbG/P88GoTgNT1ZtNr4+S/IVY18iZPlwt4EL7BvyrI/TnUxmMJwgBPLGB2MCux+MAVVUNnB3Ki08ndwNrhnDEDc55pKa5DcCgvKx3ev5vuQkGP3XyHi6M88rgdr17/WtkYpHnAshdhEEYLWcCukymWSbAm4kYEINuZsT1MOoCOnrcQHNblRE3SkHVaOUDAAD//xqRQfYAAAAGSURBVAMALcx8FOXfkS4AAAAASUVORK5CYII="
+  },
+  {
+   "id": "shoes-clown",
+   "slot": "shoes",
+   "key": "clown",
+   "price": 1000,
+   "name": {
+    "fr": "Clown",
+    "en": "Clown",
+    "es": "Clown"
+   },
+   "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAANCAYAAABLjFUnAAAA7ElEQVR4AZyQOwrCQBBAJ+kCgtgIHkC0svAEgr1XsPVItl7BXrC1UbBSPIRYpbCI+5aduIybiIa8THY+L0NyCdcoK6qYkK5MDMd08DIkl2MpMeTcSOZAqNEdm28vay7/VknK9vOJrHtDCdth9NtxtlBUkrLZ7uzrQYgUqkO/Ixbkvtk9cg4Muff6ZjMV8h+pQ93gXrrbjQByHC4ljZupkEij5bFY2tRbZod0s4+JKKFC3S65mfbbD5yeAwGta9Rcq0ybbWQ4Ruv5tSqz1f0mMJ4Wmv8r+s0QKggVPgDfzPQw72VxM0kLzW3Qj+MFAAD//1mn2K4AAAAGSURBVAMAiUiRm1c9vzAAAAAASUVORK5CYII=",
+   "dx": -3,
+   "dy": -2,
+   "farSrc": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAANCAYAAABLjFUnAAAA7ElEQVR4AZyQOwrCQBBAJ+kCgtgIHkC0svAEgr1XsPVItl7BXrC1UbBSPIRYpbCI+5aduIybiIa8THY+L0NyCdcoK6qYkK5MDMd08DIkl2MpMeTcSOZAqNEdm28vay7/VknK9vOJrHtDCdth9NtxtlBUkrLZ7uzrQYgUqkO/Ixbkvtk9cg4Muff6ZjMV8h+pQ93gXrrbjQByHC4ljZupkEij5bFY2tRbZod0s4+JKKFC3S65mfbbD5yeAwGta9Rcq0ybbWQ4Ruv5tSqz1f0mMJ4Wmv8r+s0QKggVPgDfzPQw72VxM0kLzW3Qj+MFAAD//1mn2K4AAAAGSURBVAMAiUiRm1c9vzAAAAAASUVORK5CYII=",
+   "fdx": -3,
+   "fdy": -2
+  },
+  {
+   "id": "shoes-roller",
+   "slot": "shoes",
+   "key": "roller",
+   "price": 1500,
+   "name": {
+    "fr": "Patin",
+    "en": "Roller Skate",
+    "es": "Ruedas"
+   },
+   "dx": -4,
+   "dy": -4,
+   "fdx": -2,
+   "fdy": -4,
+   "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAABI0lEQVR4AXyQv0oDQRDG52x8FPFAbHwBGysLxUKC2FlY2NiJjdikFUEFEWxEREIgRfq8QJoQcpAmRYq8QJp0m/kNzHK520vY387On++7ze5I/Re05OixebnYh8NRMRBHZdQ1pJeLZbf9bqKrVjc9mahGcbmHAZRrqXNN/Pt3YXNErq9J49VrYh0WhHwZthkgDo971/L6P0EXwYAEg5fDO47cwCEXxHZgu2l1CBEM4OFy3x7za7UQ0AFMNsValKrBuFfIwVlOSz5nU8MS3eKX56ulOCfn3+LwdzB0hvlxpjpbiLP29EeauB19SBlVBX8DxKE4fRJHmyzcIdbp0yiD2PK8/2wxtVV796M3xrIoTjkzAZUeNwJ77QxnR4etoZG1rSdrAAAA///XUZFEAAAABklEQVQDAKpCiRlpgEBjAAAAAElFTkSuQmCC",
+   "farSrc": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAABI0lEQVR4AXyQv0oDQRDG52x8FPFAbHwBGysLxUKC2FlY2NiJjdikFUEFEWxEREIgRfq8QJoQcpAmRYq8QJp0m/kNzHK520vY387On++7ze5I/Re05OixebnYh8NRMRBHZdQ1pJeLZbf9bqKrVjc9mahGcbmHAZRrqXNN/Pt3YXNErq9J49VrYh0WhHwZthkgDo971/L6P0EXwYAEg5fDO47cwCEXxHZgu2l1CBEM4OFy3x7za7UQ0AFMNsValKrBuFfIwVlOSz5nU8MS3eKX56ulOCfn3+LwdzB0hvlxpjpbiLP29EeauB19SBlVBX8DxKE4fRJHmyzcIdbp0yiD2PK8/2wxtVV796M3xrIoTjkzAZUeNwJ77QxnR4etoZG1rSdrAAAA///XUZFEAAAABklEQVQDAKpCiRlpgEBjAAAAAElFTkSuQmCC"
+  },
+  {
+   "id": "hat-tophat",
+   "slot": "hat",
+   "key": "tophat",
+   "price": 2500,
+   "name": {
+    "fr": "Haut de Forme",
+    "en": "Top Hat",
+    "es": "Sombrero de copa"
+   },
+   "dx": -12,
+   "dy": -12,
+   "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAATCAYAAAB/TkaLAAABg0lEQVR4AZySsUoDQRCG/ztLsRDEIlqorQQCShRfwcpKCKSwFCysbMXCxgew8QlsrKyEYGMhghAIIjZiYa4ISt4gcb/b29yyeMklge92d2bny2RysSZ+4qEUMr6oQJpLatW6mo1jscJ4nc0GUiuj2GGv5U/itvM8Fu4yqZVVKmtpR+GlTudV1epWGC48GynCwvxMCSMtVzdNt6Wl/ldPmquRDiJXkCRf6v323HHm1UjL15YdQSadvttxI8ik5bpt9Nd1MR/pbndb53PzhUX/Sv3ZIrrUgmBz8Ufvzx+FMpfwpPkISJ7GO0KIiLPPxs21DtqPWYj33EfypPbO1eqhwJ6kt/5Sut3vtOSo1/bkc9Q8ERAzymEgHURn37ephAd7QEaBg1y3l8jx0LoXcCYXSAlJiMBJWMlQ9NJ+iqCbfEYryxXCI7rmPZcGUSBlNhr9NCSABBCNDGZDzCxCBgg5Z1Jk8ZCOAFGK6SYUUeSTy/I/OpPa7lKRmRVFk2TcseQye5b+AAAA////OpKoAAAABklEQVQDAMzeucs0XywjAAAAAElFTkSuQmCC"
+  },
+  {
+   "id": "hat-bandana",
+   "slot": "hat",
+   "key": "bandana",
+   "price": 750,
+   "name": {
+    "fr": "Bandana",
+    "en": "Bandana",
+    "es": "Bandana"
+   },
+   "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAOCAYAAAArMezNAAABFklEQVR4AazSsUoDQRDG8fVsRbDVTrATLCxsFH0QS619AGsfwFpLH0TRxsJCsBPstBVC2pDwGzJhCZeQ5BL4bnZ2bv77zeaasuJvb3d/OK91JTDo+dNhEWfBlwIDESigKLee1kJgzbR1dVTAEnJ6sFNu389anTcaUtlQR7UE3lxv16Vy/9Arb9//rfBwzAWB1J1y0NwDybV4fDEQWuEBVv143owxweRiQhNgn7wr1nJoba75/fvZeLn8KpqzAbRusp+y712R3LNY1+XhOOH9x0974TwW4wdQarw1CZxKsp5/ZoAVajld7iAy0aK6O3nVWgJsdPfjTgnMFF0Unxsol8ZJaBzb4RGO9YMal0t5VwUYkNYFZWoEAAD//3gkXQkAAAAGSURBVAMAGTDLHxoelZsAAAAASUVORK5CYII=",
+   "dx": -14,
+   "dy": -3
+  },
+  {
+   "id": "hat-cowboy",
+   "slot": "hat",
+   "key": "cowboy",
+   "price": 2000,
+   "name": {
+    "fr": "Cowboy",
+    "en": "Cowboy",
+    "es": "Cowboy"
+   },
+   "dx": -15,
+   "dy": -8,
+   "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB0AAAAQCAYAAADqDXTRAAABNElEQVR4AaSSPYoCQRSEewd2k91g42UjA1E8g6mBR/AQXkXwMAbeQzTSXBMFjQyUr6Hk8Zie7kbhs/v9VBUz2oSKz/Bn9BCS+Vr9rrM4FPPJ4B4ENVAvZpfAvSvIzopCMcQc4aD3G4Aa6B3Of6EmuCgUYw/Bws9ydTbUPmXOrHSeDbVGPJmt7Z1XPJ9+F/22VaE25J37K5TXKFKGu/05NUr25cmppRhKg1cjqLXgT4K7sPv4yJOTmnnDhb++NdICM5ZqwAsd4GN9NYtP6k1ZRCBOX8dQg3T4eG/q1lAGCMT4vx9qkA6fNprtdfOx3n22zWKP2XJ1CzWgiWL3RZ+85JOyAFaHIIXd4+611GiZxVAKmkAT+NGBO7DDmcLPpcUT7DyGYkQTWLBoxpkDvXbkQQ/U53wCAAD//9R7SrEAAAAGSURBVAMAoRgSh1qogZYAAAAASUVORK5CYII="
+  },
+  {
+   "id": "hat-viking",
+   "slot": "hat",
+   "key": "viking",
+   "price": 2000,
+   "name": {
+    "fr": "Viking",
+    "en": "Viking",
+    "es": "Viking"
+   },
+   "dx": -15,
+   "dy": -11,
+   "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB0AAAASCAYAAACnxdXaAAAB0ElEQVR4AbySsUoDQRCGJ8HO0iqFgo1FlINYWCroG2ihhXb2EUERFERQEAUxvZ0WiiTBwlJBSwsDIVhIUNAilc8Q+ZbMObe5u+pM4M/Mzsz+3+3e5cX8JkYKXbPMLPV9Q6jfyIzYM7L+Dkrh7eul1/6fgD8c3B2UZJDKQ394uhgIEw68yEntFWT1FEDwtX4RqG2k5Rip0uaSen1QnirJ0NbLhydSua6JrVmI1vGj3vlsEpzy7z+d3MLcutgig3r/upk4u7QqiJ2Nxp+JhTOH8EDMquDAi5x0aHg0pwOF8UDYBJwasOlgitSpVApc5O+j3XanJmeefeQIT3sgag4Knaf4bt13GaKhom6BgFlX9raleltzMHIFM28heOJFHQ65g5JQoMGQgotjM+F1MuPLnpaeD1Y4vvgzg0IoCxoMANYN1JNk32vSDH742n4ESoMBBhHXSA29NluEiPyTapMPi/0IP61r7IPS8Aefq1eCzvd3BJEzx7ssryySCjlijSj6PtRQLJQGwhxxYsQJNo9ORcV64+BYVKznl9fcx8X+JKVCASHdzNeqOfGuXieEYh0UJ4UYFmOSRChXwyl9ne1uierx5tJdN1eOdE1kfwzPlX4BAAD//4x+Tl0AAAAGSURBVAMAhuYb8169RqcAAAAASUVORK5CYII="
+  },
+  {
+   "id": "shirt-red_bow",
+   "slot": "shirt",
+   "key": "red_bow",
+   "price": 950,
+   "name": {
+    "fr": "Noeud Pap' Rouge",
+    "en": "Red Bow Tie",
+    "es": "Corbata de moño"
+   },
+   "pal": {
+    "yellow": "#FFCF00",
+    "yellowL": "#FFE777",
+    "yellowM": "#FFDD45",
+    "orange": "#F29318",
+    "orangeD": "#D9760F",
+    "cheek": "#F7A94A"
+   },
+   "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAgCAYAAAB3j6rJAAADN0lEQVR4AayWP4gTQRTGXwKCf7gIgpIrLERQ5NDkrg5YiaitgtiIlTZiI1xhq8XVNlaWNtYeyDUKqa7wEuUQC7GwSFBQzKEWFnF+E17ydncmmWwu7Lfz5ntv3vtmZmezVVngd6HWHFoskEoWEkLhl/e+SPtJH3MhlBbCSiBi+eQhL6C7c1zgfKfErVpijC9oRSxdPS9yeE26ny57X5mcpYQEC/U3gnQqObcQlr+wGoMtkeZQxIkpuypzC4nOsFOJulIccwmJroatVHJVkoQgAHBMOSU8nEstd2TZEivC2LpFjDN01AwKYbAFR7P7tiMUBzJFgK/kVoUWMcDmwsaXhxeC08IXdkeRJAjIF25cbIqFJrVc4+xr//Di83k0n2ttLWxiqhicApYdIMIXZlaAKAOKdX/tiAUcsBw2HCcpA5crJMyviPOVvhpHV4NjY3xGlJlo9f2gU7nx7JT0vv71Cfc2P4jULnl71i1WLMb7fLxvvOFu9XVhC9EQX5FEMS7dfFfkfeOFoKiwKqSfIYbnABBqAQcsV7DNauDzQjBSxXCKWHoLOGA5bDhyF5ATgX8shM48YiiiYCzQvrZwBQREEJMRAhES4x9gnAYN9y4x3YxpfXvt+sQXEUFAQQhkXsyBE2uSSeiCmDUFH1xpigUcPhfix4zHThFBbFAIDivm37d3UBI71o9v3hIwCprc+Ts4eGZTlq7fHh/TiTdrRYVkw0a9yuktqbj3F4Bh5m/+iLSev/DAhsNHjIL+LESF6Kuff1uS1O73pX/n7hgUgaewBRy+TOzyxszPyKgQEipUxM/ttigoREGN0RYOn8bR0q84MRoTapOEMJCEtAr6H1dWxluFAACHT+No8324PJKEDJ7W5dzubmbsqx9HBEBSnFljwwFsBWOHvXXtBtskIWwNxWyGa8d+C1BOZw0HlKdl7L5tTX6WFFCOGQPLYSs0TvuhNmlF2JqHvW2/FSRVwLmkfL57uJMmcOrXFm74efqnRZIQV0xIREILxyPANaOLl6CzKjYGm4kU/yZcpLmmCtFPg9ajujRWvzOMwhZwIfgYVgjw0UWOUKByUSHMDiCGFuig1JYxICXHfwAAAP//qMMfzQAAAAZJREFUAwB4DiQ1tSzrkgAAAABJRU5ErkJggg==",
+   "dx": -17,
+   "dy": -16,
+   "detailSrc": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAJCAYAAAA/33wPAAAAu0lEQVR4AXyOuxHCMBBET6RkdMG4FKogogFaowMi5x5KgAgiYrHvxisM489o56S9vXfexPerulq6rh7nqBk0qD6Op7DUaQHd/89sFlA2Xv01LICanoMtZgElQIPtALx1HW9gTXj0aFh+Ayr7YbCf9fLcBuLB8PiH6dmnh8bZAqgSxrQOu3cgv70VD9mnjrMVUG7CnMqb2Yjo2eNu2QNUzvc+YZgWnsJlKjz3XfHIAFKNhGFaMoGo/JzF3AcAAP//1+3ALAAAAAZJREFUAwBnSIkLE4mCJgAAAABJRU5ErkJggg==",
+   "ddx": -8,
+   "ddy": 4
+  },
+  {
+   "id": "shirt-black_bow_copie",
+   "slot": "shirt",
+   "key": "black_bow_copie",
+   "price": 950,
+   "name": {
+    "fr": "Noeud Pap' Noir",
+    "en": "Black Bow Tie",
+    "es": "Corbata de moño negro"
+   },
+   "pal": {
+    "yellow": "#FFCF00",
+    "yellowL": "#FFE777",
+    "yellowM": "#FFDD45",
+    "orange": "#F29318",
+    "orangeD": "#D9760F",
+    "cheek": "#F7A94A"
+   },
+   "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAgCAYAAAB3j6rJAAADBElEQVR4AaSWP2gUQRTG3x4IKiSplAtiIUKs9C6pD8SgiNFSQWxs7ewUsdXC2sbK0sY+IIGokMbG3GmVysLCoJUXSASROL8XZu/N7szd/jnum33z3pv3ffNuZ2870uJzab5/aNGilLQSAvHbB99k6/kuZis0FkInELF49oQKGG2fEnw6aTB0GqxRQitibu2iyMkVGe1c11iTmo2ERIl2X0TdVZ21hdD+UjfGGyL9QxEnpmlXagtJ7nCYJUNVArWEJLthmRp2pZIQBACOKaeEm3Nu4I4sP4kVYWz/E7HOuJNmVAiLLTiao49DgRzIFAHK5LrCFTHA1sImVoQKIWihxO4oUgQBReLe5b5Y+KLW17vwTm9eYlrH13NXy4VNTgeDU0DbASKUmF0BsgwgG/3eFgt8wPqw8XGSArhaMWHaERdr/O0tLEfXpvyBKLPRzpfxMLvz6pz8+H6gBffWv4rMX1N71pAiS/m1Hs8bNdzQfSz8hGhId6SiGFeu3jfxvFEhKCp1hfIzxHAfAFIt8AHrK9mmG8RUCEZVMZwiWm+BD1gfNj5ql1AQQTwXwqSOGEg8WAv83F/xlRARQU4gBEdMjN7ABA167llipoFpY3tb3UksIYKEkhCcRTHHTq9IUNAlsWsIH97oiwU+Yi5F1+Rrp4ggNyqEgBXz9+dnXJI61s/u3hNwlDQZ+Ts4vrQuc7fv58d0Eg2tpJAwbTLL3PPLg51/2BcZvH6jwMbns31etjj7pSkpxD/6+belMP+42fkNuXn1Vg6IILYgFxCzua7DU18jk0IoFsPBv33xgAjCYh4+Yj6PazGnOK8txBaAYPXKqkBsgY+YzZ1ltxKy+X5TACSQry09wVSf96ujwtBKCOTA8/w580lNfEAnFYdWQuBg5+7GzrswftlVm1gd1BYCsQVk7kTwCp8haPC0i0vFFPM0kBhqCYEoUgcR6kYQiOXRKU3Kh9CYKsS/GrDL3vIvgcQth9jCucKvz0MQ2Hm0INQIs8JZUgjFAGK4gnDp7BlrQJUa/wEAAP//3G7izgAAAAZJREFUAwAP2fUm15/lggAAAABJRU5ErkJggg==",
+   "dx": -17,
+   "dy": -16,
+   "detailSrc": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAJCAYAAAA7KqwyAAAAoUlEQVR4AYyPUQ7CMAxDM67BP/dg4gu4EJcb31wI+EEjz2uiSJ2mTXWdOo7XHmz5ZqeAl5srfLARMN8udwv4qBrOa6vzEmCf3ztBkE+uhWi4et2nG8AJDON55ExIAo0ejQrdoArTczKAxtD19KCUFrqEtnUBDIHWt+/xpRIN6FC2LoBe+9MAA9dUO3dLAZgqimvwGjhZPiO8iASkAaFht/YHAAD//0UptZ8AAAAGSURBVAMANY9aC0x4UxYAAAAASUVORK5CYII=",
+   "ddx": -6,
+   "ddy": 4
+  },
+  {
+   "id": "glasses-future",
+   "slot": "glasses",
+   "key": "future",
+   "price": 1750,
+   "name": {
+    "fr": "RPO",
+    "en": "RPO",
+    "es": "RPO"
+   },
+   "dx": -13,
+   "dy": -3,
+   "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAJCAYAAAAsCDz7AAAA00lEQVR4AaySzQnCQBCFZ73agHj1bgPeRMQy7MC7BeRuGXYgYitexQY8x/mGvE1AI2tImMf87Jv3ArsTa7+6KcljImRlVB/uTwaRqceCi/LThlGInxYzQ3x6vPhZG/T/gE3xqR3JUWNkHHiTg17Iw4LiVe0+tLQWRhA0GJrR4Of69sOoS7hu5vYLCAoSpZcGu8yVqQFGqTrvqQPb28P6sFovjbsUMAAyQYDdbvaax5Aw8tq4sIQAi33g3MnBJTe9FfDj1flOjjBD4BuchYmnHMX8NwAAAP//1hkiCQAAAAZJREFUAwBPxsIFaZGItAAAAABJRU5ErkJggg=="
+  },
+  {
+   "id": "glasses-demi_lune",
+   "slot": "glasses",
+   "key": "demi_lune",
+   "price": 750,
+   "name": {
+    "fr": "Demi Lune",
+    "en": "Half",
+    "es": "Media luna"
+   },
+   "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAHCAYAAAAF1R1/AAAApklEQVR4AXyOwQkCQQxF/w4yLXmzALED74IHq/EgeF5bsABvtuNRZMe8sBmyIC7zNsn/n8wULb9mY8bGxckefTfzojZ93grmRA67b/pAxiqn+3kRhlNW1Su/bVEDerAlLftoUAjNaFerY7OC+6QBmH/5pvtF/qLLZq3M7XoWcFMmZ+jJAJnCbcfHk77zGkftDyfhhUj/L+cvihDBAC2WREULPyoa/hcAAP//zUqewQAAAAZJREFUAwAAl2VnhWKuAgAAAABJRU5ErkJggg==",
+   "dx": -9,
+   "dy": -2
+  },
+  {
+   "id": "glasses-ray",
+   "slot": "glasses",
+   "key": "ray",
+   "price": 1500,
+   "name": {
+    "fr": "Rey Ben",
+    "en": "Rey Ben",
+    "es": "Rey Ben"
+   },
+   "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAICAYAAADjoT9jAAABMklEQVR4AYxRW07DQAwcexNaqAJIHAD+UCl9cP9DABVUFSeAz1aohKpZY7vJEiIqdZXZ9WPG641ZdBFBiEiAXPIARwi5MJ0Ko3Cgs8g1quv1JAssyOAgtUlrGQKzcBYCTuQa42KKyfkIw8HMMRqMcF/copK1A6wFtGjApeS4kXExU42iN8TdYILJ2cwRdxVijAhyhSiiMkCVpe7/f9OLh5QgECKtUOE9xbpGwxdET3EVI235w51DWxKJkP3RyIcbshrGD/kXjMsWOAb9rJ9obTsFOwbbSDW2vyCC3sqlusDz6tHP9jb/fEK5LamJmW2xxu9qlptFk9rPwLxy920H7Hlu1JsX0gZq9/fQmOc00tVUcZca2r9ASTpyWmxeYKI2dFapc6P9QX1Jmz9fv8Lm2vB+AAAA//8pVw9PAAAABklEQVQDAKGBlSiawbIcAAAAAElFTkSuQmCC",
+   "dx": -11,
+   "dy": -4
   }
  ]
 }
