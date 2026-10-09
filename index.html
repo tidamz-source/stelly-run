@@ -559,9 +559,9 @@ __ld(10); setTimeout(() => { const L = document.getElementById('loader'); if (L)
   </div>
 </div>
 <script>__ld(30);</script>
-<script src="langues.js?v=5.101"></script>
+<script src="langues.js?v=5.102"></script>
 <script>__ld(45);</script>
-<script src="stelly.js?v=5.101"></script>
+<script src="stelly.js?v=5.102"></script>
 <script>__ld(60);</script>
 <script>
 /* ================= Langues ================= */
@@ -1545,7 +1545,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.101';
+const APP_VERSION = '5.102';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -1586,7 +1586,7 @@ function toast(msg, big, combo){ ui.toast.textContent = msg; ui.toast.classList.
 /* ================= Trophées ================= */
 const TROPHY_IDS = ['crampons', 'pasdebol', 'taupe', 'amateur', 'combo5', 'soldes', 'vitrine', 'gym', 'beach', 'city', 'fields', 'forest', 'peuf', 'junior', 'force', 'crabe', 'marmotte', 'combo10', 'plumes', 'mains', 'requin', 'deer', 'globe', 'angry', 'bronze', 'senior', 'heros', 'voltige', 'fashion', 'cendrillon', 'tetedure', 'combo50', 'master', 'huck', 'elfe', 'bulldozer', 'hydrate', 'mcfly', 'argent', 'picsou', 'chapelier', 'gmaster', 'combo100', 'or', 'prada', 'dressing', 'intouchable', 'cascadeuse', 'legende', 'accro', 'marathon', 'rainbow', 'greatest', 'parzival'];   // ordre d'affichage ; Parzival toujours en dernier, hors Greatest
 // trophées chromés : cachés tant qu'ils ne sont pas débloqués, affichés après Parzival, hors compte et hors Greatest
-const CHROME_IDS = ['serial', 'firecatch', 'rainbow2', 'platine', 'diamant', 'obsidienne', 'adamantium', 'getalife', 'cowboy', 'son31', 'promqueen'];
+const CHROME_IDS = ['serial', 'firecatch', 'rainbow2', 'platine', 'diamant', 'obsidienne', 'adamantium', 'getalife', 'flambeur', 'cowboy', 'son31', 'promqueen'];
 // looks : trophées secrets débloqués en lançant une partie avec la tenue complète (identifiants de boutique.json)
 const LOOKS = { cowboy:['hat-cowboy', 'shirt-texan', 'shoes-cowboy', 'glasses-cowboy_glasses'], son31:['hat-tophat', 'shirt-black_bow_copie', 'glasses-ray', 'shoes-mocassin'], promqueen:['hat-tiare', 'shoes-heels', 'glasses-demi_lune', 'shirt-red_bow'] };
 // [id, nom, descriptif] : nom et descriptif suivent la langue choisie
@@ -1628,7 +1628,7 @@ const TR = (() => {
     for (const [n, id] of [[5,'combo5'],[10,'combo10'],[50,'combo50'],[100,'combo100']]) if (d.st.streak >= n) unlock(id);
     if (d.coins >= 5000) unlock('picsou');
     if (d.rb >= 3) unlock('rainbow2'); if (d.discs >= 25000) unlock('platine'); if (d.discs >= 50000) unlock('diamant'); if (d.discs >= 100000) unlock('obsidienne'); if (d.discs >= 200000) unlock('adamantium'); if (d.st.streak >= 200) unlock('serial'); if (d.st.streak >= 300) unlock('firecatch');
-    if (d.games >= 1500) unlock('getalife'); if (d.st.dist >= MARATHON) unlock('marathon'); }
+    if (d.games >= 1500) unlock('getalife'); if (d.spent >= 25000) unlock('flambeur'); if (d.st.dist >= MARATHON) unlock('marathon'); }
   const MARATHON = 42195 * 30;   // 42,195 km (30 px = 1 m) ; la distance cumulée est enregistrée depuis la v5.69
   const GAMES = [[1,'crampons'],[5,'amateur'],[10,'junior'],[50,'senior'],[100,'master'],[250,'gmaster'],[500,'legende'],[1000,'accro']];
   const ZONES = { 1:'gym', 2:'beach', 3:'peuf', 4:'city', 5:'forest', 6:'fields' };
@@ -1664,7 +1664,7 @@ const TR = (() => {
       if (++g.stomps >= 5) unlock('plumes'); if (EQUIPPED.hat && EQUIPPED.hat.id === 'hat-casque' && ++d.helmet >= 10) unlock('tetedure'); if (tier === 2) unlock('voltige');
       const i = BIRD_KINDS.indexOf(sp); if (i >= 0){ d.birds |= 1 << i; if ((d.birds & 63) === 63) unlock('angry'); save(); } },
     // boutique
-    bought(it){ d.spent += it.price; unlock('soldes'); if (d.spent >= 10000) unlock('prada');
+    bought(it){ d.spent += it.price; unlock('soldes'); if (d.spent >= 10000) unlock('prada'); if (d.spent >= 25000) unlock('flambeur');
       const all = SHOP.filter(x => x.img); if (all.filter(x => x.slot === 'hat').every(x => d.own[x.id])) unlock('chapelier'); if (all.every(x => d.own[x.id])) unlock('dressing'); save(); },
     tried(it){ if (d.own[it.id] || d.tried[it.id]) return; d.tried[it.id] = 1; if (Object.keys(d.tried).filter(k => !d.own[k]).length >= 10) unlock('vitrine'); save(); },
     worn(){ if (SHOP_SLOTS.every(sl => EQUIPPED[sl])) unlock('fashion'); },
@@ -1802,6 +1802,9 @@ function buildTrophyIcons(){
   ic('tetedure', g => { const it = SI('hat-casque'); if (it) put(g, it.img, 15, 13); stars3(g, 15, 27); num(g, '10'); });
   ic('picsou', g => { for (const [x, y] of [[2,26],[11,26],[20,26],[6,21],[15,21],[10,16],[10,11]]) g.drawImage(COIN, x, y); put(g, COIN, 23, 10, 2); sparkle(g, [[4,6],[29,22]], C.yellow); });
   ic('chapelier', g => { const a = SI('hat-sorcier'), b = SI('hat-bonnet'); if (b) put(g, b.img, 9, 25); if (a) put(g, a.img, 18, 13); });
+  ic('flambeur', g => { const F = { r:C.red, o:C.orange, y:C.yellow, w:C.white };
+    ['.....r........','....rr...r....','....ror..rr...','...roor.ror...','..rooor.roor..','..royyorroor.r','.royyyyoroyorr','.roywwyyoyyyor','royywwwyyywyor','royywwwyywwyor','.royywwwwwyor.','..rooyyyyyor..'].forEach((r, y) => [...r].forEach((ch, x) => { if (F[ch]){ g.fillStyle = F[ch]; g.fillRect(9 + x, 4 + y, 1, 1); } }));
+    for (const [x, y] of [[3,26],[11,26],[20,26],[7,21],[16,21],[11,16]]) g.drawImage(COIN, x, y); sparkle(g, [[4,8],[28,12]], C.yellow); });
   ic('prada', g => { const it = SI('shoes-heels'); if (it) put(g, it.img, 16, 11); for (const [x, y] of [[3,24],[11,26],[19,24],[7,20],[15,21]]) g.drawImage(COIN, x, y); sparkle(g, [[27,22],[27,4]], C.yellow); });
   ic('dressing', g => { g.fillStyle = C.plum; g.fillRect(15, 0, 2, 3); for (let k=0;k<6;k++){ g.fillRect(15-k*2, 3+k, 2, 1); g.fillRect(15+k*2, 3+k, 2, 1); } g.fillRect(4, 9, 24, 1);
     const it = SI('shirt-collector'); if (it && it.iconImg) g.drawImage(it.iconImg, 4, 7, 24, 24); });

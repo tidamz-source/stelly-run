@@ -273,6 +273,8 @@ const TEXTS = {
   "tr.adamantium.d": { fr:"200 000 frisbees catchés", en:"Catch 200,000 frisbees", es:"Atrapa 200.000 frisbees" },
   "tr.getalife.n": { fr:"Get a Life", en:"Get a Life", es:"Get a Life" },
   "tr.getalife.d": { fr:"Jouer 1 500 parties", en:"Play 1,500 games", es:"Juega 1.500 partidas" },
+  "tr.flambeur.n": { fr:"Flambeur", en:"High Roller", es:"Derrochador" },
+  "tr.flambeur.d": { fr:"Dépenser 25 000 disques dans la boutique", en:"Spend 25,000 discs in the shop", es:"Gasta 25.000 discos en la tienda" },
   "tr.cowboy.n": { fr:"Cow Boy", en:"Cowboy", es:"Vaquero" },
   "tr.cowboy.d": { fr:"Il y a un nouveau shérif en ville", en:"There's a new sheriff in town", es:"Hay un nuevo sheriff en la ciudad" },
   "tr.son31.n": { fr:"Sur son 31", en:"Dressed to the Nines", es:"De punta en blanco" },
