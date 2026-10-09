@@ -273,6 +273,12 @@ const TEXTS = {
   "tr.adamantium.d": { fr:"200 000 frisbees catchés", en:"Catch 200,000 frisbees", es:"Atrapa 200.000 frisbees" },
   "tr.getalife.n": { fr:"Get a Life", en:"Get a Life", es:"Get a Life" },
   "tr.getalife.d": { fr:"Jouer 1 500 parties", en:"Play 1,500 games", es:"Juega 1.500 partidas" },
+  "tr.cowboy.n": { fr:"Cow Boy", en:"Cowboy", es:"Vaquero" },
+  "tr.cowboy.d": { fr:"Il y a un nouveau shérif en ville", en:"There's a new sheriff in town", es:"Hay un nuevo sheriff en la ciudad" },
+  "tr.son31.n": { fr:"Sur son 31", en:"Dressed to the Nines", es:"De punta en blanco" },
+  "tr.son31.d": { fr:"Élégant en toute circonstance", en:"Elegant in every circumstance", es:"Elegante en cualquier circunstancia" },
+  "tr.promqueen.n": { fr:"Prom Queen", en:"Prom Queen", es:"Reina del baile" },
+  "tr.promqueen.d": { fr:"La plus belle pour aller danser", en:"The belle of the ball", es:"La más guapa para ir a bailar" },
 };
 
 /* Nouvelles du jeu : la plus récente en premier. icon : image du jeu affichée à côté (chrono…) */
