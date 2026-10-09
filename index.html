@@ -427,6 +427,10 @@ body{
 #xin:focus{ border-color:var(--orange); box-shadow:0 0 0 calc(var(--s)*1px) var(--orange); }
 .xmsg{ min-height:1.2em; margin:0; font-weight:700; font-size:max(calc(var(--s)*4.2px),9px); }
 .xmsg.err{ color:#C0392B; } .xmsg.ok{ color:#2E8B3E; }
+.xsync{ margin:0; font-weight:700; font-size:max(calc(var(--s)*4.6px),9px); color:#7FD48A; }
+.xsync[hidden], .xunl[hidden]{ display:none; }
+.xunl{ font-family:inherit; font-weight:700; font-size:max(calc(var(--s)*4.2px),9px); color:var(--purple-l); background:none; border:0; text-decoration:underline; cursor:pointer; padding:calc(var(--s)*1px); margin-top:calc(var(--s)*-3px); }
+.xunl.sure{ color:#FF8A7A; }
 @media (prefers-reduced-motion: reduce){ #settings, #settings.open{ transition-duration:.01s; } }
 
 /* ----- Fiche de stats ----- */
@@ -572,6 +576,7 @@ __ld(10); setTimeout(() => { const L = document.getElementById('loader'); if (L)
         <div class="xcard"><b data-i18n="set.have">J’ai un code</b><p data-i18n="set.haveTxt">Ta partie est fusionnée avec celle de cet appareil : rien n’est perdu.</p>
           <input id="xin" maxlength="9" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="XXXX-XXXX" aria-label="Code"><button id="xget" class="btn" data-i18n="set.get">Récupérer</button><p class="xmsg" id="xmsg2"></p></div>
       </div>
+      <p class="xsync" id="xsync" hidden></p><button id="xunlink" class="xunl" hidden></button>
     </div>
     <div id="news" hidden role="dialog" aria-modal="true" aria-label="Nouvelles" data-i18n-aria="news.title">
       <div class="trhead"><h2 data-i18n="news.title">Nouvelles</h2></div>
@@ -595,9 +600,9 @@ __ld(10); setTimeout(() => { const L = document.getElementById('loader'); if (L)
   </div>
 </div>
 <script>__ld(30);</script>
-<script src="langues.js?v=5.103"></script>
+<script src="langues.js?v=5.104"></script>
 <script>__ld(45);</script>
-<script src="stelly.js?v=5.103"></script>
+<script src="stelly.js?v=5.104"></script>
 <script>__ld(60);</script>
 <script>
 /* ================= Langues ================= */
@@ -1581,7 +1586,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '5.103';
+const APP_VERSION = '5.104';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -2120,28 +2125,117 @@ const statsUI = (() => {
   return { open, close, isOpen: () => isOpen };
 })();
 
-/* ================= Réglages : transfert de partie vers un autre appareil ================= */
-// la sauvegarde part sur le script du classement, qui renvoie un code court (24 h, une seule fois) ; à l'arrivée elle est fusionnée avec celle de l'appareil
+/* ================= Synchronisation entre appareils ================= */
+// chaque appareil lié envoie SA part (ce qu'il a fait lui-même) et reçoit la part des autres ; total affiché = sa part + celle des autres
+// on envoie toujours l'état complet de sa part (jamais « +50 ») : un envoi perdu ou doublé ne fausse rien, le hors-ligne se rattrape au retour du réseau
+const SYNC = (() => {
+  const d = TR.d, XS = '|' + 'lg-st3lly-9f2k';
+  const ADD = ['games', 'discs', 'sharks', 'rb', 'spent', 'helmet', 'coins'];   // compteurs additionnés (coins : gains moins dépenses, peut être négatif)
+  const ADDST = ['combo', 'superC', 'mega', 'giga', 'ko', 'doe', 'stag', 'dist', 'missed', 'fires', 'socks', 'slows', 'time'];
+  const MAPS = ['deathBy', 'deathTh'];
+  const ORS = ['th', 'deaths', 'birds', 'deer'];   // masques : union des bits
+  const SETS = ['u', 's', 'own', 'tried'];          // trophées, vus, objets, essayés : union
+  const KEY_OK = k => { const [a, b] = k.split('.'); return b === undefined ? ADD.includes(a) : (a === 'st' ? ADDST.includes(b) : MAPS.includes(a) && /^[a-z0-9]{1,16}$/i.test(b)); };
+  const getA = k => { const [a, b] = k.split('.'); const v = b === undefined ? d[a] : (a === 'st' ? d.st[b] : d.st[a][b]); return typeof v === 'number' && isFinite(v) ? v : 0; };
+  const setA = (k, v) => { const [a, b] = k.split('.'); if (b === undefined) d[a] = v; else if (a === 'st') d.st[b] = v; else d.st[a][b] = v; };
+  function addVals(){ const r = {}; for (const k of ADD) r[k] = getA(k); for (const k of ADDST) r['st.' + k] = getA('st.' + k); for (const m of MAPS) for (const k in d.st[m]) if (KEY_OK(m + '.' + k)) r[m + '.' + k] = getA(m + '.' + k); return r; }
+  const rnd = n => { const a = new Uint8Array(n); crypto.getRandomValues(a); return Array.from(a, x => 'abcdefghijklmnopqrstuvwxyz0123456789'[x % 36]).join(''); };
+  const post = async o => { const r = await fetch(LB_URL, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body: JSON.stringify(o) }); return r.json(); };
+  // ma part : compteurs moins la part des autres déjà comptée ; le reste (records, trophées, objets) part tel quel (max et union ne comptent jamais deux fois)
+  function pack(){
+    const o = d.sy.o || {}, all = addVals(), add = {};
+    for (const k in all) add[k] = all[k] - (o[k] || 0);
+    const or = {}; for (const k of ORS) or[k] = d[k] | 0;
+    const sets = {}; for (const k of SETS) sets[k] = d[k] || {};
+    return JSON.stringify({ v:1, add, mx:{ streak: d.st.streak || 0, lbBest: d.lbBest || 0, best }, or, sets, eq: d.eq || {}, eqT: d.eqT || 0 });
+  }
+  function sum(others){
+    const O = {}, mx = { streak:0, lbBest:0, best:0 }, or = {}, sets = {}; let eq = null, eqT = d.eqT || 0;
+    for (const x of others || []){ let p; try { p = JSON.parse(x.data); } catch(e){ continue; } if (!p || !p.add || typeof p.add !== 'object') continue;
+      for (const k in p.add){ const v = +p.add[k]; if (KEY_OK(k) && isFinite(v)) O[k] = (O[k] || 0) + v; }
+      for (const k in mx){ const v = +((p.mx || {})[k]); if (isFinite(v)) mx[k] = Math.max(mx[k], v); }
+      for (const k of ORS) or[k] = (or[k] | 0) | (+((p.or || {})[k]) | 0);
+      for (const k of SETS){ const st = (p.sets || {})[k]; if (st && typeof st === 'object') for (const i in st) if (/^[a-z0-9_-]{1,40}$/i.test(i) && typeof st[i] === 'number') (sets[k] = sets[k] || {})[i] = st[i]; }
+      if ((+p.eqT || 0) > eqT && p.eq && typeof p.eq === 'object'){ eqT = +p.eqT; eq = p.eq; } }
+    return { O, mx, or, sets, eq, eqT };
+  }
+  let pending = null;
+  function apply(others){
+    if (!d.sy) return;
+    const { O, mx, or, sets, eq, eqT } = sum(others), o = d.sy.o || {};
+    for (const k of new Set([...Object.keys(O), ...Object.keys(o)])) if (KEY_OK(k)) setA(k, getA(k) - (o[k] || 0) + (O[k] || 0));
+    d.sy.o = O;
+    d.st.streak = Math.max(d.st.streak || 0, mx.streak); d.lbBest = Math.max(d.lbBest || 0, mx.lbBest);
+    if (mx.best > best){ best = mx.best; sealedSave('stellyrun_best', String(best)); }
+    for (const k of ORS) d[k] = (d[k] | 0) | (or[k] | 0);
+    for (const k of SETS) for (const i in sets[k] || {}) if (!d[k][i]) d[k][i] = sets[k][i];
+    if (eq){ const e = {}; for (const sl of SHOP_SLOTS) if (typeof eq[sl] === 'string' && d.own[eq[sl]]) e[sl] = eq[sl]; d.eq = e; d.eqT = eqT; }
+    d.sy.t = Date.now(); TR.retro(); TR.save(); refreshTrophyBadge(); applyEquip(); showTitleRecord(); setUI.refresh();
+  }
+  // les nouveautés reçues pendant une partie attendent la fin de la partie
+  setInterval(() => { if (pending && state !== 'play'){ const p = pending; pending = null; apply(p); } }, 1000);
+  let busy = null, again = false, lastT = 0;
+  async function now(){
+    if (!d.sy) return false;
+    if (busy){ again = true; return busy; }
+    busy = (async () => {
+      let ok = false;
+      try { const data = pack(), sy = d.sy;
+        const j = await post({ action:'sync', acc: sy.acc, dev: sy.dev, data, v: APP_VERSION, sig: cyrb53(sy.acc + '|' + sy.dev + '|' + data + XS + '|sync') });
+        if (j && j.ok && d.sy && d.sy.acc === sy.acc){ ok = true; lastT = Date.now(); if (state === 'play') pending = j.others; else apply(j.others); }
+      } catch(e){}
+      return ok;
+    })();
+    const r = await busy; busy = null;
+    if (again){ again = false; now(); }
+    return r;
+  }
+  const soon = () => { if (d.sy && Date.now() - lastT > 20000) now(); };
+  // première liaison de cet appareil à un compte : récupère la part des autres
+  // lineage : cet appareil contient déjà une copie de leur progression (ancien transfert) -> on ne garde que ce qu'il a fait en plus
+  async function join(acc, lineage){
+    const dev = rnd(12), j = await post({ action:'sync', acc, dev, v: APP_VERSION });
+    if (!j || !j.ok) return false;
+    const { O } = sum(j.others), o = {};
+    if (lineage) for (const k in O){ const cur = getA(k); if (k !== 'coins') setA(k, Math.max(cur, O[k])); o[k] = O[k]; }
+    d.sy = { acc, dev, o, t:0 }; apply(j.others);
+    return now();
+  }
+  async function create(){ const fresh = !d.sy; if (fresh){ d.sy = { acc: rnd(20), dev: rnd(12), o:{}, t:0 }; TR.save(); }
+    const ok = await now(); if (!ok && fresh){ delete d.sy; TR.save(); } return ok; }
+  function unlink(){ delete d.sy; TR.save(); setUI.refresh(); }
+  return { now, soon, join, create, unlink, linked: () => !!d.sy, acc: () => d.sy && d.sy.acc, last: () => d.sy && d.sy.t };
+})();
+
+/* ================= Réglages : transfert et synchronisation de la partie ================= */
 const setUI = (() => {
-  const page = $('settings'), code = $('xcode'), make = $('xmake'), inp = $('xin'), get = $('xget'), m1 = $('xmsg1'), m2 = $('xmsg2');
-  let isOpen = false, hideT = 0, busy = false;
+  const page = $('settings'), code = $('xcode'), make = $('xmake'), inp = $('xin'), get = $('xget'), m1 = $('xmsg1'), m2 = $('xmsg2'), stat = $('xsync'), unl = $('xunlink');
+  let isOpen = false, hideT = 0, busy = false, sureT = 0;
   const msg = (el, k, cls) => { el.textContent = k ? txt(k) : ''; el.className = 'xmsg' + (cls ? ' ' + cls : ''); };
   const post = async o => { const r = await fetch(LB_URL, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body: JSON.stringify(o) }); return r.json(); };
   const XSALT = '|' + 'lg-st3lly-9f2k' + '|xfer';
+  function refresh(){
+    const on = SYNC.linked(); stat.hidden = !on; unl.hidden = !on;
+    if (on){ const t = SYNC.last(); stat.textContent = txt('set.linked') + ' · ' + (t ? new Date(t).toLocaleTimeString({ fr:'fr-FR', en:'en-GB', es:'es-ES' }[LANG] || 'fr-FR', { hour:'2-digit', minute:'2-digit' }) : '…'); }
+    unl.textContent = txt('set.unlink'); clearTimeout(sureT); unl.classList.remove('sure');
+  }
   async function create(){
     if (busy) return; busy = true; make.disabled = true; msg(m1, 'set.wait');
     try { TR.save();
-      const payload = JSON.stringify({ v:1, id: LB.id, name: LB.name(), best, d: TR.d });
-      const j = await post({ action:'xfer_put', id: LB.id, payload, v: APP_VERSION, sig: cyrb53(LB.id + '|' + payload + XSALT) });
-      if (j && j.ok && j.code){ code.textContent = j.code.slice(0, 4) + '-' + j.code.slice(4); code.hidden = false; msg(m1, ''); sfx.sock(); }
-      else msg(m1, j && j.err === 'busy' ? 'set.busy' : 'set.fail', 'err');
+      if (!(await SYNC.create())){ msg(m1, 'set.net', 'err'); }
+      else {
+        const payload = JSON.stringify({ v:2, acc: SYNC.acc(), id: LB.id, name: LB.name(), best });
+        const j = await post({ action:'xfer_put', id: LB.id, payload, v: APP_VERSION, sig: cyrb53(LB.id + '|' + payload + XSALT) });
+        if (j && j.ok && j.code){ code.textContent = j.code.slice(0, 4) + '-' + j.code.slice(4); code.hidden = false; msg(m1, ''); sfx.sock(); }
+        else msg(m1, j && j.err === 'busy' ? 'set.busy' : 'set.fail', 'err');
+      }
     } catch(e){ msg(m1, 'set.net', 'err'); }
-    busy = false; make.disabled = false;
+    busy = false; make.disabled = false; refresh();
   }
-  // fusion : on garde le meilleur de chaque compteur, tous les trophées et tous les objets ; l'équipement vient de la partie importée
+  // ancien format (v5.103, instantané complet) : fusion simple
   const OR = ['th', 'deaths', 'birds', 'deer'];
   function merge(a, b, top){
-    for (const k in b){ const x = a[k], y = b[k];
+    for (const k in b){ if (top && k === 'sy') continue; const x = a[k], y = b[k];
       if (typeof y === 'number'){ if (!isFinite(y)) continue; a[k] = typeof x === 'number' && isFinite(x) ? (top && OR.includes(k) ? (x | y) : Math.max(x, y)) : y; }
       else if (y && typeof y === 'object' && !Array.isArray(y)){ a[k] = top && k === 'eq' ? Object.assign({}, y) : merge(x && typeof x === 'object' && !Array.isArray(x) ? x : {}, y, false); }
       else if (x === undefined) a[k] = y; }
@@ -2151,21 +2245,26 @@ const setUI = (() => {
     const c = inp.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
     if (c.length !== 8){ msg(m2, 'set.bad', 'err'); return; }
     if (busy) return; busy = true; get.disabled = true; msg(m2, 'set.wait');
+    const fail = k => { msg(m2, k, 'err'); busy = false; get.disabled = false; };
     try {
       const j = await post({ action:'xfer_get', code: c, id: LB.id, v: APP_VERSION });
-      if (!j || !j.ok){ msg(m2, j && j.err === 'busy' ? 'set.busy' : 'set.bad', 'err'); busy = false; get.disabled = false; return; }
+      if (!j || !j.ok) return fail(j && j.err === 'busy' ? 'set.busy' : 'set.bad');
       const p = JSON.parse(j.payload);
-      if (!p || !p.d || typeof p.d !== 'object' || !p.d.u || typeof p.d.u !== 'object' || cyrb53(String(p.id) + '|' + j.payload + XSALT) !== j.sig) throw new Error('data');
-      merge(TR.d, p.d, true); TR.retro(); TR.save();
+      if (!p || cyrb53(String(p.id) + '|' + j.payload + XSALT) !== j.sig) throw new Error('data');
+      let curId = ''; try { curId = localStorage.getItem('stellyrun_id') || ''; } catch(e){}
+      if (p.v === 2 && typeof p.acc === 'string' && /^[a-z0-9]{12,40}$/.test(p.acc)){
+        if (SYNC.acc() !== p.acc && !(await SYNC.join(p.acc, curId === p.id && !SYNC.linked()))) return fail('set.net');
+      } else if (p.d && typeof p.d === 'object' && p.d.u && typeof p.d.u === 'object'){ merge(TR.d, p.d, true); TR.retro(); TR.save(); }
+      else throw new Error('data');
       const b = +p.best || 0; if (b > best){ best = b; sealedSave('stellyrun_best', String(best)); }
       try { if (typeof p.id === 'string' && /^[a-z0-9]{4,40}$/i.test(p.id)) localStorage.setItem('stellyrun_id', p.id);
             if (typeof p.name === 'string' && /^[A-Z0-9]{3}$/.test(p.name)) localStorage.setItem('stellyrun_name', p.name); } catch(e){}
       msg(m2, 'set.ok', 'ok'); sfx.sock(); setTimeout(() => location.reload(), 1400);
-    } catch(e){ msg(m2, 'set.net', 'err'); busy = false; get.disabled = false; }
+    } catch(e){ fail('set.net'); }
   }
   function open(){
     if (isOpen || state !== 'title') return;
-    clearTimeout(hideT); page.hidden = false; void page.offsetWidth; page.classList.add('open'); isOpen = true; $('soundmenu').hidden = true; sfx.start();
+    refresh(); clearTimeout(hideT); page.hidden = false; void page.offsetWidth; page.classList.add('open'); isOpen = true; $('soundmenu').hidden = true; sfx.start(); SYNC.soon();
   }
   function close(){
     if (!isOpen) return; isOpen = false; page.classList.remove('open');
@@ -2176,11 +2275,15 @@ const setUI = (() => {
   inp.addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') retrieve(); else if (e.key === 'Escape') inp.blur(); });
   make.addEventListener('click', e => { e.stopPropagation(); create(); });
   get.addEventListener('click', e => { e.stopPropagation(); retrieve(); });
+  // délier : 2 appuis (confirmation) ; l'appareil garde toute sa progression, les autres gardent ce qu'il avait déjà envoyé
+  unl.addEventListener('click', e => { e.stopPropagation();
+    if (!unl.classList.contains('sure')){ unl.classList.add('sure'); unl.textContent = txt('set.sure'); clearTimeout(sureT); sureT = setTimeout(refresh, 3000); return; }
+    SYNC.unlink(); code.hidden = true; });
   $('setclose').addEventListener('click', e => { e.stopPropagation(); close(); });
   $('setbtn').addEventListener('click', e => { e.stopPropagation(); ensureAudio(); open(); });
   { const m = ['....ooo....','.oo.oPo.oo.','.oPooPooPo.','..oPPPPPo..','ooPPwwwPPoo','oPPPwwwPPPo','ooPPwwwPPoo','..oPPPPPo..','.oPooPooPo.','.oo.oPo.oo.','....ooo....'];
     const c = $('icoSet'); c.width = 11; c.height = m.length; pm(c.getContext('2d'), m, 0, 0, false, Object.assign({}, PAL, { w:'#FFF4D6', P:C.purple })); }
-  return { open, close, isOpen: () => isOpen };
+  return { open, close, refresh, isOpen: () => isOpen };
 })();
 
 /* ================= Boutique ================= */
@@ -2267,10 +2370,10 @@ const shopUI = (() => {
     bub.style.top = (up ? r.top - pr.top - bh - gap : r.bottom - pr.top + gap) + 'px'; bub.style.setProperty('--tx', (cx - left) + 'px');
     sfx.disc(1);
   }
-  function wear(it){ if (TR.d.eq[it.slot] === it.id) delete TR.d.eq[it.slot]; else TR.d.eq[it.slot] = it.id; TR.save(); applyEquip(); tryId = null; setPreview(); sfx.jump(); render(); }
+  function wear(it){ if (TR.d.eq[it.slot] === it.id) delete TR.d.eq[it.slot]; else TR.d.eq[it.slot] = it.id; TR.d.eqT = Date.now(); TR.save(); applyEquip(); tryId = null; setPreview(); sfx.jump(); render(); }
   function purchase(){
     const it = cur; if (!it || coins() < it.price || TR.d.own[it.id]) return;
-    TR.d.coins -= it.price; TR.d.own[it.id] = 1; TR.d.eq[it.slot] = it.id; TR.save(); applyEquip(); TR.bought(it); tryId = null; setPreview(); sfx.sock(); render();
+    TR.d.coins -= it.price; TR.d.own[it.id] = 1; TR.d.eq[it.slot] = it.id; TR.d.eqT = Date.now(); TR.save(); applyEquip(); TR.bought(it); tryId = null; setPreview(); sfx.sock(); render();
   }
   function loop(){ if (!isOpen) return; const f = PFR[Math.floor(performance.now()/62) % RUN_N]; pctx.clearRect(0, 0, prev.width, prev.height); pctx.drawImage(f, 0, prev.height - f.height); drawHat(pctx, f, 0, prev.height - f.height, pHat, performance.now()/1000); raf = requestAnimationFrame(loop); }
   function open(){
@@ -2280,7 +2383,7 @@ const shopUI = (() => {
     $('soundmenu').hidden = true; sfx.start(); loop();
   }
   function close(){
-    if (!isOpen) return; isOpen = false; hideBubble(); page.classList.remove('open'); cancelAnimationFrame(raf);
+    if (!isOpen) return; isOpen = false; hideBubble(); page.classList.remove('open'); cancelAnimationFrame(raf); SYNC.now();
     clearTimeout(hideT); hideT = setTimeout(() => { if (!isOpen) page.hidden = true; }, 500);
     if (document.activeElement) document.activeElement.blur();
   }
@@ -2421,7 +2524,7 @@ function die(kind){
   TR.die(kind);
   P.prevBest = best; P.newBest = score > best;
   if (P.newBest){ best = score; sealedSave('stellyrun_best', String(best)); }
-  LB.sendStats();
+  LB.sendStats(); SYNC.now();
 }
 function smash(o){
   for (const [img, x, y] of pieces(o, true)) debris.push({ img, x, y, vx: 200 + Math.random()*160, vy: -240 - Math.random()*140, rot:0, vr:(Math.random()-.5)*24 });
@@ -3088,7 +3191,7 @@ function press(){
 function release(){ P.hold = false; }
 function pause(){ if (state !== 'play') return; MUSIC.pause(); state = 'pause'; ui.pause.hidden = false; $('pausebtn').hidden = true; P.hold = false; $('resume').focus({ preventScroll:true }); }
 // abandon depuis la pause : la partie s'arrête, les points comptent pour le record, aucun trophée de mort
-function quitToHome(){ if (state !== 'pause') return; TR.end(); if (score > best){ best = score; sealedSave('stellyrun_best', String(best)); } TR.save(); LB.sendStats(); ui.pause.hidden = true; goHome(); }
+function quitToHome(){ if (state !== 'pause') return; TR.end(); if (score > best){ best = score; sealedSave('stellyrun_best', String(best)); } TR.save(); LB.sendStats(); SYNC.now(); ui.pause.hidden = true; goHome(); }
 function resume(){ MUSIC.resume(); state = 'play'; ui.pause.hidden = true; $('pausebtn').hidden = false; last = 0; }
 let zoneTimer = 0;
 function setZone(n){ const z = $('zone'); z.textContent = THEME_NAMES[n]; z.hidden = false; z.classList.toggle('ice', n === 3); z.classList.remove('pop'); void z.offsetWidth; z.classList.add('pop'); clearTimeout(zoneTimer); zoneTimer = setTimeout(() => { z.hidden = true; }, 3000); }
@@ -3126,12 +3229,13 @@ ui.mute.addEventListener('click', e => { e.stopPropagation(); ensureAudio(); sme
 $('tgMusic').addEventListener('click', e => { e.stopPropagation(); ensureAudio(); musicOn = !musicOn; refreshSound(); });
 $('tgSfx').addEventListener('click', e => { e.stopPropagation(); ensureAudio(); sfxOn = !sfxOn; refreshSound(); });
 refreshSound(); showTitleRecord(); $('ver').textContent = 'v' + APP_VERSION;
-document.addEventListener('visibilitychange', () => { if (document.hidden){ TR.save(); pause(); if (actx) actx.suspend(); } else if (actx) actx.resume(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden){ TR.save(); pause(); if (actx) actx.suspend(); } else { if (actx) actx.resume(); SYNC.soon(); } });
 addEventListener('blur', pause);
 addEventListener('resize', resize);
 
 resize();
 requestAnimationFrame(frame);
+setTimeout(() => SYNC.now(), 1500);   // synchro au lancement
 
 // le jeu est prêt : barre pleine, fondu, et l'animation d'accueil repart de zéro
 __ld(85);
