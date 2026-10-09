@@ -662,6 +662,48 @@
    "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAICAYAAADjoT9jAAABMklEQVR4AYxRW07DQAwcexNaqAJIHAD+UCl9cP9DABVUFSeAz1aohKpZY7vJEiIqdZXZ9WPG641ZdBFBiEiAXPIARwi5MJ0Ko3Cgs8g1quv1JAssyOAgtUlrGQKzcBYCTuQa42KKyfkIw8HMMRqMcF/copK1A6wFtGjApeS4kXExU42iN8TdYILJ2cwRdxVijAhyhSiiMkCVpe7/f9OLh5QgECKtUOE9xbpGwxdET3EVI235w51DWxKJkP3RyIcbshrGD/kXjMsWOAb9rJ9obTsFOwbbSDW2vyCC3sqlusDz6tHP9jb/fEK5LamJmW2xxu9qlptFk9rPwLxy920H7Hlu1JsX0gZq9/fQmOc00tVUcZca2r9ASTpyWmxeYKI2dFapc6P9QX1Jmz9fv8Lm2vB+AAAA//8pVw9PAAAABklEQVQDAKGBlSiawbIcAAAAAElFTkSuQmCC",
    "dx": -11,
    "dy": -4
+  },
+  {
+   "id": "shirt-texan",
+   "slot": "shirt",
+   "key": "texan",
+   "price": 750,
+   "name": {
+    "fr": "Cravate Texane",
+    "en": "Texan tie",
+    "es": "Corbata tejana"
+   },
+   "pal": {
+    "yellow": "#FFCF00",
+    "yellowL": "#FFE777",
+    "yellowM": "#FFDD45",
+    "orange": "#F29318",
+    "orangeD": "#D9760F",
+    "cheek": "#F7A94A"
+   },
+   "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAuCAYAAABNhcu5AAADkUlEQVR4AdSYv2sUQRTH3x0IKkQrJYKCNgqC3iVVihOxENHCSiGk0EIEO620sNVC/wIbLSxCQCuLgFiomMJGc6cgCIKCgkErE4iFRZzPM7P3dndmb38EIXLf3TfvvXnvs3M3c2fa0uDf0R3dNasGpaQRCI0fXfksC7eXMBupNggrAcSefdsUYLC4S/DpoMalXWOONrQQY2eOiGyflMHHUxqrU7MWSLDR0p2gu6yzMgjLn1uN5Wci3TURB1N3VSqDRJ+w34qGygQqgURXw3aquSqlQABAbFN2CR/OsZ7bsrwlFsLY/i1innFHzSAIk63YmoOXfaE5kgIA7eRWhTswyNbCJpaVghC00sZuK1IEgGzjzvGuWPmi1tc59FQ/vMS0jq/n7rYXNjltDHYBy46A0MY8FSLLiGaDX4tihQ9ZHzY+dlJKrlYITFfExWq/OjsngnNj/hSUedD2u+V+6/y9A/L9628tuDL/XmTHSbVHXWLNYn6tx3mjhruM3xDeQhjiK1ISxpWr9oqcNwoCUW5VKD8Chs8BItUKH7K+nG1Wg5iCYJSFYRex9Fb4kPVh46N2ThkI4gkIgyowNPFiLvJjf8eXUwCCnBQIjhCMfoAJGnXcWWKGKdPGVhbGh7EIBAk5EJxZmC27JyVV0CXx1DS8erorVviIuRSdk8wtgCA3CELAwvz58RaXxLb1rekZQf+Shle+DrYenJexcxeTbTqMpq0oSDotPOLJX6yK9B7MqrDxhbOLvVEQf/TzbUsJvnH16GdgRGMrExqa7gTlWKfm0Jm2oiDptPio5U54q3hmcaQRCAALH76IFb7iluFobRAaAkDZ+w/nBGHjI4ZdRbVBfBMAvh07IVPXLicwGuPrAelg9KUxiG/x+M0nb+o9OQSBQeqNX6qDuKIcWvGSwwgwSD2r62eRDvKXSiAAdCZ+CoedL3XpwrTsffVche39vZvjqd84CZBPkLRRCOJ/GlDUAxiIVu/wfq0GAGKw7muRx3zm8qOLO/GYoiAUQhTjjgJFFIbmXi4n+Z8Wc9CIGm6KjP6zBIU0M3I5250i0nKX1rrtzPRrVA2yoytC8H+qEYhbgbUn/desRmPmRiDZ7kABl/WXGW8oSJmGsZzND8JbwFthnzDks/Eie/OvSNHT1YnVWhHeguuzc8LdN8XO+nyszL0WSJnCVXM2Nwi75e7MtHC3Tx7y2XiRvaErkgUrapyN/QUAAP//0IfMpgAAAAZJREFUAwC3bQ3lEwYthAAAAABJRU5ErkJggg==",
+   "dx": -17,
+   "dy": -16,
+   "detailSrc": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAXCAYAAADZTWX7AAAA6UlEQVR4AaySIRLCMBBFNz0HAo1CVoDgAugOAsPgURyCO2AQTAWKCyBAYJhBoRAI7hH2b5tkU9pORTv5yebv280k04Tiz/JWi7dEGrK314e0mECBhwRgk/aHXIQYBbxa3UmS3+mM0s1aYgZkRJA4PJ0eb57DqIVCuogiaLXMaHC9iBAXSLidmYyG4iEJYVN6RncSEAknBg3LPwFimo9TrEiYMsY+hsSpmfxxXGnPzzu6/GEeqmZQgEL4jRCSTt0htEV7V4lVe907obJNCdpujzkeUn4wwFWvx+Nwq90iI6w4ykl7jcfpoh8AAAD//wvDHiwAAAAGSURBVAMAa9hVmZfA/RUAAAAASUVORK5CYII=",
+   "ddx": -4,
+   "ddy": 6
+  },
+  {
+   "id": "shoes-mocassin",
+   "slot": "shoes",
+   "key": "mocassin",
+   "price": 2000,
+   "name": {
+    "fr": "Mocassin",
+    "en": "Mocassin",
+    "es": "Mocasín"
+   },
+   "dx": -4,
+   "dy": -3,
+   "fdx": -4,
+   "fdy": -3,
+   "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAAMCAYAAACA0IaCAAAA0UlEQVR4AYyPMRKCQAxFo3fSxlpnPIgcCizsdWyd0dpGD4V5Gf6aAhYYHsnmJz/L2uaf3lvAQ/2dM+u3m13dIakyYzMk6Z+euwuHSR0RMIvtww0YyNBjbdtZ0qM29sGs1BnIFMGTz/dt6YZ5Ibl3mIVZ05zs+XpEIX8wxgTIuSE6ecZrYRhmfph8NYQhcFYzF4Ch1ocZGw/7o3pGIwOAyJ8Qb9e7ATmEGRtr0JhhOWcikEOYsbFGbZG0YkYiJBJVqy2SRm/cjEHhxZVQbUn0GfsBAAD//yj6b1AAAAAGSURBVAMAC2GjCdSAGvYAAAAASUVORK5CYII=",
+   "farSrc": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAAMCAYAAACA0IaCAAAA0UlEQVR4AYyPMRKCQAxFo3fSxlpnPIgcCizsdWyd0dpGD4V5Gf6aAhYYHsnmJz/L2uaf3lvAQ/2dM+u3m13dIakyYzMk6Z+euwuHSR0RMIvtww0YyNBjbdtZ0qM29sGs1BnIFMGTz/dt6YZ5Ibl3mIVZ05zs+XpEIX8wxgTIuSE6ecZrYRhmfph8NYQhcFYzF4Ch1ocZGw/7o3pGIwOAyJ8Qb9e7ATmEGRtr0JhhOWcikEOYsbFGbZG0YkYiJBJVqy2SRm/cjEHhxZVQbUn0GfsBAAD//yj6b1AAAAAGSURBVAMAC2GjCdSAGvYAAAAASUVORK5CYII="
   }
  ]
 }
