@@ -600,9 +600,9 @@ __ld(10); setTimeout(() => { const L = document.getElementById('loader'); if (L)
   </div>
 </div>
 <script>__ld(30);</script>
-<script src="langues.js?v=6.0"></script>
+<script src="langues.js?v=6.1"></script>
 <script>__ld(45);</script>
-<script src="stelly.js?v=6.0"></script>
+<script src="stelly.js?v=6.1"></script>
 <script>__ld(60);</script>
 <script>
 /* ================= Langues ================= */
@@ -1586,7 +1586,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '6.0';
+const APP_VERSION = '6.1';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -2050,7 +2050,8 @@ const newsUI = (() => {
   // icônes des articles : chrono, médaille Diamant (trophées), cintre (boutique)
   let trIcons = null;
   const HANGER = mk(20, 13, g => pm(g, ['.........www........','........w...w.......','............w.......','...........w........','..........w.........','.........ww.........','........wyyw........','......wwy..yww......','....wwyy....yyww....','..wwyy........yyww..','wwyy............yyww','wyyyyyyyyyyyyyyyyyyw','wwwwwwwwwwwwwwwwwwww'], 0, 0, false, Object.assign({}, PAL, { w:C.plum, y:C.yellow })));
-  const ICONS = { chrono: () => CHRONO[0], trophee: () => (trIcons = trIcons || buildTrophyIcons()).diamant, cintre: () => HANGER };
+  const ICONS = { chrono: () => CHRONO[0], trophee: () => (trIcons = trIcons || buildTrophyIcons()).diamant, cintre: () => HANGER,
+    reglages: () => mk(22, 22, g => { g.imageSmoothingEnabled = false; g.drawImage($('icoSet'), 0, 0, 22, 22); }) };   // roue dentée des Réglages, x2
   function render(){
     list.textContent = '';
     for (const a of NEWS){
