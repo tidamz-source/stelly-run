@@ -600,9 +600,9 @@ __ld(10); setTimeout(() => { const L = document.getElementById('loader'); if (L)
   </div>
 </div>
 <script>__ld(30);</script>
-<script src="langues.js?v=6.1"></script>
+<script src="langues.js?v=6.2"></script>
 <script>__ld(45);</script>
-<script src="stelly.js?v=6.1"></script>
+<script src="stelly.js?v=6.2"></script>
 <script>__ld(60);</script>
 <script>
 /* ================= Langues ================= */
@@ -1586,7 +1586,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '6.1';
+const APP_VERSION = '6.2';
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
 let zoneIdx = 0, zoneT = 15;
 const themeFor = sc => { const k = Math.floor(sc/5000); return k < 4 ? [0,1,2,0][k] : [3,0,1,2][(k-4) % 4]; };
@@ -1604,6 +1604,7 @@ function reset(){
   Object.assign(P, { y:GY, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, land:0, sink:false, stomps:0 });
 }
 function startGame(){
+  AC.reset();
   confetti = []; P.confettiDone = false;
   lbEntry.submit(); lbEntry.hide(); trUI.close(); shopUI.close(); lbUI.close(); newsUI.close(); statsUI.close(); setUI.close(); $('langbtn').hidden = true; $('langmenu').hidden = true; ensureAudio(); sfx.start(); reset(); TR.start(); rbAt = TR.rainbowAt(); state = 'play'; MUSIC.tempo = MUSIC.target = 1; MUSIC.fire = false; MUSIC.play(0, true);
   ui.title.hidden = true; ui.over.hidden = true; ui.pause.hidden = true; ui.hud.hidden = false;
@@ -2687,7 +2688,7 @@ function update(dt){
     ui.hi.textContent = txt('ui.record') + ' ' + pad(best);
     ui.sockbar.hidden = true; ui.firebar.hidden = true; ui.over.hidden = false;
     ui.over.querySelector('h2').textContent = deathMsg(deathKind);
-    if (score > (TR.d.lbBest || 0)) lbEntry.show(score, t, discCount); else lbEntry.hide();
+    if (score > (TR.d.lbBest || 0) && !AC.sus()) lbEntry.show(score, t, discCount); else lbEntry.hide();   // partie suspecte : pas de classement mondial
   }
 
   // requin (plage)
@@ -3105,10 +3106,26 @@ function draw(){
 
 /* ================= Boucle ================= */
 let last = 0;
+// anti-ralenti : une image en retard est rattrapée en petites étapes (le jeu ne passe plus au ralenti quand l'appareil rame ou qu'un script freine l'affichage)
+// seul un vrai gros blanc (> 0,25 s : veille, onglet caché) est plafonné
+const AC = (() => {
+  let g = 0, w = 0, a = 0, lw = 0, la = 0;
+  return {
+    reset(){ g = 0; w = 0; a = 0; },
+    // temps de jeu appliqué vs temps réel (heure système et horloge audio, la plus rapide des deux), pendant la partie seulement
+    tick(dt){ const nw = Date.now(), na = actx ? actx.currentTime : 0;
+      if (state === 'play' && lw){ g += dt; w += Math.min(5, Math.max(0, (nw - lw)/1000)); a += Math.min(5, Math.max(0, na - la)); }
+      lw = nw; la = na; },
+    // partie suspecte : le temps de jeu avance nettement moins vite que le temps réel (horloge faussée ou affichage freiné)
+    sus(){ const r = Math.max(w, a); return r >= 15 && g < r * .85; },
+    info: () => ({ g: Math.round(g*10)/10, w: Math.round(w*10)/10, a: Math.round(a*10)/10 })
+  };
+})();
 function frame(ts){
   requestAnimationFrame(frame);
-  if (!last) last = ts; let dt = (ts - last)/1000; last = ts; if (dt > .05) dt = .05;
-  if (state !== 'pause'){ const n = Math.min(6, Math.max(1, Math.ceil(dt/.006))); for (let i=0;i<n;i++) update(dt/n); }
+  if (!last) last = ts; let dt = (ts - last)/1000; last = ts; if (dt > .25) dt = .25; if (dt < 0) dt = 0;
+  AC.tick(dt);
+  if (state !== 'pause'){ const n = Math.min(42, Math.max(1, Math.ceil(dt/.006))); for (let i=0;i<n;i++) update(dt/n); }
   draw();
 }
 
