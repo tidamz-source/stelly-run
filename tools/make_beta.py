@@ -14,7 +14,7 @@ Conventions BETA :
 import pathlib, re, sys
 
 # Numéro de la beta : à incrémenter à chaque nouvelle beta (affiché « v<version du jeu>-b<numéro> »)
-BETA_REV = 3
+BETA_REV = 4
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 src = (ROOT / 'index.html').read_text(encoding='utf-8')
@@ -47,8 +47,8 @@ sub_once("navigator.serviceWorker.register('sw.js')", "Promise.resolve()", 'serv
 
 # 5. PATCHES de gameplay BETA (vides pour l'instant)
 PATCHES = [
-    # Fast Count : puissance 25 % (au lieu de 20 %)
-    ("slowMul = Math.max(.35, slowMul*.8);", "slowMul = Math.max(.35, slowMul*.75);", 'Fast Count puissance'),
+    # Fast Count : puissance 22 % (au lieu de 20 %)
+    ("slowMul = Math.max(.35, slowMul*.8);", "slowMul = Math.max(.35, slowMul*.78);", 'Fast Count puissance'),
     # Fast Count : un chrono toutes les 25 à 30 s (au lieu de 30 à 45 s) ; premier chrono inchangé
     ("slowIn = 30 + Math.random()*15;", "slowIn = 25 + Math.random()*5;", 'Fast Count fréquence'),
     # Oiseaux : jamais au milieu des disques (oiseaux et disques avancent à la même vitesse, l'écart reste fixe).
@@ -60,8 +60,16 @@ PATCHES = [
      "if (state === 'play' && rbAt > 0 && t >= rbAt && !discs.some(d => d.x > W - 50) && !flyers.some(f => !f.ko && f.x > W - 50)){", 'arc-en-ciel hors des oiseaux'),
     # Pas de longues séquences sans disques : si plus aucun disque n'attend devant Stelly,
     # le nouvel obstacle porte forcément des disques (l'arc, sinon une figure entre les obstacles)
+    # lastDiscT : dernier instant où un disque attendait encore devant Stelly
+    ("let birdWait = false;", "let birdWait = false, lastDiscT = 0, forcedN = 0;", 'disques forcés : variables'),
+    ("    discs = discs.filter(o => o.x > -30 && !o.got); items = items.filter(o => o.x > -30 && !o.got);",
+     "    if (discs.some(d => !d.got && !d.missed && d.x > P.x)) lastDiscT = t;\n    discs = discs.filter(o => o.x > -30 && !o.got); items = items.filter(o => o.x > -30 && !o.got);", 'disques forcés : suivi'),
+    # vrai trou seulement : aucun disque devant ET le trou prévu (temps déjà passé sans disque + trajet jusqu'à Stelly) dépasse 2,5 s
     ("  if (Math.random() < (sockOn || fireOn ? .75 : .42) && !items.some(it => Math.abs(it.x - cx) < 110)){",
-     "  const dry = !discs.some(dd => !dd.got && !dd.missed && dd.x > P.x + 40);\n  if ((dry || Math.random() < (sockOn || fireOn ? .75 : .42)) && !items.some(it => Math.abs(it.x - cx) < 110)){", 'disques forcés : arc'),
+     "  const dry = !discs.some(dd => !dd.got && !dd.missed && dd.x > P.x) && (lastDiscT > t || (t - lastDiscT) + (cx - P.x)/Math.max(spEff, 60) > 2.5);\n  const pArc = Math.random() < (sockOn || fireOn ? .75 : .42), forcedArc = dry && !pArc;\n  if ((dry || pArc) && !items.some(it => Math.abs(it.x - cx) < 110)){", 'disques forcés : arc'),
+    # arc forcé : 3 disques, et un arc de 5 une fois sur trois (si la vitesse le permet)
+    ("sp = Math.max(28, speed*(arcSock ? .1 : .07)), half = sp >= 36 ? 2 : 1;",
+     "sp = Math.max(28, speed*(arcSock ? .1 : .07)), half = (forcedArc && (forcedN++ % 3 !== 2)) ? 1 : (sp >= 36 ? 2 : 1);", 'disques forcés : grappes de 3 et de 5'),
     ("  if ((roomy || sockOn) && Math.random() < (sockOn || fireOn ? .8 : .45)){",
      "  if ((roomy || sockOn || (dry && arcEnd === -Infinity)) && ((dry && arcEnd === -Infinity) || Math.random() < (sockOn || fireOn ? .8 : .45))){", 'disques forcés : figure'),
     # Biomes : un nouveau biome tous les 10 000 points, ordre fixe en boucle
