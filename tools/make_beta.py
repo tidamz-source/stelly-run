@@ -14,7 +14,7 @@ Conventions BETA :
 import pathlib, re, sys
 
 # Numéro de la beta : à incrémenter à chaque nouvelle beta (affiché « v<version du jeu>-b<numéro> »)
-BETA_REV = 2
+BETA_REV = 3
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 src = (ROOT / 'index.html').read_text(encoding='utf-8')
@@ -51,6 +51,21 @@ PATCHES = [
     ("slowMul = Math.max(.35, slowMul*.8);", "slowMul = Math.max(.35, slowMul*.75);", 'Fast Count puissance'),
     # Fast Count : un chrono toutes les 25 à 30 s (au lieu de 30 à 45 s) ; premier chrono inchangé
     ("slowIn = 30 + Math.random()*15;", "slowIn = 25 + Math.random()*5;", 'Fast Count fréquence'),
+    # Oiseaux : jamais au milieu des disques (oiseaux et disques avancent à la même vitesse, l'écart reste fixe).
+    # L'oiseau attend qu'aucun disque ne soit à moins de 80 px de son point d'apparition.
+    ("else if (!obs.some(o => o.x + o.w > P.x - 6)){ birdWait = false; spawnFlyer(); }",
+     "else if (!obs.some(o => o.x + o.w > P.x - 6) && !discs.some(d => !d.got && d.x > W - 50)){ birdWait = false; spawnFlyer(); }", 'oiseau hors des disques'),
+    # Disque arc-en-ciel : pas à côté d'un oiseau
+    ("if (state === 'play' && rbAt > 0 && t >= rbAt && !discs.some(d => d.x > W - 50)){",
+     "if (state === 'play' && rbAt > 0 && t >= rbAt && !discs.some(d => d.x > W - 50) && !flyers.some(f => !f.ko && f.x > W - 50)){", 'arc-en-ciel hors des oiseaux'),
+    # Pas de longues séquences sans disques : si plus aucun disque n'attend devant Stelly,
+    # le nouvel obstacle porte forcément des disques (l'arc, sinon une figure entre les obstacles)
+    ("  if (Math.random() < (sockOn || fireOn ? .75 : .42) && !items.some(it => Math.abs(it.x - cx) < 110)){",
+     "  const dry = !discs.some(dd => !dd.got && !dd.missed && dd.x > P.x + 40);\n  if ((dry || Math.random() < (sockOn || fireOn ? .75 : .42)) && !items.some(it => Math.abs(it.x - cx) < 110)){", 'disques forcés : arc'),
+    ("  if ((roomy || sockOn) && Math.random() < (sockOn || fireOn ? .8 : .45)){",
+     "  if ((roomy || sockOn || (dry && arcEnd === -Infinity)) && ((dry && arcEnd === -Infinity) || Math.random() < (sockOn || fireOn ? .8 : .45))){", 'disques forcés : figure'),
+    # Tutoriel : avant la toute première partie (clé stellyrun_tuto absente)
+    ("function startGame(){\n  AC.reset();", "function startGame(){\n  if (tutoUI.need()){ tutoUI.open(); return; }\n  AC.reset();", 'tutoriel avant la partie'),
 ]
 for old, new, label in PATCHES:
     sub_once(old, new, label)
@@ -69,7 +84,8 @@ DBG = r"""
     ? 'vitesse ' + Math.round(spEff) + ' (x' + slowMul.toFixed(2) + ')\nchaussette ' + (P.sockT > 0 ? 'ACTIVE ' + P.sockT.toFixed(1) + ' s' : 'dans ' + Math.max(0, sockIn).toFixed(1) + ' s') + '\nFast Count x' + slowMul.toFixed(2) + ' · ' + (t > 25 ? 'chrono dans ' + Math.max(0, slowIn).toFixed(1) + ' s' : 'pas de chrono avant 25 s')
     : 'lance une partie'); }, 200); }
 """
-sub_once('\nrequestAnimationFrame(frame);\n', '\nrequestAnimationFrame(frame);\n' + DBG, 'injection debug')
+TUTO = open(ROOT / 'tools' / 'beta_tuto.js', encoding='utf-8').read().replace("'stellyrun_", "'stellyrun_test_")
+sub_once('\nrequestAnimationFrame(frame);\n', '\nrequestAnimationFrame(frame);\n' + DBG + TUTO, 'injection debug et tutoriel')
 
 (ROOT / 'beta.html').write_text(out, encoding='utf-8')
 print('[make_beta] beta.html v' + re.search(r"APP_VERSION = '([^']+)'", src).group(1) + '-b' + str(BETA_REV) + ' généré depuis index.html')
