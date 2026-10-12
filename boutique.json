@@ -171,14 +171,14 @@
    "key": "basket_bleu",
    "price": 200,
    "name": {
-    "fr": "Baskets bleues",
-    "en": "Blue Sneakers",
-    "es": "Zapatillas azules"
+    "fr": "Baskets blanches",
+    "en": "White Sneakers",
+    "es": "Zapatillas blancas"
    },
-   "farSrc": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAICAYAAAD0g6+qAAAAs0lEQVR42qWQMQrCQBBF3wQXNghewUp7ewvb2HuD2OUUgqewso29vZDKO4idV1BM8S1klxglIn6YYpg/jz9jkuiSmUmS8UW9YAaor7eXoUs9WV7GeRcwCaYsL3Gp/2jK8hJJmJmC/w0EMJ6tACjWFS71sYp1BcB+s2C+3HUCe83mdL7E5dAHSBvYfIkkS9oRT+dLrE+Q9sn19fZMCGh7ODKcjNC9Ztof8Ktc6rFwM39Ikj0A695akIKKCJoAAAAASUVORK5CYII=",
-   "fdx": -3,
+   "farSrc": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAICAYAAAD0g6+qAAAAnklEQVR4AZSQXQqCUBCFj0FQL0EQLaXXaiWtraUE9dJyBFHwQf0G5zr+gCh8OPecMwevO60/zXpE8iLCMN1p6rJCwwPmRSiywGQBDWyp95jRgHkERXp//iaGhdF5fzwID8yQKIP+OFwtCYQdRC+Jc/Apg/SPyM1YKomhWGhXw/zVpb5Fzpgg6Ic4uxbfFGWv+02P01nPy1V8xVa6wqwFAAD//zsfzGAAAAAGSURBVAMArsZXAQwJFK8AAAAASUVORK5CYII=",
+   "fdx": -4,
    "fdy": -1,
-   "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAICAYAAAD0g6+qAAAAs0lEQVR42qWQMQrCQBBF3wQXNghewUp7ewvb2HuD2OUUgqewso29vZDKO4idV1BM8S1klxglIn6YYpg/jz9jkuiSmUmS8UW9YAaor7eXoUs9WV7GeRcwCaYsL3Gp/2jK8hJJmJmC/w0EMJ6tACjWFS71sYp1BcB+s2C+3HUCe83mdL7E5dAHSBvYfIkkS9oRT+dLrE+Q9sn19fZMCGh7ODKcjNC9Ztof8Ktc6rFwM39Ikj0A695akIKKCJoAAAAASUVORK5CYII=",
+   "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAICAYAAAD0g6+qAAAAnklEQVR4AZSQXQqCUBCFj0FQL0EQLaXXaiWtraUE9dJyBFHwQf0G5zr+gCh8OPecMwevO60/zXpE8iLCMN1p6rJCwwPmRSiywGQBDWyp95jRgHkERXp//iaGhdF5fzwID8yQKIP+OFwtCYQdRC+Jc/Apg/SPyM1YKomhWGhXw/zVpb5Fzpgg6Ic4uxbfFGWv+02P01nPy1V8xVa6wqwFAAD//zsfzGAAAAAGSURBVAMArsZXAQwJFK8AAAAASUVORK5CYII=",
    "dx": -4,
    "dy": -1
   },
