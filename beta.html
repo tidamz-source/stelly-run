@@ -2432,11 +2432,12 @@ function spawnObstacle(){
   obs.push(o);
   const cx = x0 + o.w/2, fireOn = fireT > 0;
   let arcEnd = -Infinity;   // dernier frisbee de l'arc au-dessus de l'obstacle
-  const dry = !discs.some(dd => !dd.got && !dd.missed && dd.x > P.x + 40);
-  if ((dry || Math.random() < (sockOn || fireOn ? .75 : .42)) && !items.some(it => Math.abs(it.x - cx) < 110)){
+  const dry = !discs.some(dd => !dd.got && !dd.missed && dd.x > P.x) && (lastDiscT > t || (t - lastDiscT) + (cx - P.x)/Math.max(spEff, 60) > 2.5);
+  const pArc = Math.random() < (sockOn || fireOn ? .75 : .42), forcedArc = dry && !pArc;
+  if ((dry || pArc) && !items.some(it => Math.abs(it.x - cx) < 110)){
     // arc haut seulement si la chaussette durera encore quand Stelly arrivera dessus
     const arcSock = sockOn && sockLasts(cx + 80);
-    const peak = arcSock ? 92 : (o.k === 'pyr3' ? 66 : (o.k === 'pyr' ? 56 : 46)), sp = Math.max(28, speed*(arcSock ? .1 : .07)), half = sp >= 36 ? 2 : 1;
+    const peak = arcSock ? 92 : (o.k === 'pyr3' ? 66 : (o.k === 'pyr' ? 56 : 46)), sp = Math.max(28, speed*(arcSock ? .1 : .07)), half = (forcedArc && (forcedN++ % 3 !== 2)) ? 1 : (sp >= 36 ? 2 : 1);
     const gid = newGroup(2*half+1); for (let i=-half;i<=half;i++){ const hh = peak * (1 - Math.pow(i/(half+.7), 2)); discs.push({ x: cx + i*sp, y: GY - 30 - hh, g: gid }); }
     arcEnd = cx + half*sp;
   }
@@ -2470,7 +2471,7 @@ function spawnObstacle(){
 const FLY_ALT = [[12, 4], [53.5, 1.5], [76, 10]];
 // les oiseaux avancent à la vitesse du sol (comme les obstacles)
 const flySpeed = () => Math.max(spEff, 60);
-let birdWait = false;   // un oiseau attend son tour : plus aucun obstacle ne sort tant que l'écran n'est pas dégagé
+let birdWait = false, lastDiscT = 0, forcedN = 0;   // un oiseau attend son tour : plus aucun obstacle ne sort tant que l'écran n'est pas dégagé
 function flyerY(f){ return f.y0 + Math.sin(f.t*f.fs + f.ph)*f.amp + Math.sin(f.t*.8 + f.ph*2)*f.drift; }
 function spawnFlyer(){
   const sp = FLY_BY_THEME[theme]; if (!sp){ flyIn = 2; return; }
@@ -2631,6 +2632,7 @@ function update(dt){
     if (state === 'play') dist += dx;
     for (const o of obs){ o.x -= dx; if (o.leapT !== undefined) o.leapT += dt; } for (const o of discs) o.x -= dx; for (const o of items) o.x -= dx;
     obs = obs.filter(o => o.x + o.w > -30); for (const o of discs) if (!o.got && !o.missed && o.x < P.x - 20 && state === 'play'){ o.missed = true; streak = 0; TR.miss(); }
+    if (discs.some(d => !d.got && !d.missed && d.x > P.x)) lastDiscT = t;
     discs = discs.filter(o => o.x > -30 && !o.got); items = items.filter(o => o.x > -30 && !o.got);
   }
 
@@ -2707,7 +2709,7 @@ function update(dt){
     }
     for (const s of items){
       if (s.k === 'slow' && !s.got && Math.abs(s.x - P.x) < 16 && s.y + 8 > P.y-56 && s.y - 8 < P.y+2){
-        s.got = true; TR.slow(); safeT = .5; slowMul = Math.max(.35, slowMul*.75); slowFx = 1.1; slowX = s.x; slowY = s.y; sfx.slow(); toast(txt('toast.timeout'));
+        s.got = true; TR.slow(); safeT = .5; slowMul = Math.max(.35, slowMul*.78); slowFx = 1.1; slowX = s.x; slowY = s.y; sfx.slow(); toast(txt('toast.timeout'));
         burst(s.x, s.y, 18, [C.purpleL, C.yellow, C.white, C.purple], 90, 120);
       }
       if (s.k === 'sock' && Math.abs(s.x+9 - P.x) < 17 && s.y+14 > P.y-56 && s.y+6 < P.y+2){
@@ -3311,7 +3313,7 @@ requestAnimationFrame(frame);
   b.style.cssText = 'margin-top:3px;font:10px monospace;padding:3px 8px;border-radius:5px;border:1px solid #fff;background:#7B4FA0;color:#fff';
   b.addEventListener('click', e => { e.stopPropagation(); b.blur(); if (state !== 'play') return; P.sockT = 7; sfx.sock(); toast(txt('toast.superJump')); });
   d.append(info, b); document.body.appendChild(d);
-  setInterval(() => { info.textContent = 'BETA v' + APP_VERSION + '-b3' + ' · chaussette\n' + (state === 'play'
+  setInterval(() => { info.textContent = 'BETA v' + APP_VERSION + '-b4' + ' · chaussette\n' + (state === 'play'
     ? 'vitesse ' + Math.round(spEff) + ' (x' + slowMul.toFixed(2) + ')\nchaussette ' + (P.sockT > 0 ? 'ACTIVE ' + P.sockT.toFixed(1) + ' s' : 'dans ' + Math.max(0, sockIn).toFixed(1) + ' s') + '\nFast Count x' + slowMul.toFixed(2) + ' · ' + (t > 25 ? 'chrono dans ' + Math.max(0, slowIn).toFixed(1) + ' s' : 'pas de chrono avant 25 s')
     : 'lance une partie'); }, 200); }
 
