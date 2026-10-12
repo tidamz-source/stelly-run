@@ -43,7 +43,12 @@ out = out[:i] + GUARD + out[i:]
 sub_once("navigator.serviceWorker.register('sw.js')", "Promise.resolve()", 'service worker')
 
 # 5. PATCHES de gameplay BETA (vides pour l'instant)
-PATCHES = []
+PATCHES = [
+    # Fast Count : puissance 25 % (au lieu de 20 %)
+    ("slowMul = Math.max(.35, slowMul*.8);", "slowMul = Math.max(.35, slowMul*.75);", 'Fast Count puissance'),
+    # Fast Count : un chrono toutes les 25 à 30 s (au lieu de 30 à 45 s) ; premier chrono inchangé
+    ("slowIn = 30 + Math.random()*15;", "slowIn = 25 + Math.random()*5;", 'Fast Count fréquence'),
+]
 for old, new, label in PATCHES:
     sub_once(old, new, label)
 
@@ -58,7 +63,7 @@ DBG = r"""
   b.addEventListener('click', e => { e.stopPropagation(); b.blur(); if (state !== 'play') return; P.sockT = 7; sfx.sock(); toast(txt('toast.superJump')); });
   d.append(info, b); document.body.appendChild(d);
   setInterval(() => { info.textContent = 'BETA v' + APP_VERSION + ' · chaussette\n' + (state === 'play'
-    ? 'vitesse ' + Math.round(spEff) + ' (x' + slowMul.toFixed(2) + ')\nchaussette ' + (P.sockT > 0 ? 'ACTIVE ' + P.sockT.toFixed(1) + ' s' : 'dans ' + Math.max(0, sockIn).toFixed(1) + ' s')
+    ? 'vitesse ' + Math.round(spEff) + ' (x' + slowMul.toFixed(2) + ')\nchaussette ' + (P.sockT > 0 ? 'ACTIVE ' + P.sockT.toFixed(1) + ' s' : 'dans ' + Math.max(0, sockIn).toFixed(1) + ' s') + '\nFast Count x' + slowMul.toFixed(2) + ' · ' + (t > 25 ? 'chrono dans ' + Math.max(0, slowIn).toFixed(1) + ' s' : 'pas de chrono avant 25 s')
     : 'lance une partie'); }, 200); }
 """
 sub_once('\nrequestAnimationFrame(frame);\n', '\nrequestAnimationFrame(frame);\n' + DBG, 'injection debug')

@@ -2442,7 +2442,7 @@ function spawnObstacle(){
   const mx = x0 + o.w + (gap - o.w)/2, roomy = gap - o.w > speed*.64 + 125;
   // objet seul dans un espace libre (aucun frisbee à moins de 80 px), position variable, au sol ou à hauteur de saut
   const free = gap - o.w > 190, ix = x0 + o.w + 70 + Math.random()*Math.max(0, gap - o.w - 140), clear = !discs.some(dd => Math.abs(dd.x - ix) < 80);
-  if (slowIn <= 0 && !items.length && free && clear){ const lv = itemLevel(); items.push({ k:'slow', x: ix, y: GY - [26, 72][lv], lv }); slowIn = 30 + Math.random()*15; return; }
+  if (slowIn <= 0 && !items.length && free && clear){ const lv = itemLevel(); items.push({ k:'slow', x: ix, y: GY - [26, 72][lv], lv }); slowIn = 25 + Math.random()*5; return; }
   if (fireIn <= 0 && !fireOn && !items.length && free && clear){ const lv = itemLevel(); items.push({ k:'fire', x: ix, y: GY - [30, 76][lv], lv }); fireIn = itemDelay('fire'); return; }
   if (sockIn <= 0 && P.sockT <= 0 && !items.length && free && clear){ const lv = itemLevel(); items.push({ k:'sock', x: ix - 9, y: GY - [40, 88][lv], lv }); sockIn = itemDelay('sock'); return; }
   if ((roomy || sockOn) && Math.random() < (sockOn || fireOn ? .8 : .45)){
@@ -2705,7 +2705,7 @@ function update(dt){
     }
     for (const s of items){
       if (s.k === 'slow' && !s.got && Math.abs(s.x - P.x) < 16 && s.y + 8 > P.y-56 && s.y - 8 < P.y+2){
-        s.got = true; TR.slow(); safeT = .5; slowMul = Math.max(.35, slowMul*.8); slowFx = 1.1; slowX = s.x; slowY = s.y; sfx.slow(); toast(txt('toast.timeout'));
+        s.got = true; TR.slow(); safeT = .5; slowMul = Math.max(.35, slowMul*.75); slowFx = 1.1; slowX = s.x; slowY = s.y; sfx.slow(); toast(txt('toast.timeout'));
         burst(s.x, s.y, 18, [C.purpleL, C.yellow, C.white, C.purple], 90, 120);
       }
       if (s.k === 'sock' && Math.abs(s.x+9 - P.x) < 17 && s.y+14 > P.y-56 && s.y+6 < P.y+2){
@@ -3310,7 +3310,7 @@ requestAnimationFrame(frame);
   b.addEventListener('click', e => { e.stopPropagation(); b.blur(); if (state !== 'play') return; P.sockT = 7; sfx.sock(); toast(txt('toast.superJump')); });
   d.append(info, b); document.body.appendChild(d);
   setInterval(() => { info.textContent = 'BETA v' + APP_VERSION + ' · chaussette\n' + (state === 'play'
-    ? 'vitesse ' + Math.round(spEff) + ' (x' + slowMul.toFixed(2) + ')\nchaussette ' + (P.sockT > 0 ? 'ACTIVE ' + P.sockT.toFixed(1) + ' s' : 'dans ' + Math.max(0, sockIn).toFixed(1) + ' s')
+    ? 'vitesse ' + Math.round(spEff) + ' (x' + slowMul.toFixed(2) + ')\nchaussette ' + (P.sockT > 0 ? 'ACTIVE ' + P.sockT.toFixed(1) + ' s' : 'dans ' + Math.max(0, sockIn).toFixed(1) + ' s') + '\nFast Count x' + slowMul.toFixed(2) + ' · ' + (t > 25 ? 'chrono dans ' + Math.max(0, slowIn).toFixed(1) + ' s' : 'pas de chrono avant 25 s')
     : 'lance une partie'); }, 200); }
 setTimeout(() => SYNC.now(), 1500);   // synchro au lancement
 
