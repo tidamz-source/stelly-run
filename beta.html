@@ -3309,7 +3309,7 @@ requestAnimationFrame(frame);
   b.style.cssText = 'margin-top:4px;font:11px monospace;padding:3px 8px;border-radius:5px;border:1px solid #fff;background:#7B4FA0;color:#fff';
   b.addEventListener('click', e => { e.stopPropagation(); b.blur(); if (state !== 'play') return; P.sockT = 7; sfx.sock(); toast(txt('toast.superJump')); });
   d.append(info, b); document.body.appendChild(d);
-  setInterval(() => { info.textContent = 'BETA v' + APP_VERSION + ' · chaussette\n' + (state === 'play'
+  setInterval(() => { info.textContent = 'BETA v' + APP_VERSION + '-b2' + ' · chaussette\n' + (state === 'play'
     ? 'vitesse ' + Math.round(spEff) + ' (x' + slowMul.toFixed(2) + ')\nchaussette ' + (P.sockT > 0 ? 'ACTIVE ' + P.sockT.toFixed(1) + ' s' : 'dans ' + Math.max(0, sockIn).toFixed(1) + ' s') + '\nFast Count x' + slowMul.toFixed(2) + ' · ' + (t > 25 ? 'chrono dans ' + Math.max(0, slowIn).toFixed(1) + ' s' : 'pas de chrono avant 25 s')
     : 'lance une partie'); }, 200); }
 setTimeout(() => SYNC.now(), 1500);   // synchro au lancement

@@ -13,6 +13,9 @@ Conventions BETA :
 """
 import pathlib, re, sys
 
+# Numéro de la beta : à incrémenter à chaque nouvelle beta (affiché « v<version du jeu>-b<numéro> »)
+BETA_REV = 2
+
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 src = (ROOT / 'index.html').read_text(encoding='utf-8')
 out = src
@@ -62,11 +65,11 @@ DBG = r"""
   b.style.cssText = 'margin-top:4px;font:11px monospace;padding:3px 8px;border-radius:5px;border:1px solid #fff;background:#7B4FA0;color:#fff';
   b.addEventListener('click', e => { e.stopPropagation(); b.blur(); if (state !== 'play') return; P.sockT = 7; sfx.sock(); toast(txt('toast.superJump')); });
   d.append(info, b); document.body.appendChild(d);
-  setInterval(() => { info.textContent = 'BETA v' + APP_VERSION + ' · chaussette\n' + (state === 'play'
+  setInterval(() => { info.textContent = 'BETA v' + APP_VERSION + '-b""" + str(BETA_REV) + r"""' + ' · chaussette\n' + (state === 'play'
     ? 'vitesse ' + Math.round(spEff) + ' (x' + slowMul.toFixed(2) + ')\nchaussette ' + (P.sockT > 0 ? 'ACTIVE ' + P.sockT.toFixed(1) + ' s' : 'dans ' + Math.max(0, sockIn).toFixed(1) + ' s') + '\nFast Count x' + slowMul.toFixed(2) + ' · ' + (t > 25 ? 'chrono dans ' + Math.max(0, slowIn).toFixed(1) + ' s' : 'pas de chrono avant 25 s')
     : 'lance une partie'); }, 200); }
 """
 sub_once('\nrequestAnimationFrame(frame);\n', '\nrequestAnimationFrame(frame);\n' + DBG, 'injection debug')
 
 (ROOT / 'beta.html').write_text(out, encoding='utf-8')
-print('[make_beta] beta.html généré depuis index.html v' + re.search(r"APP_VERSION = '([^']+)'", src).group(1))
+print('[make_beta] beta.html v' + re.search(r"APP_VERSION = '([^']+)'", src).group(1) + '-b' + str(BETA_REV) + ' généré depuis index.html')
