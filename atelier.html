@@ -167,6 +167,21 @@ main.vig{ grid-template-columns:minmax(320px,1fr) auto 320px; }
   background:linear-gradient(135deg, transparent 0 42%, rgba(255,255,255,.75) 42% 47%, transparent 47% 50%, rgba(255,255,255,.5) 50% 52%, transparent 52%) 100% 100% / 300% 300% no-repeat;
   animation:vshine 3.6s ease-in-out infinite; }
 @keyframes vshine{ 0%, 62%{ background-position:0 0; } 100%{ background-position:100% 100%; } }
+/* onglet Obstacles (réutilise l'éditeur des accessoires) */
+.obsOnly{ display:none !important; }
+body.obs .obsOnly{ display:revert !important; }
+body.obs .accOnly{ display:none !important; }
+#ogroups h3{ font-size:14px; color:var(--lilac); margin:12px 0 6px; font-weight:500; }
+#ogroups h3:first-child{ margin-top:0; }
+#oprops b{ display:block; font-size:18px; color:var(--star); }
+#oprops .note{ color:var(--lilac); font-size:13px; line-height:1.45; margin:6px 0; }
+#oscene{ display:block; width:100%; background:#FDF4D9; border-radius:8px; }
+#oreal{ display:flex; flex-wrap:wrap; gap:14px; align-items:flex-end; }
+#oreal figure{ margin:0; text-align:center; }
+#oreal canvas{ background:#FDF4D9; border-radius:4px; display:block; margin:0 auto; }
+#oreal figcaption{ font-size:12px; color:var(--lilac); margin-top:4px; }
+/* copier-coller */
+.clipinfo{ color:var(--lilac); font-size:13px; }
 @media (max-width:1100px){
   main{ grid-template-columns:1fr; }
   main > section{ overflow:visible; }
@@ -178,7 +193,7 @@ main.vig{ grid-template-columns:minmax(320px,1fr) auto 320px; }
 <body>
 <header>
   <h1>Atelier<small>Stelly Run</small></h1>
-  <nav id="tabs"><button class="tab on" data-tab="acc">Accessoires</button><button class="tab" data-tab="vig">Vignettes</button></nav>
+  <nav id="tabs"><button class="tab on" data-tab="acc">Accessoires</button><button class="tab" data-tab="obs">Obstacles</button><button class="tab" data-tab="vig">Vignettes</button></nav>
   <span id="state">Chargement…</span>
   <button class="btn" id="download" disabled title="Copie de boutique.json sur cet appareil, sans rien publier">Télécharger</button>
   <button class="btn main" id="publish" disabled>Publier</button>
@@ -206,15 +221,21 @@ main.vig{ grid-template-columns:minmax(320px,1fr) auto 320px; }
 
 <main id="acc">
   <section id="left">
-    <div class="block">
+    <div class="block accOnly">
       <div id="slots"></div>
       <div id="items"></div>
       <button class="btn" id="newItem">Nouvel article</button>
     </div>
-    <div class="block" id="props"></div>
-    <div class="block">
+    <div class="block accOnly" id="props"></div>
+    <div class="block accOnly">
       <h2>Contrôles</h2>
       <ul id="checks"></ul>
+    </div>
+    <div class="block obsOnly" id="oprops"></div>
+    <div class="block obsOnly">
+      <h2>Obstacles</h2>
+      <p class="hint" style="color:var(--lilac);font-size:13px;margin:-4px 0 10px">Point violet : retouché. Point jaune : pas encore publié.</p>
+      <div id="ogroups"><p style="color:var(--lilac)">Chargement des obstacles du jeu…</p></div>
     </div>
   </section>
 
@@ -225,6 +246,7 @@ main.vig{ grid-template-columns:minmax(320px,1fr) auto 320px; }
       <button class="btn" data-tool="eraser" title="Gomme (E), ou clic droit">Gomme</button>
       <button class="btn" data-tool="fill" title="Remplissage (G)">Remplir</button>
       <button class="btn" data-tool="pick" title="Pipette (I), ou Alt + clic">Pipette</button>
+      <button class="btn" data-tool="select" title="Sélection (S) : glisser un rectangle ; Suppr efface la sélection">Sélection</button>
       <button class="btn" data-tool="move" title="Déplacer le dessin (M), ou flèches du clavier">Déplacer</button>
       <button class="btn" data-tool="rotate" title="Tourner le dessin (R) : glisser autour du dessin ; Maj : par pas de 15°">Tourner</button>
       <button class="btn" id="rotL" title="Quart de tour à gauche">↺ 90°</button>
@@ -235,9 +257,14 @@ main.vig{ grid-template-columns:minmax(320px,1fr) auto 320px; }
       <button class="btn" id="undo" title="Annuler (Ctrl+Z)">Annuler</button>
       <button class="btn" id="redo" title="Rétablir (Ctrl+Y)">Rétablir</button>
       <span class="sep"></span>
+      <button class="btn" id="copy" title="Copier (Ctrl+C) : la sélection, ou tout le dessin du calque">Copier</button>
+      <button class="btn" id="cut" title="Couper (Ctrl+X)">Couper</button>
+      <button class="btn" id="paste" title="Coller (Ctrl+V) : glisser pour placer, Entrée pour poser, Échap pour annuler. Fonctionne d'un onglet ou d'un article à l'autre">Coller</button>
+      <span class="sep"></span>
       <button class="btn" id="zoomOut" title="Zoom arrière">−</button>
       <button class="btn" id="zoomIn" title="Zoom avant">+</button>
-      <label>Stelly <input type="range" id="onion" min="0" max="100" value="55"></label>
+      <label><span id="onionLab">Stelly</span> <input type="range" id="onion" min="0" max="100" value="55"></label>
+      <label class="obsOnly"><input type="checkbox" id="ohit" checked> Collision</label>
       <label><input type="checkbox" id="grid" checked> Grille</label>
     </div>
     <div id="refbar">
@@ -256,17 +283,25 @@ main.vig{ grid-template-columns:minmax(320px,1fr) auto 320px; }
   </section>
 
   <section id="right">
-    <div class="block">
+    <div class="block accOnly">
       <h2>Course</h2>
       <canvas id="big"></canvas>
     </div>
-    <div class="block">
+    <div class="block accOnly">
       <h2>Toutes les poses</h2>
       <div id="poses"></div>
     </div>
-    <div class="block">
+    <div class="block accOnly">
       <h2>Vignette de la boutique</h2>
       <div id="iconBox"><canvas id="icon" width="96" height="96"></canvas><span id="iconTxt"></span></div>
+    </div>
+    <div class="block obsOnly">
+      <h2>Dans le jeu</h2>
+      <canvas id="oscene" width="180" height="96"></canvas>
+    </div>
+    <div class="block obsOnly">
+      <h2>Taille réelle</h2>
+      <div id="oreal"></div>
     </div>
   </section>
 </main>
@@ -290,6 +325,11 @@ main.vig{ grid-template-columns:minmax(320px,1fr) auto 320px; }
         <button class="btn" data-vtool="eraser" title="Gomme (E), ou clic droit">Gomme</button>
         <button class="btn" data-vtool="fill" title="Remplissage (G)">Remplir</button>
         <button class="btn" data-vtool="pick" title="Pipette (I), ou Alt + clic">Pipette</button>
+        <button class="btn" data-vtool="select" title="Sélection (S) : glisser un rectangle ; Suppr efface la sélection">Sélection</button>
+        <span class="sep"></span>
+        <button class="btn" id="vcopy" title="Copier (Ctrl+C) : la sélection, ou toute l'icône">Copier</button>
+        <button class="btn" id="vcut" title="Couper (Ctrl+X)">Couper</button>
+        <button class="btn" id="vpaste" title="Coller (Ctrl+V) : glisser pour placer, Entrée pour poser, Échap pour annuler">Coller</button>
         <span class="sep"></span>
         <button class="btn" id="vundo" title="Annuler (Ctrl+Z)">Annuler</button>
         <button class="btn" id="vredo" title="Rétablir (Ctrl+Y)">Rétablir</button>
@@ -323,23 +363,25 @@ main.vig{ grid-template-columns:minmax(320px,1fr) auto 320px; }
     <div class="block note">
       <p>Les icônes font 32 × 32 pixels. Les retouches des trophées vont dans <b>trophees.json</b>, celles des vignettes dans <b>boutique.json</b> ; le bouton <b>Publier</b> envoie tout en une fois.</p>
       <p>Le fond des tuiles (crème, doré, cadenas) est géré par le jeu : seul le dessin se retouche ici.</p>
-      <p>Raccourcis : B crayon, E gomme, G remplir, I pipette, flèches pour décaler le dessin, Ctrl+Z / Ctrl+Y.</p>
+      <p>Raccourcis : B crayon, E gomme, G remplir, I pipette, S sélection, flèches pour décaler le dessin, Ctrl+Z / Ctrl+Y.</p>
+      <p>Copier-coller : Ctrl+C / Ctrl+X copie la sélection (ou toute l'icône), Ctrl+V colle, y compris un dessin copié dans les onglets Accessoires ou Obstacles. Glisse le collage pour le placer, Entrée pour le poser, Échap pour annuler. Ctrl+Maj+V colle une image comme modèle.</p>
     </div>
   </section>
 </main>
 
-<script src="langues.js?v=6.11"></script>
-<script src="stelly.js?v=6.11"></script>
+<script src="langues.js?v=6.12"></script>
+<script src="stelly.js?v=6.12"></script>
 <script>
 (() => {
 'use strict';
-const { C, mk, drawStelly, drawHat, POSES, PAD, SW, SH, CX, CY, BODY_PAL } = StellyArt;
+const { C, mk, drawStelly, drawHat, POSES, PAD, SW, SH, CX, CY, FB, BODY_PAL } = StellyArt;
 const $ = id => document.getElementById(id);
 const DRAFT_KEY = 'stellyrun_atelier_brouillon';
 
 /* ================= Repères ================= */
 // zone de dessin : 96 × 96 pixels, Stelly (canevas 64 × 80, marge PAD comprise) posé en (16, 8)
-const EW = 96, EH = 96, OX = 16, OY = 8;
+// la zone de dessin change de taille pour les obstacles (taille de l'obstacle + marge)
+let EW = 96, EH = 96; const AW = 96, AH = 96, OX = 16, OY = 8;
 const SLOTS = ['hat', 'glasses', 'shirt', 'shoes'];
 const SLOT_NAME = { hat:'Chapeaux', glasses:'Lunettes', shirt:'Costumes', shoes:'Chaussures' };
 const SLOT_ONE = { hat:'chapeau', glasses:'lunettes', shirt:'costume', shoes:'chaussures' };
@@ -374,6 +416,25 @@ function iconOf(im){
 }
 const hex = c => '#' + [0, 1, 2].map(i => c[i].toString(16).padStart(2, '0')).join('').toUpperCase();
 
+/* ================= Presse-papiers de pixels (partagé par les trois onglets) ================= */
+// CLIP : { img, x, y, ctx } ; ctx : repère du dessin copié ('acc' : zone des accessoires, 'obs:<id>', 'vig') ;
+// dans le même repère, le collage revient à la même place ; sinon, il arrive au centre
+let CLIP = null;
+// trim : recadre une image sur ses pixels visibles ; { img, dx, dy } ou null
+function trim(c){
+  const w = c.width, h = c.height, d = c.getContext('2d').getImageData(0, 0, w, h).data; let x0 = w, y0 = h, x1 = -1, y1 = -1;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (d[(y*w + x)*4 + 3]){ if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+  if (x1 < 0) return null;
+  return { img:mk(x1 - x0 + 1, y1 - y0 + 1, g => g.drawImage(c, -x0, -y0)), dx:x0, dy:y0 };
+}
+// rectangle de sélection normalisé, borné à la zone
+function normRect(a, b, W, H){
+  const x0 = Math.max(0, Math.min(a[0], b[0])), y0 = Math.max(0, Math.min(a[1], b[1])), x1 = Math.min(W - 1, Math.max(a[0], b[0])), y1 = Math.min(H - 1, Math.max(a[1], b[1]));
+  return x1 < x0 || y1 < y0 ? null : { x:x0, y:y0, w:x1 - x0 + 1, h:y1 - y0 + 1 };
+}
+function drawSel(g, r, z){ g.save(); g.lineWidth = 1; g.setLineDash([4, 3]); g.strokeStyle = '#2E0E30'; g.strokeRect(r.x*z + .5, r.y*z + .5, r.w*z - 1, r.h*z - 1);
+  g.strokeStyle = '#FFCF00'; g.lineDashOffset = 3.5; g.strokeRect(r.x*z + .5, r.y*z + .5, r.w*z - 1, r.h*z - 1); g.restore(); }
+
 /* ================= Données ================= */
 let DATA = { items:[] }, ONLINE = { items:[] }, ONLINE_IDS = new Set();
 let slot = 'hat', SES = null, ACTIVE = null, tool = 'pen', color = C.plum, Z = 6;
@@ -381,9 +442,9 @@ const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const onlineOf = id => ONLINE.items.find(x => x.id === id);
 
 /* ================= Session d'édition (calques d'un article) ================= */
-const layerKeys = s => s.item.slot === 'hat' ? s.frames : s.item.slot === 'glasses' ? ['main'] : s.item.slot === 'shirt' ? ['motif'] : ['front', 'back'];
-const anchorOf = (s, k) => s.item.slot === 'hat' ? 'hat' : { main:'glasses', motif:'shirt', front:'front', back:'back' }[k];
-const labelOf = (s, k) => s.item.slot === 'hat' ? 'Image ' + (s.frames.indexOf(k) + 1) : { main:'Lunettes', motif:'Motif', front:'Pied avant', back:'Pied arrière' }[k];
+const layerKeys = s => s.kind === 'obs' || s.item.slot === 'hat' ? s.frames : s.item.slot === 'glasses' ? ['main'] : s.item.slot === 'shirt' ? ['motif'] : ['front', 'back'];
+const anchorOf = (s, k) => s.kind === 'obs' ? null : s.item.slot === 'hat' ? 'hat' : { main:'glasses', motif:'shirt', front:'front', back:'back' }[k];
+const labelOf = (s, k) => s.kind === 'obs' ? (s.frames.length > 1 ? 'Image ' + (s.frames.indexOf(k) + 1) : 'Dessin') : s.item.slot === 'hat' ? 'Image ' + (s.frames.indexOf(k) + 1) : { main:'Lunettes', motif:'Motif', front:'Pied avant', back:'Pied arrière' }[k];
 
 async function openSession(it){
   const s = { item:it, L:{}, dirty:new Set(), frames:[], nextF:0, hist:[], redo:[], pal:null, orig:{} };
@@ -428,6 +489,7 @@ const samePx = (a, b) => a.length === b.length && a.every((v, i) => v === b[i]);
 // écrit les calques modifiés dans l'article (les images non retouchées gardent leur code d'origine,
 // y compris quand une retouche est annulée : mêmes pixels = même code)
 function commit(s){
+  if (s.kind === 'obs') return ocommit(s);
   const it = s.item;
   // image d'un calque : { src, dx, dy } ; mêmes pixels qu'à l'ouverture = code et décalage d'origine
   const get = k => { const o = s.orig[k]; if (o && samePx(pixels(s.L[k]), o.px)) return o;
@@ -460,6 +522,7 @@ function refreshState(){
   const n = mod + del, tn = tchanges().length, parts = [];
   if (n) parts.push(n + ' article' + (n > 1 ? 's' : '') + ' modifié' + (n > 1 ? 's' : ''));
   if (tn) parts.push(tn + ' icône' + (tn > 1 ? 's' : '') + ' de trophée modifiée' + (tn > 1 ? 's' : ''));
+  const on = ochanges().length; if (on) parts.push(on + ' obstacle' + (on > 1 ? 's' : '') + ' modifié' + (on > 1 ? 's' : ''));
   $('state').innerHTML = parts.length ? '<b>' + parts.join(', ') + '</b> par rapport à la version en ligne' : 'Identique à la version en ligne';
   document.querySelectorAll('.item').forEach(b => { const it = DATA.items.find(x => x.id === b.dataset.id); b.querySelector('.mod').textContent = it && !same(it, onlineOf(it.id)) ? '●' : ''; });
 }
@@ -514,13 +577,16 @@ function renderList(){
 /* ================= Sélection ================= */
 async function select(id){
   const it = DATA.items.find(x => x.id === id); if (!it) return;
+  stampFloat(); SEL = null;
   if (SES && SES.dirty.size) commit(SES);
+  EW = AW; EH = AH;
   slot = it.slot; SES = await openSession(it); ACTIVE = layerKeys(SES)[0];
   renderSlots(); renderList(); renderProps(); renderLayers(); collectColors(); refBar(); invalidate(); fit();
 }
 
 /* ================= Fiche article ================= */
 function renderProps(){
+  if (SES && SES.kind === 'obs') return;   // fiche des accessoires ; celle des obstacles : orenderProps()
   const box = $('props'), it = SES && SES.item; box.innerHTML = '';
   if (!it) return;
   const isNew = !ONLINE_IDS.has(it.id);
@@ -597,8 +663,13 @@ function remove(){
 /* ================= Calques ================= */
 function renderLayers(){
   const box = $('layers'); box.innerHTML = ''; if (!SES) return;
-  for (const k of layerKeys(SES)){ const b = button(labelOf(SES, k), () => { ACTIVE = k; renderLayers(); invalidate(); }); if (k === ACTIVE) b.classList.add('on'); box.appendChild(b); }
+  for (const k of layerKeys(SES)){ const b = button(labelOf(SES, k), () => { stampFloat(); SEL = null; ACTIVE = k; renderLayers(); invalidate(); }); if (k === ACTIVE) b.classList.add('on'); box.appendChild(b); }
   const it = SES.item;
+  if (SES.kind === 'obs'){
+    box.appendChild(button('Effacer le calque', () => { if (!confirm('Effacer « ' + labelOf(SES, ACTIVE) + ' » ?')) return; snapshot(ACTIVE); SES.L[ACTIVE].g.clearRect(0, 0, EW, EH); SES.dirty.add(ACTIVE); commit(SES); invalidate(); }, '', 'danger'));
+    hint(it.bird ? 'Volant : ' + (SES.frames.length > 1 ? 'trois images de battement d\'ailes (le jeu les enchaîne 1, 2, 3, 2).' : 'une seule image.') + ' Garde-le dans le cadre.' : (it.gy && it.gy < SES.h ? 'La ligne verte est le sol : le jeu enfonce un peu cet obstacle.' : 'Le bas du cadre est le sol.') + ' Les pixels hors du cadre ne sont pas gardés.');
+    return;
+  }
   if (it.slot === 'hat'){
     box.appendChild(button('Ajouter une image', () => {
       const k = 'f' + SES.nextF++, c = layerCanvas(); c.g.drawImage(SES.L[ACTIVE], 0, 0); SES.L[k] = c;
@@ -684,7 +755,7 @@ $('refDel').onclick = () => { if (SES){ REFS.delete(SES.item); refBar(); draw();
 $('stage').addEventListener('dragover', e => { e.preventDefault(); $('stage').classList.add('drop'); });
 $('stage').addEventListener('dragleave', () => $('stage').classList.remove('drop'));
 $('stage').addEventListener('drop', e => { e.preventDefault(); $('stage').classList.remove('drop'); loadRef(e.dataTransfer.files[0]); });
-addEventListener('paste', e => { if (TAB !== 'acc') return; const f = [...(e.clipboardData || {}).files || []].find(f => /^image\//.test(f.type)); if (f && !/INPUT/.test(document.activeElement.tagName)){ e.preventDefault(); loadRef(f); } });
+addEventListener('paste', e => { if (TAB !== 'acc' && TAB !== 'obs') return; const f = [...(e.clipboardData || {}).files || []].find(f => /^image\//.test(f.type)); if (f && !/INPUT/.test(document.activeElement.tagName)){ e.preventDefault(); loadRef(f); } });
 
 /* ================= Tourner, retourner ================= */
 function bbox(c){
@@ -740,31 +811,44 @@ let BASE = null;   // Stelly avec les autres calques ; recalculé quand ils chan
 function invalidate(){ BASE = null; draw(); schedulePreview(); }
 function draw(){
   if (!SES){ ed.width = EW*Z; ed.height = EH*Z; eg.clearRect(0, 0, ed.width, ed.height); return; }
-  if (!BASE){ BASE = mk(EW, EH); const c = mk(SW, SH + PAD);
-    drawStelly(c.getContext('2d'), Object.assign({}, POSE0, { oy:PAD, eq:runtime(SES, ACTIVE) })); BASE.getContext('2d').drawImage(c, OX, OY); }
-  if (ed.width !== EW*Z){ ed.width = EW*Z; ed.height = EH*Z; }
+  if (!BASE){ BASE = mk(EW, EH);
+    if (SES.kind === 'obs') BASE.getContext('2d').drawImage(SES.item.f[SES.frames.indexOf(ACTIVE)], SES.M, SES.M);   // dessin d'origine du jeu
+    else { const c = mk(SW, SH + PAD); drawStelly(c.getContext('2d'), Object.assign({}, POSE0, { oy:PAD, eq:runtime(SES, ACTIVE) })); BASE.getContext('2d').drawImage(c, OX, OY); } }
+  if (ed.width !== EW*Z || ed.height !== EH*Z){ ed.width = EW*Z; ed.height = EH*Z; }
   eg.imageSmoothingEnabled = false;
   eg.fillStyle = C.cream; eg.fillRect(0, 0, ed.width, ed.height);
   eg.globalAlpha = +$('onion').value / 100; eg.drawImage(BASE, 0, 0, EW*Z, EH*Z);
   // chapeau animé : l'image précédente en transparence
   const R = ref();
   if (R && R.show){ eg.globalAlpha = R.op; eg.imageSmoothingEnabled = true; eg.drawImage(R.img, R.x*Z, R.y*Z, R.img.width*R.s*Z, R.img.height*R.s*Z); eg.imageSmoothingEnabled = false; }
-  if (SES.item.slot === 'hat'){ const i = SES.frames.indexOf(ACTIVE); if (i > 0){ eg.globalAlpha = .25; eg.drawImage(SES.L[SES.frames[i - 1]], 0, 0, EW*Z, EH*Z); } }
+  if (SES.kind === 'obs' || SES.item.slot === 'hat'){ const i = SES.frames.indexOf(ACTIVE); if (i > 0){ eg.globalAlpha = .25; eg.drawImage(SES.L[SES.frames[i - 1]], 0, 0, EW*Z, EH*Z); } }
   eg.globalAlpha = 1; eg.drawImage(SES.L[ACTIVE], 0, 0, EW*Z, EH*Z);
+  if (FLOAT){ eg.drawImage(FLOAT.img, FLOAT.x*Z, FLOAT.y*Z, FLOAT.img.width*Z, FLOAT.img.height*Z); drawSel(eg, { x:FLOAT.x, y:FLOAT.y, w:FLOAT.img.width, h:FLOAT.img.height }, Z); }
   if ($('grid').checked && Z >= 5){ eg.fillStyle = 'rgba(46,14,48,.12)';
     for (let x = 1; x < EW; x++) eg.fillRect(x*Z, 0, 1, ed.height); for (let y = 1; y < EH; y++) eg.fillRect(0, y*Z, ed.width, 1); }
-  // point d'accroche
-  const a = ANCH[anchorOf(SES, ACTIVE)]; eg.strokeStyle = 'rgba(224,65,58,.85)'; eg.lineWidth = 2;
-  eg.strokeRect(a.x*Z + 1, a.y*Z + 1, Z - 2, Z - 2);
+  if (SES.kind === 'obs'){
+    // cadre de l'obstacle : l'extérieur est grisé (non gardé), le bas est le sol, la zone de collision en rouge
+    const { M, w, h } = SES, it = SES.item; eg.fillStyle = 'rgba(46,14,48,.28)';
+    eg.fillRect(0, 0, ed.width, M*Z); eg.fillRect(0, (M + h)*Z, ed.width, ed.height - (M + h)*Z); eg.fillRect(0, M*Z, M*Z, h*Z); eg.fillRect((M + w)*Z, M*Z, ed.width - (M + w)*Z, h*Z);
+    eg.save(); eg.setLineDash([5, 4]); eg.strokeStyle = 'rgba(122,87,160,.9)'; eg.lineWidth = 1; eg.strokeRect(M*Z - .5, M*Z - .5, w*Z + 1, h*Z + 1); eg.restore();
+    if (!it.bird){ eg.fillStyle = 'rgba(63,183,90,.9)'; eg.fillRect(0, (M + (it.gy || h))*Z - 1, ed.width, 2); }
+    if ($('ohit').checked){ eg.strokeStyle = 'rgba(224,65,58,.9)'; eg.lineWidth = 2;
+      for (const [x0, x1, y0, y1] of it.hit) eg.strokeRect((M + x0)*Z + 1, (M + y0)*Z + 1, (x1 - x0)*Z - 2, (y1 - y0)*Z - 2); }
+  } else {
+    // point d'accroche
+    const a = ANCH[anchorOf(SES, ACTIVE)]; eg.strokeStyle = 'rgba(224,65,58,.85)'; eg.lineWidth = 2;
+    eg.strokeRect(a.x*Z + 1, a.y*Z + 1, Z - 2, Z - 2);
+  }
+  if (SEL) drawSel(eg, SEL, Z);
 }
 function fit(){
   const st = $('stage'), z = Math.floor(Math.min((st.clientWidth - 20) / EW, (st.clientHeight - 20) / EH));
-  Z = Math.max(3, Math.min(14, z || 6)); draw();
+  Z = Math.max(3, Math.min(SES && SES.kind === 'obs' ? 20 : 14, z || 6)); draw();
 }
 
 /* ================= Dessin ================= */
 function setTool(t){ tool = t; document.querySelectorAll('[data-tool]').forEach(b => b.classList.toggle('on', b.dataset.tool === t));
-  ed.style.cursor = t === 'ref' || t === 'move' ? 'move' : t === 'rotate' ? 'grab' : 'crosshair'; }
+  ed.style.cursor = t === 'ref' || t === 'move' ? 'move' : t === 'rotate' ? 'grab' : 'crosshair'; if (t !== 'select' && SEL){ SEL = null; draw(); } }
 function snapshot(k){ SES.hist.push({ k, d:SES.L[k].g.getImageData(0, 0, EW, EH) }); if (SES.hist.length > 80) SES.hist.shift(); SES.redo = []; }
 function undoRedo(from, to){
   if (!SES || !from.length) return; const h = from.pop(), L = SES.L[h.k]; if (!L) return;
@@ -799,11 +883,43 @@ function fill(x, y){
 function shift(dx, dy){
   const L = SES.L[ACTIVE], tmp = mk(EW, EH, g => g.drawImage(L, 0, 0)); L.g.clearRect(0, 0, EW, EH); L.g.drawImage(tmp, dx, dy);
 }
-let stroke = null;
+let stroke = null, SEL = null, FLOAT = null;
+const ctxKey = () => SES && SES.kind === 'obs' ? 'obs:' + SES.item.id : 'acc';
+// copier : la sélection, sinon tout le dessin du calque ; couper : copie puis efface
+function doCopy(cut){
+  if (!SES) return;
+  if (FLOAT){ CLIP = { img:FLOAT.img, x:FLOAT.x, y:FLOAT.y, ctx:ctxKey() }; if (cut) cancelFloat(); hint('Copié.'); return; }
+  const L = SES.L[ACTIVE], b = SEL || (r => r && { x:r.x0, y:r.y0, w:r.w, h:r.h })(bbox(L));
+  if (!b){ hint('Rien à copier : le calque est vide.'); return; }
+  const t = trim(mk(b.w, b.h, g => g.drawImage(L, b.x, b.y, b.w, b.h, 0, 0, b.w, b.h)));
+  if (!t){ hint('Rien à copier : la sélection est vide.'); return; }
+  CLIP = { img:t.img, x:b.x + t.dx, y:b.y + t.dy, ctx:ctxKey() };
+  if (cut){ snapshot(ACTIVE); SES.dirty.add(ACTIVE); L.g.clearRect(b.x, b.y, b.w, b.h); commit(SES); collectColors(); invalidate(); }
+  hint((cut ? 'Coupé' : 'Copié') + ' : ' + t.img.width + ' × ' + t.img.height + ' px. Colle-le ici, sur un autre article, un obstacle ou une vignette.');
+}
+function doPaste(){
+  if (!SES) return; if (!CLIP){ hint('Rien à coller : copie d\'abord un dessin (Ctrl+C).'); return; }
+  stampFloat(); SEL = null;
+  const w = CLIP.img.width, h = CLIP.img.height, here = CLIP.ctx === ctxKey();
+  FLOAT = { img:CLIP.img, x:here ? CLIP.x : Math.round((EW - w) / 2), y:here ? CLIP.y : Math.round((EH - h) / 2) };
+  draw(); hint('Collage : glisse-le pour le placer, flèches pour l\'ajuster, Entrée ou clic à côté pour le poser, Échap pour annuler.');
+}
+// pose le collage dans le calque (une seule étape d'annulation)
+function stampFloat(){
+  if (!FLOAT || !SES){ FLOAT = null; return; } const F = FLOAT; FLOAT = null;
+  snapshot(ACTIVE); SES.dirty.add(ACTIVE); SES.L[ACTIVE].g.drawImage(F.img, F.x, F.y); commit(SES); collectColors(); invalidate();
+}
+function cancelFloat(){ FLOAT = null; if (SES) draw(); }
+function clearSel(){ if (!SEL || !SES) return; snapshot(ACTIVE); SES.dirty.add(ACTIVE); SES.L[ACTIVE].g.clearRect(SEL.x, SEL.y, SEL.w, SEL.h); commit(SES); invalidate(); }
+$('copy').onclick = () => doCopy(false); $('cut').onclick = () => doCopy(true); $('paste').onclick = doPaste;
 ed.addEventListener('contextmenu', e => e.preventDefault());
 ed.addEventListener('pointerdown', e => {
   if (!SES) return; ed.setPointerCapture(e.pointerId);
   const [x, y] = cell(e), t = e.altKey ? 'pick' : e.button === 2 ? 'eraser' : tool;
+  if (FLOAT){ const [fx, fy] = pos(e);
+    if (fx >= FLOAT.x && fy >= FLOAT.y && fx < FLOAT.x + FLOAT.img.width && fy < FLOAT.y + FLOAT.img.height){ stroke = { t:'float', ox:x - FLOAT.x, oy:y - FLOAT.y, x, y }; return; }
+    stampFloat(); return; }
+  if (t === 'select'){ stroke = { t, a:[x, y], x, y, moved:false }; SEL = normRect([x, y], [x, y], EW, EH); draw(); return; }
   if (t === 'pick'){ pick(x, y); return; }
   if (t === 'ref'){ const R = ref(); if (R){ const [fx, fy] = pos(e); stroke = { t, fx, fy, x0:R.x, y0:R.y }; } return; }
   if (t === 'rotate'){ const r = rotStart(); if (!r) return; const [fx, fy] = pos(e);
@@ -817,7 +933,11 @@ ed.addEventListener('pointerdown', e => {
 });
 ed.addEventListener('pointermove', e => {
   if (!SES) return; const [x, y] = cell(e);
-  $('hint').textContent = inside(x, y) ? 'x ' + (x - ANCH[anchorOf(SES, ACTIVE)].x) + ', y ' + (y - ANCH[anchorOf(SES, ACTIVE)].y) + ' par rapport au point d\'accroche' : '';
+  if (!FLOAT && !(stroke && stroke.t === 'select')) $('hint').textContent = !inside(x, y) ? '' : SES.kind === 'obs' ? 'x ' + (x - SES.M) + ', y ' + (y - SES.M) + ' dans le cadre de l\'obstacle'
+    : 'x ' + (x - ANCH[anchorOf(SES, ACTIVE)].x) + ', y ' + (y - ANCH[anchorOf(SES, ACTIVE)].y) + ' par rapport au point d\'accroche';
+  if (stroke && stroke.t === 'float'){ if (x !== stroke.x || y !== stroke.y){ FLOAT.x = x - stroke.ox; FLOAT.y = y - stroke.oy; stroke.x = x; stroke.y = y; draw(); } return; }
+  if (stroke && stroke.t === 'select'){ if (x !== stroke.x || y !== stroke.y){ stroke.moved = true; SEL = normRect(stroke.a, [x, y], EW, EH); stroke.x = x; stroke.y = y; draw();
+    if (SEL) hint('Sélection : ' + SEL.w + ' × ' + SEL.h + ' px. Ctrl+C pour copier, Ctrl+X pour couper, Suppr pour effacer.'); } return; }
   if (stroke && stroke.t === 'ref'){ const R = ref(), [fx, fy] = pos(e); if (R){ R.x = stroke.x0 + fx - stroke.fx; R.y = stroke.y0 + fy - stroke.fy; draw(); } return; }
   if (stroke && stroke.t === 'rotate'){
     const [fx, fy] = pos(e), st = e.shiftKey ? Math.PI / 12 : Math.PI / 180;
@@ -830,7 +950,9 @@ ed.addEventListener('pointermove', e => {
   else if (stroke.t !== 'fill') line(stroke.x, stroke.y, x, y, stroke.t === 'eraser');
   stroke.x = x; stroke.y = y; draw();
 });
-const endStroke = () => { if (!stroke) return; const t = stroke.t; stroke = null; if (t === 'ref') return; commit(SES); collectColors(); schedulePreview(); };
+const endStroke = () => { if (!stroke) return; const s = stroke, t = s.t; stroke = null;
+  if (t === 'select'){ if (!s.moved) SEL = null; draw(); return; }
+  if (t === 'ref' || t === 'float') return; commit(SES); collectColors(); schedulePreview(); };
 ed.addEventListener('pointerup', endStroke); ed.addEventListener('pointercancel', endStroke);
 function hint(t){ $('hint').textContent = t; }
 
@@ -838,6 +960,7 @@ function hint(t){ $('hint').textContent = t; }
 let PREV = null, prevT = 0;
 function schedulePreview(){ clearTimeout(prevT); prevT = setTimeout(buildPreview, 60); }
 function buildPreview(){
+  if (SES && SES.kind === 'obs'){ obuildPreview(); return; }
   if (!SES){ PREV = null; return; }
   const eq = runtime(SES, null), hat = hatRuntime(SES);
   const one = o => { const c = mk(SW, SH + PAD), ank = drawStelly(c.getContext('2d'), Object.assign({}, o, { oy:PAD, eq })); return { c, head:ank.head }; };
@@ -865,6 +988,7 @@ function drawIcon(){
 const big = $('big'); big.width = SW; big.height = SH + PAD; big.style.width = SW*3 + 'px';
 function tick(now){
   requestAnimationFrame(tick);
+  if (TAB === 'obs'){ otick(now); return; }
   if (!PREV) return;
   const t = now / 1000, bg = big.getContext('2d'), p = PREV.run[Math.floor(now / 62) % PREV.run.length];
   bg.clearRect(0, 0, big.width, big.height); bg.drawImage(p.c, 0, 0); drawHat(bg, p, 0, 0, PREV.hat, t);
@@ -887,7 +1011,7 @@ $('stage').addEventListener('wheel', e => {
   if (e.ctrlKey || e.metaKey){ e.preventDefault(); setZoom(Z + (e.deltaY < 0 ? 1 : -1)); return; }
   const R = ref(); if (tool === 'ref' && R){ e.preventDefault(); resizeRef(R.pct*(e.deltaY < 0 ? 1.05 : 1/1.05)); }
 }, { passive:false });
-$('onion').oninput = draw; $('grid').onchange = draw;
+$('onion').oninput = draw; $('grid').onchange = draw; $('ohit').onchange = draw;
 $('picker').oninput = e => chooseColor(e.target.value);
 $('picker').onchange = e => { const c = e.target.value.toUpperCase(); if (!CHARTE.includes(c)){ RECENT = [c, ...RECENT.filter(x => x !== c)].slice(0, 16); collectColors(); } };
 $('newItem').onclick = newItem;
@@ -899,14 +1023,31 @@ $('download').onclick = () => {
 };
 $('revert').onclick = () => {
   if (!confirm('Abandonner le brouillon et revenir à la version en ligne ?')) return;
-  try { localStorage.removeItem(DRAFT_KEY); localStorage.removeItem(TDRAFT_KEY); } catch(e){}
-  DATA = JSON.parse(JSON.stringify(ONLINE)); TDATA = JSON.parse(JSON.stringify(TONLINE)); $('banner').classList.remove('show'); SES = null;
+  try { localStorage.removeItem(DRAFT_KEY); localStorage.removeItem(TDRAFT_KEY); localStorage.removeItem(ODRAFT_KEY); } catch(e){}
+  FLOAT = null; SEL = null;
+  DATA = JSON.parse(JSON.stringify(ONLINE)); TDATA = JSON.parse(JSON.stringify(TONLINE)); ODATA = JSON.parse(JSON.stringify(ONLINE_O)); $('banner').classList.remove('show');
+  OB.ses = null; OB.accSes = null;
+  if (TAB === 'obs'){ SES = null; if (OB.ready){ orenderList(); oselect(OB.list[0].id); } if (V.ready) vrenderLists(); renderSlots(); renderList(); refreshChecks(); refreshState(); return; }
+  SES = null; if (OB.ready) orenderList();
   if (V.ready){ vrenderLists(); if (V.sel) vselect(V.sel.k, V.sel.id); } refreshState();
   renderSlots(); renderList(); refreshChecks(); const f = DATA.items.find(x => x.slot === slot); if (f) select(f.id);
 };
 addEventListener('keydown', e => {
-  if (TAB !== 'acc' || /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) || !SES) return;
-  const k = e.key.toLowerCase();
+  if ((TAB !== 'acc' && TAB !== 'obs') || /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) || !SES) return;
+  const k = e.key.toLowerCase(), mod = e.ctrlKey || e.metaKey;
+  if (mod && k === 'c'){ e.preventDefault(); doCopy(false); return; }
+  if (mod && k === 'x'){ e.preventDefault(); doCopy(true); return; }
+  // Ctrl+V colle les pixels copiés dans l'atelier ; Ctrl+Maj+V (ou rien de copié) colle une image comme modèle
+  if (mod && k === 'v' && !e.shiftKey && CLIP){ e.preventDefault(); doPaste(); return; }
+  if (FLOAT){
+    if (k === 'enter'){ e.preventDefault(); stampFloat(); return; }
+    if (k === 'escape'){ e.preventDefault(); cancelFloat(); hint('Collage annulé.'); return; }
+    const fm = { arrowleft:[-1, 0], arrowright:[1, 0], arrowup:[0, -1], arrowdown:[0, 1] }[k];
+    if (fm){ e.preventDefault(); FLOAT.x += fm[0]; FLOAT.y += fm[1]; draw(); return; }
+  }
+  if (SEL && (k === 'delete' || k === 'backspace')){ e.preventDefault(); clearSel(); return; }
+  if (SEL && k === 'escape'){ SEL = null; draw(); return; }
+  if (k === 's' && !mod){ setTool('select'); return; }
   if ((e.ctrlKey || e.metaKey) && k === 'z'){ e.preventDefault(); e.shiftKey ? undoRedo(SES.redo, SES.hist) : undoRedo(SES.hist, SES.redo); return; }
   if ((e.ctrlKey || e.metaKey) && k === 'y'){ e.preventDefault(); undoRedo(SES.redo, SES.hist); return; }
   const tk = { b:'pen', e:'eraser', g:'fill', i:'pick', m:'move', r:'rotate' }[k]; if (tk && !e.ctrlKey && !e.metaKey){ setTool(tk); return; }
@@ -965,25 +1106,28 @@ function bump(index, sw, atelier, stats){
   stats = stats.replace(/langues\.js\?v=[\d.]+/g, 'langues.js?v=' + nv);
   return { old, nv, index, sw, atelier, stats };
 }
-function commitMessage(v, ch, tch){
+function commitMessage(v, ch, tch, och){
   const part = (t, l) => l.length ? t + ' ' + l.map(nm).join(', ') : '';
   const out = [];
   if (ch.n) out.push('boutique (' + [part('ajout :', ch.add), part('retouche :', ch.mod), part('retrait :', ch.del)].filter(Boolean).join(' ; ') + ')');
   if (tch.length) out.push('icônes de trophées (' + tch.map(trName).join(', ') + ')');
+  if (och && och.length) out.push('obstacles (' + och.map(oname).join(', ') + ')');
   return 'v' + v + ' : ' + out.join(' ; ');
 }
 
 let PREP = null;
 function pubMsg(t, cls){ const e = $('pubMsg'); e.textContent = t; e.className = 'msg' + (cls ? ' ' + cls : ''); }
 async function openPublish(){
+  stampFloat(); if (V.sel) vstamp();
   if (SES && SES.dirty.size) commit(SES);
   if (!token()){ openToken(); return; }
   PREP = null; $('pubGo').disabled = true; $('pubDlg').showModal();
-  const ch = changes(), tch = tchanges(), ul = $('pubList'); ul.innerHTML = '';
+  const ch = changes(), tch = tchanges(), och = ochanges(), ul = $('pubList'); ul.innerHTML = '';
   const li = (t, it) => { const e = document.createElement('li'); e.textContent = t + ' : ' + nm(it) + ' (' + SLOT_ONE[it.slot] + ')'; ul.appendChild(e); };
   ch.add.forEach(it => li('Ajout', it)); ch.mod.forEach(it => li('Retouche', it)); ch.del.forEach(it => li('Retrait', it));
   tch.forEach(id => { const e = document.createElement('li'); e.textContent = (TDATA.icons[id] ? 'Icône retouchée' : 'Icône d\'origine rétablie') + ' : ' + trName(id) + ' (trophée)'; ul.appendChild(e); });
-  if (!ch.n && !tch.length){ pubMsg('Rien à publier : la boutique et les icônes sont identiques à la version en ligne.'); return; }
+  och.forEach(id => { const e = document.createElement('li'); e.textContent = (ODATA.sprites[id] ? 'Obstacle retouché' : 'Dessin d\'origine rétabli') + ' : ' + oname(id) + ' (obstacle)'; ul.appendChild(e); });
+  if (!ch.n && !tch.length && !och.length){ pubMsg('Rien à publier : la boutique, les icônes et les obstacles sont identiques à la version en ligne.'); return; }
   const p = problems(); if (p.length){ pubMsg(p.length + ' point(s) à corriger avant de publier : ' + p.map(x => x.txt).join(' ; '), 'err'); return; }
   try {
     pubMsg('Vérification des images…');
@@ -994,7 +1138,7 @@ async function openPublish(){
     const b = bump(index, sw, atelier, stats);
     let warn = '';
     try { if (!same(JSON.parse(remote), ONLINE)) warn = ' Attention : la boutique en ligne a changé depuis l\'ouverture de l\'atelier (autre appareil ?) ; publier remplacera ces changements.'; } catch(e){}
-    PREP = { head, ch, tch, ...b };
+    PREP = { head, ch, tch, och, ...b };
     pubMsg('Prêt : version ' + b.old + ' → ' + b.nv + ', un seul commit sur ' + BRANCH + '.' + warn, warn ? 'err' : 'ok');
     $('pubGo').disabled = false;
   } catch(e){ pubMsg(e.message, 'err'); if (e.status === 401) { forgetToken(); } }
@@ -1006,12 +1150,14 @@ async function doPublish(){
     const base = await gh('/git/commits/' + P.head, { where:'commit' });
     const files = [['boutique.json', JSON.stringify(DATA, null, 1) + '\n'], ['index.html', P.index], ['sw.js', P.sw], ['atelier.html', P.atelier], ['stats.html', P.stats]];
     if (P.tch.length) files.push(['trophees.json', JSON.stringify(TDATA, null, 1) + '\n']);
+    if (P.och.length) files.push(['obstacles.json', JSON.stringify(ODATA, null, 1) + '\n']);
     const tree = await gh('/git/trees', { method:'POST', where:'arbre', body:{ base_tree:base.tree.sha, tree:files.map(([path, content]) => ({ path, mode:'100644', type:'blob', content })) } });
-    const c = await gh('/git/commits', { method:'POST', where:'commit', body:{ message:commitMessage(P.nv, P.ch, P.tch), tree:tree.sha, parents:[P.head] } });
+    const c = await gh('/git/commits', { method:'POST', where:'commit', body:{ message:commitMessage(P.nv, P.ch, P.tch, P.och), tree:tree.sha, parents:[P.head] } });
     await gh('/git/refs/heads/' + BRANCH, { method:'PATCH', where:'ref', body:{ sha:c.sha } });
     ONLINE = JSON.parse(JSON.stringify(DATA)); ONLINE_IDS = new Set(ONLINE.items.map(x => x.id));
-    TONLINE = JSON.parse(JSON.stringify(TDATA));
-    try { localStorage.removeItem(DRAFT_KEY); localStorage.removeItem(TDRAFT_KEY); } catch(e){}
+    TONLINE = JSON.parse(JSON.stringify(TDATA)); ONLINE_O = JSON.parse(JSON.stringify(ODATA));
+    try { localStorage.removeItem(DRAFT_KEY); localStorage.removeItem(TDRAFT_KEY); localStorage.removeItem(ODRAFT_KEY); } catch(e){}
+    if (OB.ready) orenderList();
     $('banner').classList.remove('show'); refreshState(); renderProps(); if (V.ready) vrenderLists();
     pubMsg('Publié en v' + P.nv + '. Le jeu sera à jour d\'ici une à deux minutes (le temps que GitHub Pages reconstruise le site).', 'ok');
     $('pubList').innerHTML = '';
@@ -1032,6 +1178,122 @@ $('publish').onclick = openPublish;
 $('pubGo').onclick = doPublish;
 $('pubClose').onclick = () => $('pubDlg').close();
 $('pubToken').onclick = openToken;
+
+/* ================= Onglet Obstacles : obstacles au sol et volants ================= */
+// retouches dans obstacles.json { sprites: { id: [une image PNG par trame] } } ; sans retouche, le jeu garde le dessin de son code.
+// L'image garde exactement la taille de l'obstacle du jeu : ses zones de collision ne bougent pas.
+const ODRAFT_KEY = 'stellyrun_atelier_obstacles', OM = 12;
+let ONLINE_O = { sprites:{} }, ODATA = { sprites:{} };
+const OB = { list:[], ready:false, ses:null, active:null, accSes:null, accActive:null, stelly:null };
+const ONAME = { cone_rouge:'Plot rouge', cone_jaune:'Plot jaune', chantier:'Plot de chantier', chateau:'Château de sable', fort:'Fort de sable', chateau_3:'Grand château de sable',
+  neige:'Boule de neige', neige_pile:'Pile de boules de neige', neige_3:'Grande pile de neige', neige_eclat:'Boule de neige (éclat)',
+  souche:'Souche', rondins_pile:'Pile de rondins', rondins_3:'Grande pile de rondins', rondin_eclat:'Rondin (éclat)',
+  foin:'Botte de foin', foin_pile:'Pile de foin', foin_3:'Grande pile de foin', foin_eclat:'Botte de foin (éclat)',
+  pigeon:'Pigeon', mouette:'Mouette', aigle:'Aigle', chouette:'Chouette', corbeau:'Corbeau', volant:'Volant de badminton' };
+const ONOTE = { neige_eclat:'Morceau lancé quand une pile de neige éclate.', rondin_eclat:'Morceau lancé quand une pile de rondins éclate.', foin_eclat:'Morceau lancé quand une pile de foin éclate.',
+  cone_rouge:'Seul, en rangée de 2 ou 3, ou en pyramide de 3 et de 6.', cone_jaune:'Seul, en rangée de 2 ou 3, ou en pyramide de 3 et de 6.', chantier:'Seul, en rangée ou en pyramide (City).',
+  chateau:'Seul ou en rangée.', fort:'Remplace la pyramide de 3.', chateau_3:'Remplace la pyramide de 6.' };
+const oname = id => ONAME[id] || id;
+const oOf = id => OB.list.find(o => o.id === id);
+function ochanges(){ return [...new Set([...Object.keys(ODATA.sprites), ...Object.keys(ONLINE_O.sprites)])].filter(id => !same(ODATA.sprites[id], ONLINE_O.sprites[id])); }
+function saveODraft(){ try { localStorage.setItem(ODRAFT_KEY, JSON.stringify({ saved:Date.now(), data:ODATA })); } catch(e){ console.warn('[atelier] brouillon des obstacles non enregistré', e); } }
+const pxData = c => c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+
+// image actuelle d'une trame : retouche du brouillon, sinon dessin d'origine
+async function oframe(o, i){
+  const src = (ODATA.sprites[o.id] || [])[i], c = mk(o.f[i].width, o.f[i].height);
+  const im = src ? await loadImg(src) : null; c.getContext('2d').drawImage(im || o.f[i], 0, 0); return c;
+}
+async function openObs(o){
+  const w = o.f[0].width, hh = o.f[0].height, s = { kind:'obs', item:o, L:{}, frames:[], dirty:new Set(), hist:[], redo:[], orig:{}, M:OM, w, h:hh };
+  EW = w + 2*OM; EH = hh + 2*OM;
+  for (let i = 0; i < o.f.length; i++){ const k = 'f' + i, c = layerCanvas(), fr = await oframe(o, i); s.frames.push(k); s.L[k] = c; c.g.drawImage(fr, OM, OM);
+    s.orig[k] = { src:(ODATA.sprites[o.id] || [])[i] || null, fpx:pxData(fr) }; }
+  return s;
+}
+const frameCanvas = (s, k) => mk(s.w, s.h, g => g.drawImage(s.L[k], s.M, s.M, s.w, s.h, 0, 0, s.w, s.h));
+// enregistre l'obstacle dans le brouillon ; identique au dessin d'origine -> la retouche est supprimée
+function ocommit(s){
+  const o = s.item; let orig = true; const out = [];
+  s.frames.forEach((k, i) => { const fc = frameCanvas(s, k), px = pxData(fc);
+    if (!samePx(px, pxData(o.f[i]))) orig = false;
+    out.push(s.orig[k].src && samePx(px, s.orig[k].fpx) ? s.orig[k].src : fc.toDataURL('image/png')); });
+  if (orig) delete ODATA.sprites[o.id]; else ODATA.sprites[o.id] = out;
+  saveODraft(); refreshState(); othumb(o.id); orenderProps();
+}
+
+/* ----- liste ----- */
+function orenderList(){
+  const box = $('ogroups'); box.innerHTML = ''; const groups = {};
+  for (const o of OB.list){ const key = o.bird ? 'Volants' : 'Au sol · ' + o.g; (groups[key] = groups[key] || []).push(o); }
+  const keys = Object.keys(groups).sort((a, b) => (a.startsWith('Volants') - b.startsWith('Volants')));
+  for (const key of keys){ const t = document.createElement('h3'); t.textContent = key; box.appendChild(t);
+    const g = document.createElement('div'); g.className = 'vgrid'; box.appendChild(g);
+    for (const o of groups[key]){ const b = document.createElement('button'); b.className = 'vt'; b.dataset.oid = o.id; b.title = oname(o.id) + (o.bird ? ' (' + o.g + ')' : '');
+      const c = document.createElement('canvas'), w = o.f[0].width, hh = o.f[0].height, k = Math.min(44 / w, 44 / hh, 3);
+      c.width = w; c.height = hh; c.style.width = Math.round(w*k) + 'px'; c.style.height = Math.round(hh*k) + 'px'; b.appendChild(c);
+      b.onclick = () => oselect(o.id); g.appendChild(b); othumb(o.id); } }
+}
+async function othumb(id){
+  const b = document.querySelector('.vt[data-oid="' + CSS.escape(id) + '"]'), o = oOf(id); if (!b || !o) return;
+  const c = b.querySelector('canvas'), fr = await oframe(o, o.bird && o.f.length > 1 ? 1 : 0), g = c.getContext('2d'); g.clearRect(0, 0, c.width, c.height); g.drawImage(fr, 0, 0);
+  b.classList.toggle('mod', !same(ODATA.sprites[id], ONLINE_O.sprites[id])); b.classList.toggle('custom', !!ODATA.sprites[id]);
+  b.classList.toggle('sel', !!SES && SES.kind === 'obs' && SES.item.id === id);
+}
+function orenderProps(){
+  const box = $('oprops'); if (!SES || SES.kind !== 'obs'){ box.innerHTML = ''; return; }
+  const o = SES.item, n = o.f.length;
+  box.innerHTML = '<b></b><p class="note"></p><p class="note"></p><div class="row"></div>';
+  box.children[0].textContent = oname(o.id);
+  box.children[1].textContent = (o.bird ? 'Volant' : 'Obstacle au sol') + ' · ' + o.g + ' · ' + o.f[0].width + ' × ' + o.f[0].height + ' px' + (n > 1 ? ' · ' + n + ' images' : '') + (ONOTE[o.id] ? ' · ' + ONOTE[o.id] : '');
+  box.children[2].textContent = o.hit.length ? 'Le cadre garde la taille du jeu : le rectangle rouge est la zone de collision, elle ne change pas avec le dessin.' : 'Simple morceau qui s\'envole : pas de collision.';
+  const row = box.children[3];
+  row.appendChild(button('Revenir au dessin d\'origine', () => orestore(false), 'Supprime la retouche : le jeu reprend le dessin de son code'));
+  row.appendChild(button('Revenir à la version en ligne', () => orestore(true), 'Annule tes retouches depuis la dernière publication'));
+}
+async function orestore(online){
+  if (!SES || SES.kind !== 'obs') return; const id = SES.item.id;
+  if (online && ONLINE_O.sprites[id]) ODATA.sprites[id] = ONLINE_O.sprites[id].slice(); else delete ODATA.sprites[id];
+  saveODraft(); refreshState(); othumb(id); FLOAT = null; await oselect(id, true);
+}
+
+/* ----- édition ----- */
+async function oselect(id, force){
+  const o = oOf(id); if (!o) return;
+  if (SES && SES.kind === 'obs' && SES.item === o && !force) return;
+  stampFloat(); SEL = null;
+  if (SES && SES.dirty.size) commit(SES);
+  SES = await openObs(o); ACTIVE = SES.frames[o.bird && SES.frames.length > 1 ? 1 : 0];
+  document.querySelectorAll('.vt[data-oid]').forEach(b => b.classList.toggle('sel', b.dataset.oid === id));
+  orenderProps(); renderLayers(); collectColors(); refBar(); invalidate(); fit();
+}
+
+/* ----- aperçu : scène du jeu et taille réelle ----- */
+let OPREV = null;
+function obuildPreview(){
+  if (!SES || SES.kind !== 'obs') return;
+  const s = SES, frames = s.frames.map(k => frameCanvas(s, k));
+  OPREV = { o:s.item, frames };
+  const box = $('oreal'); box.innerHTML = '';
+  frames.forEach((fc, i) => { for (const k of [1, 2]){ const f = document.createElement('figure'), c = document.createElement('canvas'); c.width = fc.width; c.height = fc.height;
+    c.style.width = fc.width*k + 'px'; c.style.height = fc.height*k + 'px'; c.getContext('2d').drawImage(fc, 0, 0); f.appendChild(c);
+    f.insertAdjacentHTML('beforeend', '<figcaption></figcaption>'); f.lastChild.textContent = (frames.length > 1 ? 'Image ' + (i + 1) + ' · ' : '') + '×' + k; box.appendChild(f); } });
+}
+function otick(now){
+  const cv = $('oscene'); if (!OPREV || !cv) return;
+  const g = cv.getContext('2d'), W = cv.width, H = cv.height, GY = 84, o = OPREV.o; g.imageSmoothingEnabled = false;
+  g.fillStyle = '#FDF4D9'; g.fillRect(0, 0, W, H);
+  g.fillStyle = '#9BD17E'; g.fillRect(0, GY, W, H - GY); g.fillStyle = '#5FA84C'; g.fillRect(0, GY, W, 2);
+  // Stelly à l'échelle, qui court sur place
+  if (!OB.stelly) OB.stelly = POSES.run.map(p => { const c = mk(SW, SH + PAD); drawStelly(c.getContext('2d'), Object.assign({}, p, { oy:PAD, eq:{} })); return c; });
+  g.drawImage(OB.stelly[Math.floor(now / 62) % OB.stelly.length], 6, GY - FB - PAD);
+  const fr = OPREV.frames, x = 104;
+  if (o.bird){
+    const cy = GY - 54 + Math.round(Math.sin(now / 400)*2);
+    if (o.id === 'volant'){ g.save(); g.translate(x + (fr[0].width >> 1), cy); g.rotate(Math.sin(now / 111)*.18); g.drawImage(fr[0], -(fr[0].width >> 1), -(fr[0].height >> 1)); g.restore(); }
+    else { const i = fr.length > 1 ? [0, 1, 2, 1][Math.floor(now / 80) % 4] : 0; g.drawImage(fr[i], x, cy - (fr[i].height >> 1)); }
+  } else g.drawImage(fr[0], x, GY - (o.gy || fr[0].height));
+}
 
 /* ================= Onglet Vignettes : icônes des trophées et vignettes de la boutique ================= */
 // trophées : retouches dans trophees.json { icons: { id: PNG 32 × 32 } } ; sans retouche, le jeu garde l'icône dessinée par son code
@@ -1056,7 +1318,7 @@ function loadOrig(){
     const t0 = Date.now();
     const poll = () => {
       let SA = null; try { SA = f.contentWindow && f.contentWindow.StellyAtelier; } catch(e){}
-      if (SA){ const I = SA.icons(); V.ids = SA.trophies; V.chrome = SA.chrome;
+      if (SA){ const I = SA.icons(); V.ids = SA.trophies; V.chrome = SA.chrome; if (SA.obstacles) OB.list = SA.obstacles().map(o => ({ id:o.id, g:o.g, bird:o.bird, gy:o.gy || o.f[0].height, hit:JSON.parse(JSON.stringify(o.hit)), f:o.f.map(c => mk(c.width, c.height, g => g.drawImage(c, 0, 0))) }));
         for (const id of [...SA.trophies, ...SA.chrome, 'secret']) if (I[id]) V.orig[id] = mk(VN, VN, g => g.drawImage(I[id], 0, 0));
         f.remove(); res(true); return; }
       if (Date.now() - t0 > 30000){ f.remove(); V.loading = null; res(false); return; }
@@ -1100,6 +1362,7 @@ function vrenderLists(){
 /* ----- édition ----- */
 async function vselect(k, id){
   if (k === 'shop' && !itemOf(id)) return;
+  vstamp(); V.selR = null;
   V.sel = { k, id }; V.hist = []; V.redo = [];
   const cv = await current(k, id); vg.clearRect(0, 0, VN, VN); vg.drawImage(cv, 0, 0);
   const it = k === 'shop' ? itemOf(id) : null, sec = V.chrome.includes(id) || id === 'secret';
@@ -1126,13 +1389,33 @@ async function vcommit(){
   refreshState(); vthumb(k, id); vpreview();
 }
 function vdraw(){
-  const g = ved.getContext('2d'), W = ved.width; g.clearRect(0, 0, W, W);
+  const g = ved.getContext('2d'), W = ved.width; g.fillStyle = '#FDF4D9'; g.fillRect(0, 0, W, W);
   if (V.ref){ const r = V.ref, k = Math.min(VN / r.width, VN / r.height), w = r.width*k, h = r.height*k;
     g.globalAlpha = V.refOp; g.imageSmoothingEnabled = true; g.drawImage(r, (VN - w) / 2*VZ, (VN - h) / 2*VZ, w*VZ, h*VZ); g.globalAlpha = 1; }
   g.imageSmoothingEnabled = false; g.drawImage(VC, 0, 0, W, W);
   if ($('vgrid').checked){ g.strokeStyle = 'rgba(255,255,255,.13)'; g.lineWidth = 1; g.beginPath();
     for (let i = 1; i < VN; i++){ g.moveTo(i*VZ + .5, 0); g.lineTo(i*VZ + .5, W); g.moveTo(0, i*VZ + .5); g.lineTo(W, i*VZ + .5); } g.stroke(); }
+  if (V.float){ const F = V.float; g.drawImage(F.img, F.x*VZ, F.y*VZ, F.img.width*VZ, F.img.height*VZ); drawSel(g, { x:F.x, y:F.y, w:F.img.width, h:F.img.height }, VZ); }
+  if (V.selR) drawSel(g, V.selR, VZ);
 }
+// sélection, copier, couper, coller (presse-papiers partagé avec les autres onglets)
+function vcopy(cut){
+  if (!V.sel) return;
+  if (V.float){ CLIP = { img:V.float.img, x:V.float.x, y:V.float.y, ctx:'vig' }; if (cut){ V.float = null; vdraw(); } return; }
+  const b = V.selR || { x:0, y:0, w:VN, h:VN }, t = trim(mk(b.w, b.h, g => g.drawImage(VC, b.x, b.y, b.w, b.h, 0, 0, b.w, b.h)));
+  if (!t){ $('vpos').textContent = 'Rien à copier.'; return; }
+  CLIP = { img:t.img, x:b.x + t.dx, y:b.y + t.dy, ctx:'vig' };
+  if (cut){ vsnap(); vg.clearRect(b.x, b.y, b.w, b.h); vdraw(); vcommit(); }
+  $('vpos').textContent = (cut ? 'Coupé' : 'Copié') + ' : ' + t.img.width + ' × ' + t.img.height + ' px.';
+}
+function vpaste(){
+  if (!V.sel) return; if (!CLIP){ $('vpos').textContent = 'Rien à coller : copie d\'abord un dessin.'; return; }
+  vstamp(); V.selR = null; const w = CLIP.img.width, hh = CLIP.img.height, here = CLIP.ctx === 'vig';
+  V.float = { img:CLIP.img, x:here ? CLIP.x : Math.round((VN - w) / 2), y:here ? CLIP.y : Math.round((VN - hh) / 2) };
+  vdraw(); $('vpos').textContent = 'Collage : glisse-le, flèches pour l\'ajuster, Entrée ou clic à côté pour le poser, Échap pour annuler.';
+}
+function vstamp(){ if (!V.float || !V.sel){ V.float = null; return; } const F = V.float; V.float = null; vsnap(); vg.drawImage(F.img, F.x, F.y); vcollect(); vdraw(); vcommit(); }
+$('vcopy').onclick = () => vcopy(false); $('vcut').onclick = () => vcopy(true); $('vpaste').onclick = vpaste;
 function vpreview(){
   if (!V.sel) return; const { k, id } = V.sel, box = $('vprev'); box.innerHTML = '';
   const tile = (cls, lab) => { const f = document.createElement('figure'), t = document.createElement('div'), c = document.createElement('canvas');
@@ -1155,7 +1438,7 @@ function vcollect(){
   out.forEach((c, i) => { const b = document.createElement('button'); b.className = 'sw' + (i < CHARTE.length ? ' ch' : ''); b.style.background = c; b.dataset.c = c; b.title = c; b.onclick = () => vchoose(c); box.appendChild(b); });
   vchoose(V.color);
 }
-function vsetTool(t){ V.tool = t; document.querySelectorAll('[data-vtool]').forEach(b => b.classList.toggle('on', b.dataset.vtool === t)); }
+function vsetTool(t){ V.tool = t; document.querySelectorAll('[data-vtool]').forEach(b => b.classList.toggle('on', b.dataset.vtool === t)); if (t !== 'select' && V.selR){ V.selR = null; vdraw(); } }
 const vpos = e => { const r = ved.getBoundingClientRect(); return [Math.floor((e.clientX - r.left) / r.width*VN), Math.floor((e.clientY - r.top) / r.height*VN)]; };
 const vin = (x, y) => x >= 0 && y >= 0 && x < VN && y < VN;
 function vplot(x, y, er){ if (!vin(x, y)) return; if (er) vg.clearRect(x, y, 1, 1); else { vg.fillStyle = V.color; vg.fillRect(x, y, 1, 1); } }
@@ -1178,14 +1461,24 @@ ved.addEventListener('contextmenu', e => e.preventDefault());
 ved.addEventListener('pointerdown', e => {
   if (!V.sel) return; e.preventDefault(); ved.setPointerCapture(e.pointerId);
   const p = vpos(e), er = e.button === 2 || V.tool === 'eraser';
+  if (V.float){ const F = V.float;
+    if (p[0] >= F.x && p[1] >= F.y && p[0] < F.x + F.img.width && p[1] < F.y + F.img.height){ vdown = { float:true, o:[p[0] - F.x, p[1] - F.y] }; return; }
+    vstamp(); return; }
+  if (V.tool === 'select' && e.button !== 2){ vdown = { sel:true, a:p, moved:false }; V.selR = normRect(p, p, VN, VN); vdraw(); return; }
   if (e.altKey || (V.tool === 'pick' && e.button !== 2)){ vpick(p[0], p[1]); return; }
   vsnap();
   if (V.tool === 'fill' && !er){ if (vfill(p[0], p[1])){ vdraw(); vcommit(); } else V.hist.pop(); return; }
   vdown = { p, er }; vplot(p[0], p[1], er); vdraw();
 });
 ved.addEventListener('pointermove', e => { const p = vpos(e); $('vpos').textContent = vin(p[0], p[1]) ? 'x ' + p[0] + ' · y ' + p[1] : '';
-  if (!vdown) return; vline(vdown.p, p, vdown.er); vdown.p = p; vdraw(); });
-const vup = () => { if (!vdown) return; vdown = null; vcollect(); vcommit(); };
+  if (!vdown) return;
+  if (vdown.float){ V.float.x = p[0] - vdown.o[0]; V.float.y = p[1] - vdown.o[1]; vdraw(); return; }
+  if (vdown.sel){ vdown.moved = vdown.moved || p[0] !== vdown.a[0] || p[1] !== vdown.a[1]; V.selR = normRect(vdown.a, p, VN, VN); vdraw();
+    if (V.selR) $('vpos').textContent = 'Sélection : ' + V.selR.w + ' × ' + V.selR.h + ' px. Ctrl+C, Ctrl+X, Suppr.'; return; }
+  vline(vdown.p, p, vdown.er); vdown.p = p; vdraw(); });
+const vup = () => { if (!vdown) return; const d = vdown; vdown = null;
+  if (d.float) return; if (d.sel){ if (!d.moved) V.selR = null; vdraw(); return; }
+  vcollect(); vcommit(); };
 ved.addEventListener('pointerup', vup); ved.addEventListener('pointercancel', vup);
 ved.addEventListener('pointerleave', () => { $('vpos').textContent = ''; });
 document.querySelectorAll('[data-vtool]').forEach(b => b.onclick = () => vsetTool(b.dataset.vtool));
@@ -1217,7 +1510,19 @@ vst.addEventListener('drop', e => { e.preventDefault(); vst.classList.remove('dr
 addEventListener('paste', e => { if (TAB !== 'vig' || /INPUT/.test(document.activeElement.tagName)) return; const f = [...(e.clipboardData || {}).files || []].find(f => /^image\//.test(f.type)); if (f){ e.preventDefault(); vsetRef(f); } });
 addEventListener('keydown', e => {
   if (TAB !== 'vig' || !V.sel || /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) return;
-  const k = e.key.toLowerCase();
+  const k = e.key.toLowerCase(), mod = e.ctrlKey || e.metaKey;
+  if (mod && k === 'c'){ e.preventDefault(); vcopy(false); return; }
+  if (mod && k === 'x'){ e.preventDefault(); vcopy(true); return; }
+  if (mod && k === 'v' && !e.shiftKey && CLIP){ e.preventDefault(); vpaste(); return; }
+  if (V.float){
+    if (k === 'enter'){ e.preventDefault(); vstamp(); return; }
+    if (k === 'escape'){ e.preventDefault(); V.float = null; vdraw(); return; }
+    const fm = { arrowleft:[-1, 0], arrowright:[1, 0], arrowup:[0, -1], arrowdown:[0, 1] }[k];
+    if (fm){ e.preventDefault(); V.float.x += fm[0]; V.float.y += fm[1]; vdraw(); return; }
+  }
+  if (V.selR && (k === 'delete' || k === 'backspace')){ e.preventDefault(); vsnap(); vg.clearRect(V.selR.x, V.selR.y, V.selR.w, V.selR.h); vdraw(); vcommit(); return; }
+  if (V.selR && k === 'escape'){ V.selR = null; vdraw(); return; }
+  if (k === 's' && !mod){ vsetTool('select'); return; }
   if ((e.ctrlKey || e.metaKey) && k === 'z'){ e.preventDefault(); e.shiftKey ? vundo(V.redo, V.hist) : vundo(V.hist, V.redo); return; }
   if ((e.ctrlKey || e.metaKey) && k === 'y'){ e.preventDefault(); vundo(V.redo, V.hist); return; }
   const tk = { b:'pen', e:'eraser', g:'fill', i:'pick' }[k]; if (tk && !e.ctrlKey && !e.metaKey){ vsetTool(tk); return; }
@@ -1227,16 +1532,37 @@ addEventListener('keydown', e => {
 
 /* ----- onglets ----- */
 async function vopen(){
-  if (SES && SES.dirty && SES.dirty.size) commit(SES);
+  if (SES && SES.dirty && SES.dirty.size && SES.kind !== 'obs') commit(SES);
   if (V.ready){ vrenderLists(); if (V.sel) vselect(V.sel.k, V.sel.id); return; }
   $('vempty').hidden = false; $('vempty').textContent = 'Chargement des icônes du jeu…';
   if (!(await loadOrig())){ $('vempty').textContent = 'Impossible de charger les icônes du jeu (index.html). Recharge la page pour réessayer.'; return; }
   V.ready = true; $('vempty').textContent = 'Choisis une icône à gauche.'; vrenderLists();
 }
+// accessoires et obstacles partagent l'éditeur : chaque onglet garde sa session (article ou obstacle en cours)
+function useSes(kind){
+  stampFloat(); SEL = null; if (SES && SES.dirty.size) commit(SES);
+  if (SES && SES.kind === 'obs'){ OB.ses = SES; OB.active = ACTIVE; } else if (SES){ OB.accSes = SES; OB.accActive = ACTIVE; }
+  SES = kind === 'obs' ? OB.ses : OB.accSes; ACTIVE = kind === 'obs' ? OB.active : OB.accActive;
+  if (SES && SES.kind === 'obs'){ EW = SES.w + 2*SES.M; EH = SES.h + 2*SES.M; } else { EW = AW; EH = AH; }
+  document.body.classList.toggle('obs', kind === 'obs'); $('onionLab').textContent = kind === 'obs' ? 'Original' : 'Stelly';
+  if (kind !== 'obs'){ renderProps(); renderList(); }
+  renderLayers(); collectColors(); refBar(); BASE = null; fit(); schedulePreview();
+}
+async function oopen(){
+  if (!OB.ready){ $('ogroups').innerHTML = '<p style="color:var(--lilac)">Chargement des obstacles du jeu…</p>';
+    if (!(await loadOrig()) || !OB.list.length){ $('ogroups').innerHTML = '<p style="color:#FFB3AE">Impossible de charger les obstacles du jeu (index.html). Recharge la page pour réessayer.</p>'; return; }
+    OB.ready = true; }
+  orenderList();
+  if (!SES) await oselect(OB.list[0].id); else orenderProps();
+}
 function setTab(t){
-  TAB = t; $('acc').hidden = t !== 'acc'; $('vig').hidden = t !== 'vig';
+  if (TAB === 'vig'){ vstamp(); V.selR = null; }
+  const was = TAB; TAB = t; $('acc').hidden = t === 'vig'; $('vig').hidden = t !== 'vig';
   document.querySelectorAll('#tabs .tab').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
-  if (t === 'acc') fit(); else vopen();
+  if (t === 'vig'){ if (was === 'obs') useSes('acc'); document.body.classList.remove('obs'); vopen(); return; }
+  if ((t === 'obs') !== (SES ? SES.kind === 'obs' : false) || was === 'vig') useSes(t);
+  if (t === 'obs') oopen();
+  else if (!SES){ const f = DATA.items.find(x => x.slot === slot); if (f) select(f.id); } else fit();
 }
 document.querySelectorAll('#tabs .tab').forEach(b => b.onclick = () => setTab(b.dataset.tab));
 vsetTool('pen');
@@ -1260,6 +1586,14 @@ vsetTool('pen');
   try { const d = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null');
     if (d && d.data && !same(d.data, ONLINE)){ DATA = d.data;
       $('bannerTxt').textContent = 'Brouillon repris (' + new Date(d.saved).toLocaleString('fr-FR', { dateStyle:'short', timeStyle:'short' }) + '). Il reste sur cet appareil tant qu\'il n\'est pas publié.';
+      $('banner').classList.add('show'); } } catch(e){}
+  try { ONLINE_O = token() ? JSON.parse(await raw('obstacles.json', BRANCH)) : null; } catch(e){ ONLINE_O = null; }
+  if (!ONLINE_O) try { const r = await fetch('obstacles.json', { cache:'no-cache' }); ONLINE_O = r.ok ? await r.json() : null; } catch(e){ ONLINE_O = null; }
+  if (!ONLINE_O || typeof ONLINE_O.sprites !== 'object') ONLINE_O = { sprites:{} };
+  ODATA = JSON.parse(JSON.stringify(ONLINE_O));
+  try { const t = JSON.parse(localStorage.getItem(ODRAFT_KEY) || 'null');
+    if (t && t.data && t.data.sprites && !same(t.data, ONLINE_O)){ ODATA = t.data;
+      $('bannerTxt').textContent = 'Brouillon repris (' + new Date(t.saved).toLocaleString('fr-FR', { dateStyle:'short', timeStyle:'short' }) + '). Il reste sur cet appareil tant qu\'il n\'est pas publié.';
       $('banner').classList.add('show'); } } catch(e){}
   $('download').disabled = false; $('publish').disabled = false;
   renderSlots(); renderList(); refreshChecks(); refreshState();

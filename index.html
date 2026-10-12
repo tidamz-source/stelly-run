@@ -600,9 +600,9 @@ __ld(10); setTimeout(() => { const L = document.getElementById('loader'); if (L)
   </div>
 </div>
 <script>__ld(30);</script>
-<script src="langues.js?v=6.11"></script>
+<script src="langues.js?v=6.12"></script>
 <script>__ld(45);</script>
-<script src="stelly.js?v=6.11"></script>
+<script src="stelly.js?v=6.12"></script>
 <script>__ld(60);</script>
 <script>
 /* ================= Langues ================= */
@@ -1588,7 +1588,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '6.11';
+const APP_VERSION = '6.12';
 // icônes de trophées retouchées dans l'atelier (trophees.json) : remplacent celles dessinées par le code
 const TR_OVR = {}; let TR_OVR_N = 0;
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
@@ -2341,7 +2341,8 @@ fetch('boutique.json', { cache:'no-cache' }).then(r => r.json())
   }; im.onerror = res; im.src = it.src;
 })))).then(() => { for (const it of SHOP) if (it.img) it.ico = shopIcon(it); applyEquip(); if (TR.d.coins >= 5000) TR.unlock('picsou');
     // pont pour l'atelier : liste des trophées et icônes d'origine (sans les retouches)
-    if (ATELIER) window.StellyAtelier = { trophies: TROPHY_IDS.slice(), chrome: CHROME_IDS.slice(), icons: () => buildTrophyIcons(true) }; });
+    if (ATELIER) window.StellyAtelier = { trophies: TROPHY_IDS.slice(), chrome: CHROME_IDS.slice(), icons: () => buildTrophyIcons(true),
+      obstacles: () => OBSTACLES.map(o => ({ id:o.id, g:o.g, bird:!!o.bird, hit:o.hit, gy:o.gy || o.f[0].height, f:o.f.map(c => mk(c.width, c.height, g => g.drawImage(c, 0, 0))) })) }; });
 
 const shopUI = (() => {
   const page = $('shop'), grid = $('shgrid'), bub = $('shbub'), buy = $('shbuy'), prev = $('shprev'), pctx = prev.getContext('2d');
@@ -2479,6 +2480,40 @@ function spawnFlyer(){
   flyIn = Math.max(2.5, 5 - 2.5*lvl()) + Math.random()*3;
 }
 const ROUND = { 3:[SNOWMAN, BIGSNOW, SNOW3], 5:[STUMP, LOGPYR, LOG3], 6:[BALE1, BALEPYR, BALE3] };
+// obstacles retouchables dans l'atelier (obstacles.json { sprites: { id: [une image par trame] } }) :
+// les images retouchées sont redessinées dans les mêmes canevas, à la même taille, pour garder les collisions.
+// hit : zones de collision en coordonnées de l'image [x0, x1, y0, y1], déduites de hitboxes() et des volants ;
+// gy : hauteur du sol dans l'image quand l'obstacle est enfoncé (forêt), sinon le bas de l'image
+const OBSTACLES = [
+  { id:'cone_rouge', g:'Outdoor · Indoor', f:[CONES[0]], hit:[[3,10,4,16]] },
+  { id:'cone_jaune', g:'Outdoor · Indoor', f:[CONES[1]], hit:[[3,10,4,16]] },
+  { id:'chantier', g:'City', f:[CHANTIER], hit:[[6,13,5,17]] },
+  { id:'chateau', g:'Beach', f:[CASTLE], hit:[[2,12,7,20]] },
+  { id:'fort', g:'Beach', f:[FORT], hit:[[2,34,10,32]] },
+  { id:'chateau_3', g:'Beach', f:[CASTLE3], hit:[[2,36,35,46],[8,30,23,46],[14,24,11,46]] },
+  { id:'neige', g:'Catch La Peuf', f:[SNOWMAN], hit:[[3,13,4,15]] },
+  { id:'neige_pile', g:'Catch La Peuf', f:[BIGSNOW], hit:[[2,24,11,22],[8,18,3,22]] },
+  { id:'neige_3', g:'Catch La Peuf', f:[SNOW3], hit:[[2,36,30,41],[8,30,20,41],[14,24,10,41]] },
+  { id:'neige_eclat', g:'Catch La Peuf', f:[PILE_PIECE[3]], hit:[] },
+  { id:'souche', g:'Forest', f:[STUMP], hit:[[3,13,4,13]], gy:13 },
+  { id:'rondins_pile', g:'Forest', f:[LOGPYR], hit:[[2,24,11,17],[8,18,3,17]], gy:17 },
+  { id:'rondins_3', g:'Forest', f:[LOG3], hit:[[2,36,30,36],[8,30,20,36],[14,24,10,36]], gy:36 },
+  { id:'rondin_eclat', g:'Forest', f:[PILE_PIECE[5]], hit:[], gy:16 },
+  { id:'foin', g:'Fields', f:[BALE1], hit:[[3,13,4,15]] },
+  { id:'foin_pile', g:'Fields', f:[BALEPYR], hit:[[2,24,11,22],[8,18,3,22]] },
+  { id:'foin_3', g:'Fields', f:[BALE3], hit:[[2,36,30,41],[8,30,20,41],[14,24,10,41]] },
+  { id:'foin_eclat', g:'Fields', f:[PILE_PIECE[6]], hit:[] },
+  ...[['pigeon','pigeon','Outdoor · City'], ['mouette','gull','Beach'], ['aigle','eagle','Catch La Peuf'], ['chouette','owl','Forest'], ['corbeau','crow','Fields'], ['volant','shuttle','Indoor']]
+    .map(([id, sp, g]) => { const S = FLY_SPECS[sp], f = sp === 'shuttle' ? [SHUTTLE] : FLY_FR[sp], cx = S.w >> 1, cy = S.h >> 1;
+      return { id, g, bird:true, f, hit:[[cx - S.hw, cx + S.hw, cy - S.hh, cy + S.hh]] }; })
+];
+if (!ATELIER) fetch('obstacles.json', { cache:'no-cache' }).then(r => r.ok ? r.json() : null).then(j => {
+  const sp = j && j.sprites; if (!sp || typeof sp !== 'object') return;
+  for (const o of OBSTACLES){ const L = sp[o.id]; if (!Array.isArray(L)) continue;
+    L.forEach((src, i) => { const c = o.f[i]; if (!c || !src) return; const im = new Image();
+      im.onload = () => { if (im.width !== c.width || im.height !== c.height) return; const g = c.getContext('2d'); g.clearRect(0, 0, c.width, c.height); g.drawImage(im, 0, 0); };
+      im.src = src; }); }
+}).catch(() => {});
 const coneImg = o => o.th === 4 ? CHANTIER : CONES[o.c];
 const coneDx = o => o.th === 4 ? -((CHANTIER.width - 13) >> 1) : 0;
 function hitboxes(o){
