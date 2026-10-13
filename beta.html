@@ -601,9 +601,9 @@ __ld(10); setTimeout(() => { const L = document.getElementById('loader'); if (L)
   </div>
 </div>
 <script>__ld(30);</script>
-<script src="langues.js?v=6.13"></script>
+<script src="langues.js?v=6.22"></script>
 <script>__ld(45);</script>
-<script src="stelly.js?v=6.13"></script>
+<script src="stelly.js?v=6.22"></script>
 <script>__ld(60);</script>
 <script>
 /* ================= Langues ================= */
@@ -1589,7 +1589,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '6.13';
+const APP_VERSION = '6.22';
 // icônes de trophées retouchées dans l'atelier (trophees.json) : remplacent celles dessinées par le code
 const TR_OVR = {}; let TR_OVR_N = 0;
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
@@ -2472,7 +2472,7 @@ const FLY_ALT = [[12, 4], [53.5, 1.5], [76, 10]];
 // les oiseaux avancent à la vitesse du sol (comme les obstacles)
 const flySpeed = () => Math.max(spEff, 60);
 let birdWait = false, lastDiscT = 0, forcedN = 0;   // un oiseau attend son tour : plus aucun obstacle ne sort tant que l'écran n'est pas dégagé
-function flyerY(f){ return f.y0 + Math.sin(f.t*f.fs + f.ph)*f.amp + Math.sin(f.t*.8 + f.ph*2)*f.drift; }
+function flyerY(f){ return f.y0; }
 function spawnFlyer(){
   const sp = FLY_BY_THEME[theme]; if (!sp){ flyIn = 2; return; }
   const k = 1, T = (W + 30 - P.x)/flySpeed();
@@ -2696,6 +2696,7 @@ function update(dt){
         // mi-hauteur : tolérance élargie (pieds jusqu'à 9 px sous le centre, accepté dès le sommet du saut) car le saut appuyé l'atteint tout juste
         const mid = f.tier === 1;
         if (!P.ground && P.vy > (mid ? -60 : 40) && P.y < fy + (mid ? 9 : 3)){ stomp(f, fy); continue; }
+        if (!(Math.abs(f.x - P.x) < S.hw*.5 + 7 && fy + S.hh*.6 > P.y - 46 && fy - S.hh*.6 < P.y - 2)) continue;   // frôlé sans être touché
         if (fireT > 0 || graceT > 0){ f.gone = true; debris.push({ img: f.sp === 'shuttle' ? SHUTTLE : FLY_FR[f.sp][1], x: f.x - S.w/2, y: fy - S.h/2, vx: 220, vy: -260, rot: 0, vr: 14 }); sfx.smash(); }
         else { die(f.sp); break; }
       }
@@ -3313,7 +3314,7 @@ requestAnimationFrame(frame);
   b.style.cssText = 'margin-top:3px;font:10px monospace;padding:3px 8px;border-radius:5px;border:1px solid #fff;background:#7B4FA0;color:#fff';
   b.addEventListener('click', e => { e.stopPropagation(); b.blur(); if (state !== 'play') return; P.sockT = 7; sfx.sock(); toast(txt('toast.superJump')); });
   d.append(info, b); document.body.appendChild(d);
-  setInterval(() => { info.textContent = 'BETA v' + APP_VERSION + '-b4' + ' · chaussette\n' + (state === 'play'
+  setInterval(() => { info.textContent = 'BETA v' + APP_VERSION + '-b5' + ' · chaussette\n' + (state === 'play'
     ? 'vitesse ' + Math.round(spEff) + ' (x' + slowMul.toFixed(2) + ')\nchaussette ' + (P.sockT > 0 ? 'ACTIVE ' + P.sockT.toFixed(1) + ' s' : 'dans ' + Math.max(0, sockIn).toFixed(1) + ' s') + '\nFast Count x' + slowMul.toFixed(2) + ' · ' + (t > 25 ? 'chrono dans ' + Math.max(0, slowIn).toFixed(1) + ' s' : 'pas de chrono avant 25 s')
     : 'lance une partie'); }, 200); }
 
