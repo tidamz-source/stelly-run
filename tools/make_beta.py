@@ -14,7 +14,7 @@ Conventions BETA :
 import pathlib, re, sys
 
 # Numéro de la beta : à incrémenter à chaque nouvelle beta (affiché « v<version du jeu>-b<numéro> »)
-BETA_REV = 4
+BETA_REV = 5
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 src = (ROOT / 'index.html').read_text(encoding='utf-8')
@@ -76,6 +76,13 @@ PATCHES = [
     # STADE (0) > INDOOR (1) > BEACH (2) > NEIGE (3) > CAMPAGNE (6) > VILLE (4) > FORÊT (5)
     ("    if (zoneT <= 0){ zoneT = 12 + Math.random()*6; do { nt = Math.floor(Math.random()*THEME_NAMES.length); } while (nt === theme); }",
      "    nt = [0, 1, 2, 3, 6, 4, 5][Math.floor(score/10000) % 7];", 'biomes tous les 10 000 points'),
+    # Oiseaux : plus d'ondulation, le dessin vole droit à la hauteur exacte de sa hitbox (les ailes battent toujours)
+    ("function flyerY(f){ return f.y0 + Math.sin(f.t*f.fs + f.ph)*f.amp + Math.sin(f.t*.8 + f.ph*2)*f.drift; }",
+     "function flyerY(f){ return f.y0; }", 'oiseaux sans ondulation'),
+    # Oiseaux : hitbox « C hybride ». La zone pour assommer reste la hitbox actuelle ;
+    # la zone qui tue est réduite à 50 % de la largeur et 60 % de la hauteur de l'oiseau (pigeon : 8 x 6 px au lieu de 16 x 10)
+    ("if (!P.ground && P.vy > (mid ? -60 : 40) && P.y < fy + (mid ? 9 : 3)){ stomp(f, fy); continue; }",
+     "if (!P.ground && P.vy > (mid ? -60 : 40) && P.y < fy + (mid ? 9 : 3)){ stomp(f, fy); continue; }\n        if (!(Math.abs(f.x - P.x) < S.hw*.5 + 7 && fy + S.hh*.6 > P.y - 46 && fy - S.hh*.6 < P.y - 2)) continue;   // frôlé sans être touché", 'oiseaux : hitbox C hybride'),
     # Texte de changement de biome : en haut, centré, même taille
     ("#zone{ position:absolute; right:calc(var(--s)*10px); bottom:calc(var(--s)*8px);",
      "#zone{ position:absolute; left:0; right:0; top:calc(var(--s)*8px); text-align:center;", 'biome en haut centré'),
