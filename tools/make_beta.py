@@ -14,7 +14,7 @@ Conventions BETA :
 import pathlib, re, sys
 
 # Numéro de la beta : à incrémenter à chaque nouvelle beta (affiché « v<version du jeu>-b<numéro> »)
-BETA_REV = 10
+BETA_REV = 12
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 src = (ROOT / 'index.html').read_text(encoding='utf-8')
@@ -93,6 +93,15 @@ PATCHES = [
      "const room = Math.max(spEff, 190)*.85, start = Math.max(mx - 60, arcEnd + room, x0 + o.w + 1.2*Math.max(spEff, 190)), need = start + 120 + room - x0;", 'rangée haute : piste libre avant'),
     # Tutoriel : avant la toute première partie (clé stellyrun_tuto absente)
     ("function startGame(){\n  AC.reset();", "function startGame(){\n  if (tutoUI.need()){ tutoUI.open(); return; }\n  AC.reset();", 'tutoriel avant la partie'),
+    # Trophées de costumes (Cow Boy, Sur son 31, Prom Queen) : plus cachés, et comptés pour « Greatest » (tous les trophées)
+    ("'accro', 'marathon', 'rainbow', 'greatest', 'parzival'];", "'accro', 'marathon', 'rainbow', 'cowboy', 'son31', 'promqueen', 'greatest', 'parzival'];", 'trophées de costumes : liste normale'),
+    ("'flambeur', 'cowboy', 'son31', 'promqueen'];", "'flambeur', 'dam'];", 'trophées de costumes : plus secrets ; nouveau trophée caché La Tenue de Dam'),
+    # La Tenue de Dam : Casque Viking, lunettes du futur (RPO), Noeud Pap' Rouge, chaussons Bunny
+    ("promqueen:['hat-tiare', 'shoes-heels', 'glasses-demi_lune', 'shirt-red_bow'] };",
+     "promqueen:['hat-tiare', 'shoes-heels', 'glasses-demi_lune', 'shirt-red_bow'], dam:['hat-viking', 'glasses-future', 'shirt-red_bow', 'shoes-bunny'] };", 'La Tenue de Dam : tenue'),
+    # Remise à zéro : les stats mises de côté restent comptées dans les stats mondiales
+    ("    return JSON.stringify({ name: n || '', games: d.games,", "    return JSON.stringify(statsArchive({ name: n || '', games: d.games,", 'stats mondiales : archive (début)'),
+    ("giga: st.giga, deathBy: st.deathBy, deathTh: st.deathTh });", "giga: st.giga, deathBy: st.deathBy, deathTh: st.deathTh }));", 'stats mondiales : archive (fin)'),
     # Consommables et défis quotidiens : branchements (le code est dans tools/beta_cons.js et tools/beta_daily.js)
     ("rbAt = TR.rainbowAt(); state = 'play';", "rbAt = TR.rainbowAt(); state = 'play'; consStart(); dqStart();", 'consommables + défis : départ de partie'),
     ("function die(kind){\n  if (state !== 'play') return;", "function die(kind){\n  if (state !== 'play') return;\n  if (consHit(kind)) return;   // bouclier ou ressort", 'consommables : bouclier et ressort'),
@@ -147,8 +156,9 @@ DBG = r"""
 beta_js = lambda f: open(ROOT / 'tools' / f, encoding='utf-8').read().replace("'stellyrun_", "'stellyrun_test_")
 TUTO = beta_js('beta_tuto.js')
 CONS = beta_js('beta_cons.js')
+RESET = beta_js('beta_reset.js')
 DAILY = '\nconst DQ_DATA = ' + open(ROOT / 'tools' / 'beta_defis.json', encoding='utf-8').read().strip() + ';\n' + beta_js('beta_daily.js')
-sub_once('\nrequestAnimationFrame(frame);\n', '\nrequestAnimationFrame(frame);\n' + TUTO + CONS + DAILY + DBG, 'injection tutoriel, consommables, défis et debug')
+sub_once('\nrequestAnimationFrame(frame);\n', '\nrequestAnimationFrame(frame);\n' + TUTO + CONS + DAILY + RESET + DBG, 'injection tutoriel, consommables, défis et debug')
 
 (ROOT / 'beta.html').write_text(out, encoding='utf-8')
 # garde-fou : le script du jeu doit rester valide (vérifié avec node s'il est installé)
