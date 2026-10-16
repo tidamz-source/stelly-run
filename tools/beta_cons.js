@@ -113,7 +113,7 @@ const biomeName = k => THEME_NAMES[BIOME_ORDER[k]];
     + '#bnbub .bios button{ font:inherit; font-weight:700; font-size:max(calc(var(--s)*4.2px),8px); padding:calc(var(--s)*.8px) calc(var(--s)*2px); border-radius:calc(var(--s)*2px);'
     + ' border:calc(var(--s)*1px) solid #5FD3F5; background:#fff; color:#0B2236; cursor:pointer; }'
     + '#bnbub .bios button.on{ background:#5FD3F5; }'
-    + '#conshud{ position:absolute; top:calc(var(--s)*31px); left:calc(var(--s)*10px); display:flex; gap:calc(var(--s)*3px); pointer-events:none; }'
+    + '#conshud{ display:flex; gap:calc(var(--s)*3px); margin-top:calc(var(--s)*3px); pointer-events:none; } #conshud:empty{ display:none; }'
     + '#conshud > *{ display:flex; align-items:center; justify-content:center; gap:calc(var(--s)*1px); height:calc(var(--s)*12px); min-width:calc(var(--s)*12px); background:rgba(255,255,255,.85);'
     + ' border:calc(var(--s)*1px) solid var(--plum); border-radius:calc(var(--s)*2px); padding:0 calc(var(--s)*1.5px); font-family:var(--num); font-size:max(calc(var(--s)*4px),8px); color:var(--plum); }'
     + '#conshud canvas{ height:calc(var(--s)*9px); width:auto; image-rendering:pixelated; }'
@@ -208,7 +208,7 @@ const bonusShop = (() => {
 })();
 
 // ---------- pendant la partie ----------
-const hudC = document.createElement('div'); hudC.id = 'conshud'; ui.hud.appendChild(hudC);
+const hudC = document.createElement('div'); hudC.id = 'conshud'; $('hi').after(hudC);   // dans la colonne du score : les barres de super saut et d'invincibilité passent dessous
 function hudRefresh(){
   hudC.textContent = '';
   const chip = (img, n) => { const s = document.createElement('span'); s.appendChild(cvOf(img)); if (n != null) s.append('×' + n); hudC.appendChild(s); };
