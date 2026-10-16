@@ -14,7 +14,7 @@ Conventions BETA :
 import pathlib, re, sys
 
 # Numéro de la beta : à incrémenter à chaque nouvelle beta (affiché « v<version du jeu>-b<numéro> »)
-BETA_REV = 7
+BETA_REV = 8
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 src = (ROOT / 'index.html').read_text(encoding='utf-8')
