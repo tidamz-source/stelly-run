@@ -14,7 +14,7 @@ Conventions BETA :
 import pathlib, re, sys
 
 # Numéro de la beta : à incrémenter à chaque nouvelle beta (affiché « v<version du jeu>-b<numéro> »)
-BETA_REV = 5
+BETA_REV = 6
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 src = (ROOT / 'index.html').read_text(encoding='utf-8')
@@ -87,6 +87,10 @@ PATCHES = [
     ("#zone{ position:absolute; right:calc(var(--s)*10px); bottom:calc(var(--s)*8px);",
      "#zone{ position:absolute; left:0; right:0; top:calc(var(--s)*8px); text-align:center;", 'biome en haut centré'),
     ("transform-origin:right bottom; }", "transform-origin:center top; }", 'biome : origine de l\'animation'),
+    # Chaussette : la rangée haute de 5 commence au moins 1,2 s de course après la fin de l'obstacle qui la précède
+    # (mesuré : en dessous de 1 à 1,2 s, sauter l'obstacle empêche de reprendre un super saut à temps pour les 5 disques)
+    ("const room = Math.max(spEff, 190)*.85, start = Math.max(mx - 60, arcEnd + room), need = start + 120 + room - x0;",
+     "const room = Math.max(spEff, 190)*.85, start = Math.max(mx - 60, arcEnd + room, x0 + o.w + 1.2*Math.max(spEff, 190)), need = start + 120 + room - x0;", 'rangée haute : piste libre avant'),
     # Tutoriel : avant la toute première partie (clé stellyrun_tuto absente)
     ("function startGame(){\n  AC.reset();", "function startGame(){\n  if (tutoUI.need()){ tutoUI.open(); return; }\n  AC.reset();", 'tutoriel avant la partie'),
 ]
