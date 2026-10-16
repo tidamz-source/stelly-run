@@ -14,7 +14,7 @@ Conventions BETA :
 import pathlib, re, sys
 
 # Numéro de la beta : à incrémenter à chaque nouvelle beta (affiché « v<version du jeu>-b<numéro> »)
-BETA_REV = 8
+BETA_REV = 9
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 src = (ROOT / 'index.html').read_text(encoding='utf-8')
@@ -108,10 +108,19 @@ for old, new, label in PATCHES:
 
 # 6. Panneau debug (injecté dans l'IIFE du jeu)
 DBG = r"""
-/* ================= BETA : panneau debug ================= */
-{ const d = document.createElement('div'); d.id = 'dbg';
-  d.style.cssText = 'position:fixed;right:6px;top:58px;z-index:99;opacity:.8;font:9px/1.3 monospace;color:#fff;background:rgba(46,14,48,.82);padding:6px 8px;border-radius:6px;white-space:pre;text-align:center';
-  const info = document.createElement('div'); info.style.pointerEvents = 'none';
+/* ================= BETA : panneau debug (replié par défaut) + compteur de performances ================= */
+{ const PERF = { frames:0, worst:0, last:0, upd:0, drw:0, fps:0, w:0, u:0, dr:0 };
+  { const u0 = update, d0 = draw;
+    update = function(dt){ const a = performance.now(); u0(dt); PERF.upd += performance.now() - a; };
+    draw = function(){ const a = performance.now(); d0(); PERF.drw += performance.now() - a; };
+    const tick = now => { if (PERF.last){ const g = now - PERF.last; if (g > PERF.worst) PERF.worst = g; } PERF.last = now; PERF.frames++; requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+    setInterval(() => { const n = Math.max(1, PERF.frames); PERF.fps = PERF.frames; PERF.w = Math.round(PERF.worst); PERF.u = PERF.upd/n; PERF.dr = PERF.drw/n;
+      PERF.frames = 0; PERF.worst = 0; PERF.upd = 0; PERF.drw = 0; }, 1000); }
+  const d = document.createElement('div'); d.id = 'dbg';
+  d.style.cssText = 'position:fixed;right:6px;top:58px;z-index:99;font:9px/1.3 monospace;color:#fff;background:rgba(46,14,48,.9);padding:4px 7px;border-radius:6px;white-space:pre;text-align:center;cursor:pointer';
+  const info = document.createElement('div');
+  const box = document.createElement('div'); box.hidden = true;
   const b = document.createElement('button'); b.type = 'button'; b.tabIndex = -1; b.textContent = '🧦 donner une chaussette';
   b.style.cssText = 'margin-top:3px;font:10px monospace;padding:3px 8px;border-radius:5px;border:1px solid #fff;background:#7B4FA0;color:#fff';
   b.addEventListener('click', e => { e.stopPropagation(); b.blur(); if (state !== 'play') return; P.sockT = 7; sfx.sock(); toast(txt('toast.superJump')); });
@@ -120,10 +129,20 @@ DBG = r"""
   const bCoins = mkb('+5 000 disques', () => { TR.d.coins += 5000; TR.save(); toast('+5000'); });
   const bTuto = mkb('revoir le tuto', () => { tutoUI.reset(); toast('tuto au prochain départ'); });
   const bDay = mkb('défis : jour suivant', x => { x.textContent = 'défis : ' + dqUI.shiftDay(); });
-  d.append(info, b, bCoins, bTuto, bDay); document.body.appendChild(d);
-  setInterval(() => { info.textContent = 'BETA v' + APP_VERSION + '-b""" + str(BETA_REV) + r"""' + ' · chaussette\n' + (state === 'play'
-    ? 'vitesse ' + Math.round(spEff) + ' (x' + slowMul.toFixed(2) + ')\nchaussette ' + (P.sockT > 0 ? 'ACTIVE ' + P.sockT.toFixed(1) + ' s' : 'dans ' + Math.max(0, sockIn).toFixed(1) + ' s') + '\nFast Count x' + slowMul.toFixed(2) + ' · ' + (t > 25 ? 'chrono dans ' + Math.max(0, slowIn).toFixed(1) + ' s' : 'pas de chrono avant 25 s')
-    : 'lance une partie') + '\ndisques en poche ' + TR.d.coins; }, 200); }
+  const det = document.createElement('div');
+  box.append(det, b, bCoins, bTuto, bDay); d.append(info, box); document.body.appendChild(d);
+  let open = false; try { open = localStorage.getItem('stellyrun_test_dbgopen') === '1'; } catch(e){}
+  const setOpen = v => { open = v; box.hidden = !v; try { localStorage.setItem('stellyrun_test_dbgopen', v ? '1' : '0'); } catch(e){} paint(); };
+  d.addEventListener('pointerdown', e => e.stopPropagation());
+  d.addEventListener('click', e => { if (e.target.closest('button')) return; e.stopPropagation(); setOpen(!open); });
+  function paint(){
+    info.textContent = 'BETA v' + APP_VERSION + '-b""" + str(BETA_REV) + r"""' + ' · ' + PERF.fps + ' i/s · pire ' + PERF.w + ' ms ' + (open ? '▾' : '▸');
+    if (!open) return;
+    det.textContent = 'jeu ' + PERF.u.toFixed(1) + ' ms + dessin ' + PERF.dr.toFixed(1) + ' ms par image\n' + (state === 'play'
+      ? 'vitesse ' + Math.round(spEff) + ' (x' + slowMul.toFixed(2) + ')\nchaussette ' + (P.sockT > 0 ? 'ACTIVE ' + P.sockT.toFixed(1) + ' s' : 'dans ' + Math.max(0, sockIn).toFixed(1) + ' s') + '\nFast Count x' + slowMul.toFixed(2) + ' · ' + (t > 25 ? 'chrono dans ' + Math.max(0, slowIn).toFixed(1) + ' s' : 'pas de chrono avant 25 s')
+      : 'lance une partie') + '\ndisques en poche ' + TR.d.coins;
+  }
+  setOpen(open); setInterval(paint, 1000); }
 """
 beta_js = lambda f: open(ROOT / 'tools' / f, encoding='utf-8').read().replace("'stellyrun_", "'stellyrun_test_")
 TUTO = beta_js('beta_tuto.js')
@@ -132,4 +151,11 @@ DAILY = '\nconst DQ_DATA = ' + open(ROOT / 'tools' / 'beta_defis.json', encoding
 sub_once('\nrequestAnimationFrame(frame);\n', '\nrequestAnimationFrame(frame);\n' + TUTO + CONS + DAILY + DBG, 'injection tutoriel, consommables, défis et debug')
 
 (ROOT / 'beta.html').write_text(out, encoding='utf-8')
+# garde-fou : le script du jeu doit rester valide (vérifié avec node s'il est installé)
+import shutil, subprocess, tempfile
+if shutil.which('node'):
+    big = max(re.findall(r'<script>(.*?)</script>', out, re.S), key=len)
+    with tempfile.NamedTemporaryFile('w', suffix='.js', delete=False, encoding='utf-8') as f: f.write(big)
+    r = subprocess.run(['node', '--check', f.name], capture_output=True, text=True)
+    if r.returncode: sys.exit('[make_beta] ERREUR DE SYNTAXE dans beta.html :\n' + r.stderr[:600])
 print('[make_beta] beta.html v' + re.search(r"APP_VERSION = '([^']+)'", src).group(1) + '-b' + str(BETA_REV) + ' généré depuis index.html')
