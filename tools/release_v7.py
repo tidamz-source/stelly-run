@@ -5,7 +5,7 @@
 - applique à index.html toutes les modifs de gameplay de la beta (PATCHES de tools/make_beta.py)
 - intègre les modules de la beta (tutoriel, bonus, défis du jour, remise à zéro) + flèches des Nouvelles
 - déplace leurs textes dans langues.js, ajoute la news de la boutique Bonus
-- récompenses de trophées, parties boostées hors classement
+- récompenses de trophées (les parties avec bonus comptent au classement)
 - version 7.0 (index.html, stats.html, sw.js)
 """
 import ast, json, pathlib, re, sys, shutil, subprocess, tempfile
@@ -49,8 +49,6 @@ REL = [
    "const LOOKS = {", 'récompenses : barème'),
   ("    if (d.u[id]) return; d.u[id] = Date.now();\n    if (!d.u.greatest && TROPHY_IDS.every(k => k === 'greatest' || k === 'parzival' || d.u[k])) d.u.greatest = Date.now();",
    "    if (d.u[id]) return; d.u[id] = Date.now(); trophyReward(d, id);\n    if (!d.u.greatest && TROPHY_IDS.every(k => k === 'greatest' || k === 'parzival' || d.u[k])){ d.u.greatest = Date.now(); trophyReward(d, 'greatest'); }", 'récompenses : versement'),
-  # parties boostées (bonus ou cœur) : jamais envoyées au classement mondial
-  ("if (score > (TR.d.lbBest || 0) && !AC.sus()) lbEntry.show(", "if (score > (TR.d.lbBest || 0) && !AC.sus() && !RUN_C.boosted) lbEntry.show(", 'classement : parties boostées exclues'),
   # icône de la news Bonus (le cœur, x2)
   ("    reglages: () => mk(22, 22, g => { g.imageSmoothingEnabled = false; g.drawImage($('icoSet'), 0, 0, 22, 22); }) };",
    "    reglages: () => mk(22, 22, g => { g.imageSmoothingEnabled = false; g.drawImage($('icoSet'), 0, 0, 22, 22); }),\n    bonus: () => mk(22, 20, g => { g.imageSmoothingEnabled = false; g.drawImage(ICO_HEART, 0, 0, 22, 20); }) };", 'news : icône bonus'),
@@ -77,9 +75,9 @@ texts.append('''  "tr.reward":  { fr:"Trophée « {name} » · +{n}", en:"Trophy
 lng = once(lng, '\n};\n\n/* Nouvelles du jeu', '\n  // v7.0 : tutoriel, boutique Bonus, Cœur, défis du jour, remise à zéro, récompenses de trophées\n' + '\n'.join(texts) + '\n};\n\n/* Nouvelles du jeu', 'langues : textes v7.0')
 NEWS = '''  { id:'2026-10-17-bonus', date:'2026-10-17', icon:'bonus',
     title:{ fr:'La boutique Bonus est ouverte', en:'The Boosts shop is open', es:'Abre la tienda de Bonus' },
-    text:{ fr:'Nouvel onglet Bonus dans la boutique : Bouclier, Chaussette de départ, Chrono de poche, Gant collant, Billet de biome et Cœur pour ré-animer Stelly. Achète, équipe, et c\\u2019est parti ! Une partie avec un bonus ne compte pas au classement mondial.',
-      en:'New Boosts tab in the shop: Shield, Head-start sock, Pocket stopwatch, Sticky glove, Biome ticket and Heart to revive Stelly. Buy, equip and go! A run with a boost doesn\\u2019t count for the world ranking.',
-      es:'Nueva pestaña Bonus en la tienda: Escudo, Calcetín de salida, Cronómetro de bolsillo, Guante pegajoso, Billete de bioma y Corazón para reanimar a Stelly. ¡Compra, equipa y a correr! Una partida con bonus no cuenta para la clasificación mundial.' } },
+    text:{ fr:'Nouvel onglet Bonus dans la boutique : Bouclier, Chaussette de départ, Chrono de poche, Gant collant, Billet de biome et Cœur pour ré-animer Stelly. Achète, équipe, et c\\u2019est parti !',
+      en:'New Boosts tab in the shop: Shield, Head-start sock, Pocket stopwatch, Sticky glove, Biome ticket and Heart to revive Stelly. Buy, equip and go!',
+      es:'Nueva pestaña Bonus en la tienda: Escudo, Calcetín de salida, Cronómetro de bolsillo, Guante pegajoso, Billete de bioma y Corazón para reanimar a Stelly. ¡Compra, equipa y a correr!' } },
 '''
 lng = once(lng, "const NEWS = [\n", "const NEWS = [\n" + NEWS, 'news : boutique Bonus')
 
