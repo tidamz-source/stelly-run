@@ -130,8 +130,8 @@ body{
   border:calc(var(--s)*1px) solid var(--plum); border-radius:calc(var(--s)*1.5px); padding:0; cursor:pointer; }
 #pausebtn i{ display:block; width:calc(var(--s)*1.6px); height:calc(var(--s)*5px); background:var(--plum); }
 #pausebtn:focus-visible{ outline:calc(var(--s)*1px) dashed var(--plum); outline-offset:2px; }
-#zone{ position:absolute; right:calc(var(--s)*10px); bottom:calc(var(--s)*8px); pointer-events:none; font-weight:700; font-size:max(calc(var(--s)*8px),14px); line-height:1;
-  color:var(--white); -webkit-text-stroke:calc(var(--s)*1.3px) var(--plum); paint-order:stroke fill; text-shadow:0 calc(var(--s)*1.5px) 0 var(--plum); transform-origin:right bottom; }
+#zone{ position:absolute; left:0; right:0; top:calc(var(--s)*8px); text-align:center; pointer-events:none; font-weight:700; font-size:max(calc(var(--s)*8px),14px); line-height:1;
+  color:var(--white); -webkit-text-stroke:calc(var(--s)*1.3px) var(--plum); paint-order:stroke fill; text-shadow:0 calc(var(--s)*1.5px) 0 var(--plum); transform-origin:center top; }
 #zone.ice{ color:#E8F7FF; -webkit-text-stroke-color:#1E4E7A; text-shadow:0 calc(var(--s)*1.5px) 0 #1E4E7A; }
 #zone.pop{ animation:zonepop .6s cubic-bezier(.3,1.6,.5,1); }
 @keyframes zonepop{ 0%{ transform:scale(.4); opacity:0; } 100%{ transform:scale(1); opacity:1; } }
@@ -600,9 +600,9 @@ __ld(10); setTimeout(() => { const L = document.getElementById('loader'); if (L)
   </div>
 </div>
 <script>__ld(30);</script>
-<script src="langues.js?v=6.22"></script>
+<script src="langues.js?v=7.0"></script>
 <script>__ld(45);</script>
-<script src="stelly.js?v=6.22"></script>
+<script src="stelly.js?v=7.0"></script>
 <script>__ld(60);</script>
 <script>
 /* ================= Langues ================= */
@@ -1588,7 +1588,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '6.22';
+const APP_VERSION = '7.0';
 // icônes de trophées retouchées dans l'atelier (trophees.json) : remplacent celles dessinées par le code
 const TR_OVR = {}; let TR_OVR_N = 0;
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
@@ -1608,9 +1608,10 @@ function reset(){
   Object.assign(P, { y:GY, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, land:0, sink:false, stomps:0 });
 }
 function startGame(){
+  if (tutoUI.need()){ tutoUI.open(); return; }
   AC.reset();
   confetti = []; P.confettiDone = false;
-  lbEntry.submit(); lbEntry.hide(); trUI.close(); shopUI.close(); lbUI.close(); newsUI.close(); statsUI.close(); setUI.close(); $('langbtn').hidden = true; $('langmenu').hidden = true; ensureAudio(); sfx.start(); reset(); TR.start(); rbAt = TR.rainbowAt(); state = 'play'; MUSIC.tempo = MUSIC.target = 1; MUSIC.fire = false; MUSIC.play(0, true);
+  lbEntry.submit(); lbEntry.hide(); trUI.close(); shopUI.close(); lbUI.close(); newsUI.close(); statsUI.close(); setUI.close(); $('langbtn').hidden = true; $('langmenu').hidden = true; ensureAudio(); sfx.start(); reset(); TR.start(); rbAt = TR.rainbowAt(); state = 'play'; consStart(); dqStart(); MUSIC.tempo = MUSIC.target = 1; MUSIC.fire = false; MUSIC.play(0, true);
   ui.title.hidden = true; ui.over.hidden = true; ui.pause.hidden = true; ui.hud.hidden = false;
   ui.hi.textContent = txt('ui.record') + ' ' + pad(best); ui.firebar.hidden = true; ui.sockbar.hidden = true; ui.dcount.hidden = false; $('pausebtn').hidden = false; clearTimeout(zoneTimer); $('zone').hidden = true;
   if (document.activeElement) document.activeElement.blur();
@@ -1630,11 +1631,14 @@ function toast(msg, big, combo){ ui.toast.textContent = msg; ui.toast.classList.
   ui.toast.classList.toggle('combo', !!combo); ui.toast.classList.toggle('c2', combo === 2); ui.toast.classList.toggle('c3', combo === 3); ui.toast.classList.remove('show'); void ui.toast.offsetWidth; ui.toast.classList.add('show'); }
 
 /* ================= Trophées ================= */
-const TROPHY_IDS = ['crampons', 'pasdebol', 'taupe', 'amateur', 'combo5', 'soldes', 'vitrine', 'gym', 'beach', 'city', 'fields', 'forest', 'peuf', 'junior', 'force', 'crabe', 'marmotte', 'combo10', 'plumes', 'mains', 'requin', 'deer', 'globe', 'angry', 'bronze', 'senior', 'heros', 'voltige', 'fashion', 'cendrillon', 'tetedure', 'combo50', 'master', 'huck', 'elfe', 'bulldozer', 'hydrate', 'mcfly', 'argent', 'picsou', 'chapelier', 'gmaster', 'combo100', 'or', 'prada', 'dressing', 'intouchable', 'cascadeuse', 'legende', 'accro', 'marathon', 'rainbow', 'greatest', 'parzival'];   // ordre d'affichage ; Parzival toujours en dernier, hors Greatest
+const TROPHY_IDS = ['crampons', 'pasdebol', 'taupe', 'amateur', 'combo5', 'soldes', 'vitrine', 'gym', 'beach', 'city', 'fields', 'forest', 'peuf', 'junior', 'force', 'crabe', 'marmotte', 'combo10', 'plumes', 'mains', 'requin', 'deer', 'globe', 'angry', 'bronze', 'senior', 'heros', 'voltige', 'fashion', 'cendrillon', 'tetedure', 'combo50', 'master', 'huck', 'elfe', 'bulldozer', 'hydrate', 'mcfly', 'argent', 'picsou', 'chapelier', 'gmaster', 'combo100', 'or', 'prada', 'dressing', 'intouchable', 'cascadeuse', 'legende', 'accro', 'marathon', 'rainbow', 'cowboy', 'son31', 'promqueen', 'greatest', 'parzival'];   // ordre d'affichage ; Parzival toujours en dernier, hors Greatest
 // trophées chromés : cachés tant qu'ils ne sont pas débloqués, affichés après Parzival, hors compte et hors Greatest
-const CHROME_IDS = ['serial', 'firecatch', 'rainbow2', 'platine', 'diamant', 'obsidienne', 'adamantium', 'getalife', 'flambeur', 'cowboy', 'son31', 'promqueen'];
+const CHROME_IDS = ['serial', 'firecatch', 'rainbow2', 'platine', 'diamant', 'obsidienne', 'adamantium', 'getalife', 'flambeur', 'dam'];
 // looks : trophées secrets débloqués en lançant une partie avec la tenue complète (identifiants de boutique.json)
-const LOOKS = { cowboy:['hat-cowboy', 'shirt-texan', 'shoes-cowboy', 'glasses-cowboy_glasses'], son31:['hat-tophat', 'shirt-black_bow_copie', 'glasses-ray', 'shoes-mocassin'], promqueen:['hat-tiare', 'shoes-heels', 'glasses-demi_lune', 'shirt-red_bow'] };
+// v7.0 : disques offerts au déblocage d'un trophée (facile 50, moyen 150, difficile 400, exploit 1000, secret 500, Greatest 2500)
+const TROPHY_REWARD = {"crampons":50,"pasdebol":50,"taupe":50,"amateur":50,"combo5":50,"soldes":50,"vitrine":50,"junior":50,"crabe":50,"marmotte":50,"mains":50,"fashion":50,"gym":150,"force":150,"combo10":150,"plumes":150,"requin":150,"deer":150,"bronze":150,"senior":150,"heros":150,"voltige":150,"cendrillon":150,"tetedure":150,"huck":150,"elfe":150,"hydrate":150,"mcfly":150,"rainbow":150,"cowboy":150,"son31":150,"promqueen":150,"beach":400,"peuf":400,"angry":400,"combo50":400,"master":400,"bulldozer":400,"argent":400,"picsou":400,"chapelier":400,"gmaster":400,"prada":400,"intouchable":400,"cascadeuse":400,"marathon":400,"fields":1000,"city":1000,"forest":1000,"globe":1000,"combo100":1000,"or":1000,"dressing":1000,"legende":1000,"accro":1000,"parzival":1000,"greatest":2500,"serial":500,"firecatch":500,"rainbow2":500,"platine":500,"diamant":500,"obsidienne":500,"adamantium":500,"getalife":500,"flambeur":500,"dam":500};
+function trophyReward(d, id){ const n = TROPHY_REWARD[id] || 0; if (!n) return; d.coins = (d.coins || 0) + n; toast(txt('tr.reward', { name: txt('tr.' + id + '.n'), n }), true); }
+const LOOKS = { cowboy:['hat-cowboy', 'shirt-texan', 'shoes-cowboy', 'glasses-cowboy_glasses'], son31:['hat-tophat', 'shirt-black_bow_copie', 'glasses-ray', 'shoes-mocassin'], promqueen:['hat-tiare', 'shoes-heels', 'glasses-demi_lune', 'shirt-red_bow'], dam:['hat-viking', 'glasses-future', 'shirt-red_bow', 'shoes-bunny'] };
 // [id, nom, descriptif] : nom et descriptif suivent la langue choisie
 const trEntry = id => { const a = [id];
   Object.defineProperty(a, 1, { get: () => txt('tr.' + id + '.n'), enumerable: true });
@@ -1663,8 +1667,8 @@ const TR = (() => {
   let ended = false;
   function endStats(){ if (ended) return; ended = true; d.st.dist += Math.round(dist); d.st.time += Math.round(t); if (bestStreak > d.st.streak) d.st.streak = bestStreak; retro(); }
   function unlock(id){
-    if (d.u[id]) return; d.u[id] = Date.now();
-    if (!d.u.greatest && TROPHY_IDS.every(k => k === 'greatest' || k === 'parzival' || d.u[k])) d.u.greatest = Date.now();
+    if (d.u[id]) return; d.u[id] = Date.now(); trophyReward(d, id);
+    if (!d.u.greatest && TROPHY_IDS.every(k => k === 'greatest' || k === 'parzival' || d.u[k])){ d.u.greatest = Date.now(); trophyReward(d, 'greatest'); }
     save(); refreshTrophyBadge();
   }
   // rattrapage des trophées dont le compteur est déjà atteint (à l'ouverture de l'appli et au début de chaque partie)
@@ -1972,9 +1976,9 @@ const LB = (() => {
   // stats cumulées du joueur, envoyées à la fin de chaque partie pour la page des stats mondiales (dernier état seulement)
   function statsPayload(){
     const d = TR.d, st = d.st, n = store('stellyrun_name');
-    return JSON.stringify({ name: n || '', games: d.games, discs: d.discs, rb: d.rb || 0, spent: d.spent || 0, sharks: d.sharks || 0, best: Math.max(best, d.lbBest || 0),
+    return JSON.stringify(statsArchive({ name: n || '', games: d.games, discs: d.discs, rb: d.rb || 0, spent: d.spent || 0, sharks: d.sharks || 0, best: Math.max(best, d.lbBest || 0),
       ko: st.ko, doe: st.doe, stag: st.stag, dist: st.dist, streak: st.streak, missed: st.missed, fires: st.fires, socks: st.socks, slows: st.slows, time: st.time,
-      combo: st.combo, superC: st.superC, mega: st.mega, giga: st.giga, deathBy: st.deathBy, deathTh: st.deathTh });
+      combo: st.combo, superC: st.superC, mega: st.mega, giga: st.giga, deathBy: st.deathBy, deathTh: st.deathTh }));
   }
   async function sendStats(){
     const payload = statsPayload(); store('stellyrun_statspending', payload);
@@ -2061,7 +2065,8 @@ const newsUI = (() => {
   let trIcons = null;
   const HANGER = mk(20, 13, g => pm(g, ['.........www........','........w...w.......','............w.......','...........w........','..........w.........','.........ww.........','........wyyw........','......wwy..yww......','....wwyy....yyww....','..wwyy........yyww..','wwyy............yyww','wyyyyyyyyyyyyyyyyyyw','wwwwwwwwwwwwwwwwwwww'], 0, 0, false, Object.assign({}, PAL, { w:C.plum, y:C.yellow })));
   const ICONS = { chrono: () => CHRONO[0], trophee: () => (trIcons = trIcons && trIcons.ovrN === TR_OVR_N ? trIcons : buildTrophyIcons()).diamant, cintre: () => HANGER,
-    reglages: () => mk(22, 22, g => { g.imageSmoothingEnabled = false; g.drawImage($('icoSet'), 0, 0, 22, 22); }) };   // roue dentée des Réglages, x2
+    reglages: () => mk(22, 22, g => { g.imageSmoothingEnabled = false; g.drawImage($('icoSet'), 0, 0, 22, 22); }),
+    bonus: () => mk(22, 20, g => { g.imageSmoothingEnabled = false; g.drawImage(ICO_HEART, 0, 0, 22, 20); }) };   // roue dentée des Réglages, x2
   function render(){
     list.textContent = '';
     for (const a of NEWS){
@@ -2430,10 +2435,12 @@ function spawnObstacle(){
   obs.push(o);
   const cx = x0 + o.w/2, fireOn = fireT > 0;
   let arcEnd = -Infinity;   // dernier frisbee de l'arc au-dessus de l'obstacle
-  if (Math.random() < (sockOn || fireOn ? .75 : .42) && !items.some(it => Math.abs(it.x - cx) < 110)){
+  const dry = !discs.some(dd => !dd.got && !dd.missed && dd.x > P.x) && (lastDiscT > t || (t - lastDiscT) + (cx - P.x)/Math.max(spEff, 60) > 2.5);
+  const pArc = Math.random() < (sockOn || fireOn ? .75 : .42), forcedArc = dry && !pArc;
+  if ((dry || pArc) && !items.some(it => Math.abs(it.x - cx) < 110)){
     // arc haut seulement si la chaussette durera encore quand Stelly arrivera dessus
     const arcSock = sockOn && sockLasts(cx + 80);
-    const peak = arcSock ? 92 : (o.k === 'pyr3' ? 66 : (o.k === 'pyr' ? 56 : 46)), sp = Math.max(28, speed*(arcSock ? .1 : .07)), half = sp >= 36 ? 2 : 1;
+    const peak = arcSock ? 92 : (o.k === 'pyr3' ? 66 : (o.k === 'pyr' ? 56 : 46)), sp = Math.max(28, speed*(arcSock ? .1 : .07)), half = (forcedArc && (forcedN++ % 3 !== 2)) ? 1 : (sp >= 36 ? 2 : 1);
     const gid = newGroup(2*half+1); for (let i=-half;i<=half;i++){ const hh = peak * (1 - Math.pow(i/(half+.7), 2)); discs.push({ x: cx + i*sp, y: GY - 30 - hh, g: gid }); }
     arcEnd = cx + half*sp;
   }
@@ -2441,18 +2448,18 @@ function spawnObstacle(){
   const mx = x0 + o.w + (gap - o.w)/2, roomy = gap - o.w > speed*.64 + 125;
   // objet seul dans un espace libre (aucun frisbee à moins de 80 px), position variable, au sol ou à hauteur de saut
   const free = gap - o.w > 190, ix = x0 + o.w + 70 + Math.random()*Math.max(0, gap - o.w - 140), clear = !discs.some(dd => Math.abs(dd.x - ix) < 80);
-  if (slowIn <= 0 && !items.length && free && clear){ const lv = itemLevel(); items.push({ k:'slow', x: ix, y: GY - [26, 72][lv], lv }); slowIn = 30 + Math.random()*15; return; }
+  if (slowIn <= 0 && !items.length && free && clear){ const lv = itemLevel(); items.push({ k:'slow', x: ix, y: GY - [26, 72][lv], lv }); slowIn = 25 + Math.random()*5; return; }
   if (fireIn <= 0 && !fireOn && !items.length && free && clear){ const lv = itemLevel(); items.push({ k:'fire', x: ix, y: GY - [30, 76][lv], lv }); fireIn = itemDelay('fire'); return; }
   if (sockIn <= 0 && P.sockT <= 0 && !items.length && free && clear){ const lv = itemLevel(); items.push({ k:'sock', x: ix - 9, y: GY - [40, 88][lv], lv }); sockIn = itemDelay('sock'); return; }
-  if ((roomy || sockOn) && Math.random() < (sockOn || fireOn ? .8 : .45)){
+  if ((roomy || sockOn || (dry && arcEnd === -Infinity)) && ((dry && arcEnd === -Infinity) || Math.random() < (sockOn || fireOn ? .8 : .45))){
     // jamais deux fois d'affilée le même motif entre les obstacles (rangée de 5 de la chaussette, rangée au sol, rangée haute, diagonale)
     if (sockOn && lastPat !== 'row'){
       // rangée haute (chaussette) : assez loin de l'arc pour retomber et ressauter, et assez tôt pour repartir avant l'obstacle suivant
       // si l'espace manque, l'obstacle suivant est repoussé d'autant (pendant les 7 s de la chaussette seulement)
-      const room = Math.max(spEff, 190)*.85, start = Math.max(mx - 60, arcEnd + room), need = start + 120 + room - x0;
+      const room = Math.max(spEff, 190)*.85, start = Math.max(mx - 60, arcEnd + room, x0 + o.w + 1.2*Math.max(spEff, 190)), need = start + 120 + room - x0;
       // rangée haute seulement si la chaussette durera jusqu'au dernier frisbee
       if (sockLasts(start + 120)){ if (need > gap){ gap = need; nextObs = gap; }
-        const gid = newGroup(5); for (let i=0;i<5;i++) discs.push({ x: start + i*30, y: GY - 128, g: gid }); lastPat = 'row'; }
+        const gid = newGroup(5); groups[gid].hi = 1; for (let i=0;i<5;i++) discs.push({ x: start + i*30, y: GY - 128, g: gid }); lastPat = 'row'; }
     }
     else { const opts = ['low', 'mid', 'diag'].filter(k => k !== lastPat), k = opts[Math.floor(Math.random()*opts.length)]; lastPat = k;
       if (k === 'low') for (let i=0;i<4;i++) discs.push({ x: mx + (i-1.5)*30, y: GY - 16 });
@@ -2467,8 +2474,8 @@ function spawnObstacle(){
 const FLY_ALT = [[12, 4], [53.5, 1.5], [76, 10]];
 // les oiseaux avancent à la vitesse du sol (comme les obstacles)
 const flySpeed = () => Math.max(spEff, 60);
-let birdWait = false;   // un oiseau attend son tour : plus aucun obstacle ne sort tant que l'écran n'est pas dégagé
-function flyerY(f){ return f.y0 + Math.sin(f.t*f.fs + f.ph)*f.amp + Math.sin(f.t*.8 + f.ph*2)*f.drift; }
+let birdWait = false, lastDiscT = 0, forcedN = 0;   // un oiseau attend son tour : plus aucun obstacle ne sort tant que l'écran n'est pas dégagé
+function flyerY(f){ return f.y0; }
 function spawnFlyer(){
   const sp = FLY_BY_THEME[theme]; if (!sp){ flyIn = 2; return; }
   const k = 1, T = (W + 30 - P.x)/flySpeed();
@@ -2565,6 +2572,7 @@ function overTrophies(ids, compact){
 }
 function die(kind){
   if (state !== 'play') return;
+  if (consHit(kind)) return;   // bouclier ou ressort
   $('pausebtn').hidden = true;
   state = 'over'; overT = 0; deathKind = kind; flash = .12; fireT = 0; graceT = 0; MUSIC.stop(); MUSIC.fire = false; MUSIC.jingle();
   if (kind === 'hole' || kind === 'sewer'){ P.sink = true; P.vy = 30; P.ground = false; sfx.fall(); dust(P.x, GY, 10); shake = .15; }
@@ -2627,15 +2635,16 @@ function update(dt){
   if (state !== 'title'){
     if (state === 'play') dist += dx;
     for (const o of obs){ o.x -= dx; if (o.leapT !== undefined) o.leapT += dt; } for (const o of discs) o.x -= dx; for (const o of items) o.x -= dx;
-    obs = obs.filter(o => o.x + o.w > -30); for (const o of discs) if (!o.got && !o.missed && o.x < P.x - 20 && state === 'play'){ o.missed = true; streak = 0; TR.miss(); }
+    obs = obs.filter(o => o.x + o.w > -30); for (const o of discs) if (!o.got && !o.missed && o.x < P.x - 20 && state === 'play'){ o.missed = true; if (!consGlove()) streak = 0; TR.miss(); }
+    if (discs.some(d => !d.got && !d.missed && d.x > P.x)) lastDiscT = t;
     discs = discs.filter(o => o.x > -30 && !o.got); items = items.filter(o => o.x > -30 && !o.got);
   }
 
-  if (state === 'play' && rbAt > 0 && t >= rbAt && !discs.some(d => d.x > W - 50)){ rbAt = -1; discs.push({ x: W + 40, y: GY - 64, rb: true }); }
+  if (state === 'play' && rbAt > 0 && t >= rbAt && !discs.some(d => d.x > W - 50) && !flyers.some(f => !f.ko && f.x > W - 50)){ rbAt = -1; discs.push({ x: W + 40, y: GY - 64, rb: true }); }
   if (state === 'play' && t > 3){
     if (!birdWait){ flyIn -= dt; if (flyIn <= 0){ if (FLY_BY_THEME[theme]) birdWait = true; else flyIn = 2; } }
     // l'oiseau sort quand plus aucun obstacle n'est devant Stelly
-    else if (!obs.some(o => o.x + o.w > P.x - 6)){ birdWait = false; spawnFlyer(); }
+    else if (!obs.some(o => o.x + o.w > P.x - 6) && !discs.some(d => !d.got && d.x > W - 50)){ birdWait = false; spawnFlyer(); }
   }
   if (state !== 'title'){
     for (const f of flyers){ f.t += dt;
@@ -2691,6 +2700,7 @@ function update(dt){
         // mi-hauteur : tolérance élargie (pieds jusqu'à 9 px sous le centre, accepté dès le sommet du saut) car le saut appuyé l'atteint tout juste
         const mid = f.tier === 1;
         if (!P.ground && P.vy > (mid ? -60 : 40) && P.y < fy + (mid ? 9 : 3)){ stomp(f, fy); continue; }
+        if (!(Math.abs(f.x - P.x) < S.hw*.5 + 7 && fy + S.hh*.6 > P.y - 46 && fy - S.hh*.6 < P.y - 2)) continue;   // frôlé sans être touché
         if (fireT > 0 || graceT > 0){ f.gone = true; debris.push({ img: f.sp === 'shuttle' ? SHUTTLE : FLY_FR[f.sp][1], x: f.x - S.w/2, y: fy - S.h/2, vx: 220, vy: -260, rot: 0, vr: 14 }); sfx.smash(); }
         else { die(f.sp); break; }
       }
@@ -2704,7 +2714,7 @@ function update(dt){
     }
     for (const s of items){
       if (s.k === 'slow' && !s.got && Math.abs(s.x - P.x) < 16 && s.y + 8 > P.y-56 && s.y - 8 < P.y+2){
-        s.got = true; TR.slow(); safeT = .5; slowMul = Math.max(.35, slowMul*.8); slowFx = 1.1; slowX = s.x; slowY = s.y; sfx.slow(); toast(txt('toast.timeout'));
+        s.got = true; TR.slow(); safeT = .5; slowMul = Math.max(.35, slowMul*.78); slowFx = 1.1; slowX = s.x; slowY = s.y; sfx.slow(); toast(txt('toast.timeout'));
         burst(s.x, s.y, 18, [C.purpleL, C.yellow, C.white, C.purple], 90, 120);
       }
       if (s.k === 'sock' && Math.abs(s.x+9 - P.x) < 17 && s.y+14 > P.y-56 && s.y+6 < P.y+2){
@@ -2717,7 +2727,7 @@ function update(dt){
     if (score >= milestone){ milestone += 500; sfx.mile(); ui.score.classList.add('pulse'); setTimeout(() => ui.score.classList.remove('pulse'), 220); }
     if (score !== shownScore){ ui.score.textContent = pad(score); shownScore = score; }
     let nt = theme; zoneT -= dt;
-    if (zoneT <= 0){ zoneT = 12 + Math.random()*6; do { nt = Math.floor(Math.random()*THEME_NAMES.length); } while (nt === theme); }
+    nt = [0, 1, 2, 3, 6, 4, 5][(Math.floor(score/10000) + biomeOff) % 7];
     if (nt !== theme){ prevTheme = theme; theme = nt; setZone(nt); TR.zone(nt); transT = .8; flash = .25; sfx.world(); }
     ui.sockbar.hidden = P.sockT <= 0; if (P.sockT > 0) ui.sockfill.style.transform = 'scaleX(' + (P.sockT/7).toFixed(3) + ')';
     ui.firebar.hidden = fireT <= 0; if (fireT > 0) ui.firefill.style.transform = 'scaleX(' + (fireT/7).toFixed(3) + ')';
@@ -2734,7 +2744,7 @@ function update(dt){
     ui.hi.textContent = txt('ui.record') + ' ' + pad(best);
     ui.sockbar.hidden = true; ui.firebar.hidden = true; ui.over.hidden = false;
     ui.over.querySelector('h2').textContent = deathMsg(deathKind);
-    if (score > (TR.d.lbBest || 0) && !AC.sus()) lbEntry.show(score, t, discCount); else lbEntry.hide();   // partie suspecte : pas de classement mondial
+    if (score > (TR.d.lbBest || 0) && !AC.sus() && !RUN_C.boosted) lbEntry.show(score, t, discCount); else lbEntry.hide();   // partie suspecte : pas de classement mondial
   }
 
   // requin (plage)
@@ -3171,7 +3181,7 @@ function frame(ts){
   requestAnimationFrame(frame);
   if (!last) last = ts; let dt = (ts - last)/1000; last = ts; if (dt > .25) dt = .25; if (dt < 0) dt = 0;
   AC.tick(dt);
-  if (state !== 'pause'){ const n = Math.min(42, Math.max(1, Math.ceil(dt/.006))); for (let i=0;i<n;i++) update(dt/n); }
+  if (state !== 'pause' && state !== 'revive'){ const n = Math.min(42, Math.max(1, Math.ceil(dt/.006))); for (let i=0;i<n;i++) update(dt/n); }
   draw();
 }
 
@@ -3246,10 +3256,11 @@ icon('icoFire', BOTTLE);
 /* ================= Contrôles ================= */
 function press(){
   ensureAudio();
-  if (trUI.isOpen() || shopUI.isOpen() || lbUI.isOpen() || newsUI.isOpen() || statsUI.isOpen() || setUI.isOpen()) return;
+  if (dqUI.isOpen() || trUI.isOpen() || shopUI.isOpen() || lbUI.isOpen() || newsUI.isOpen() || statsUI.isOpen() || setUI.isOpen()) return;
   if (state === 'title'){ startGame(); return; }
   if (state === 'over'){ if (overT > .7) startGame(); return; }
   if (state === 'pause'){ resume(); return; }
+  if (state === 'revive') return;
   P.hold = true; P.buf = .13;
 }
 function release(){ P.hold = false; }
@@ -3299,6 +3310,565 @@ addEventListener('resize', resize);
 
 resize();
 requestAnimationFrame(frame);
+
+/* ================= v7.0 : tutoriel en 4 images (avant la toute première partie) ================= */
+// 1 sauter (tap) · 2 attraper les disques · 3 un obstacle touché = perdu · 4 retomber sur un oiseau = l'assommer
+// aucun texte : on tape n'importe où pour passer à l'image suivante, la dernière lance la partie
+const tutoUI = (() => {
+  const KEY = 'stellyrun_tuto2';
+  const TW = 240, TH = 135, GYT = 104;
+  const css = document.createElement('style');
+  css.textContent = '#tuto{ position:absolute; inset:0; z-index:40; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:calc(var(--s)*6px);'
+    + ' background:repeating-linear-gradient(135deg, rgba(255,255,255,.035) 0 calc(var(--s)*6px), transparent 0 calc(var(--s)*12px)), var(--plum); cursor:pointer; }'
+    + '#tuto[hidden]{ display:none; }'
+    + '#tuto canvas{ height:calc(var(--s)*' + Math.round(TH*.9) + 'px); max-height:78%; width:auto; aspect-ratio:' + TW + '/' + TH + '; image-rendering:pixelated;'
+    + ' border:calc(var(--s)*2px) solid var(--yellow); border-radius:calc(var(--s)*3px); box-shadow:0 calc(var(--s)*3px) 0 rgba(0,0,0,.4); }'
+    + '#tutodots{ display:flex; gap:calc(var(--s)*4px); }'
+    + '#tutodots i{ width:calc(var(--s)*4px); height:calc(var(--s)*4px); border-radius:50%; background:rgba(255,255,255,.3); }'
+    + '#tutodots i.on{ background:var(--yellow); }';
+  document.head.appendChild(css);
+  const page = document.createElement('div'); page.id = 'tuto'; page.hidden = true; page.setAttribute('role', 'dialog'); page.setAttribute('aria-modal', 'true');
+  const cv = document.createElement('canvas'); cv.width = TW; cv.height = TH;
+  const dots = document.createElement('div'); dots.id = 'tutodots'; dots.innerHTML = '<i></i><i></i><i></i><i></i>';
+  page.append(cv, dots); $('news').parentElement.appendChild(page);
+  const g = cv.getContext('2d'); g.imageSmoothingEnabled = false;
+
+  // ---------- petits outils de dessin ----------
+  const stelly = (spr, x, y, a) => { g.globalAlpha = a == null ? 1 : a; g.drawImage(spr, Math.round(x - CX), Math.round(y - FB - PAD)); g.globalAlpha = 1; };
+  const at = (img, x, y, a) => { g.globalAlpha = a == null ? 1 : a; g.drawImage(img, Math.round(x - img.width/2), Math.round(y - img.height/2)); g.globalAlpha = 1; };
+  const onGround = (img, x) => g.drawImage(img, Math.round(x - img.width/2), GYT - img.height);
+  function ring(cx, cy, r, col){ g.fillStyle = col; let x = r, y = 0, e = 1 - r;
+    while (x >= y){ for (const [a, b] of [[x,y],[y,x],[-y,x],[-x,y],[-x,-y],[-y,-x],[y,-x],[x,-y]]) g.fillRect(cx + a, cy + b, 1, 1);
+      y++; if (e < 0) e += 2*y + 1; else { x--; e += 2*(y - x) + 1; } } }
+  function dotted(pts, col){ g.fillStyle = col; for (const [x, y] of pts) g.fillRect(Math.round(x), Math.round(y), 2, 2); }
+  // trajectoire d'un saut : de x0 à x1 au sol, sommet à h px au-dessus du sol
+  const arcY = (x, x0, x1, h) => { const u = (x - x0)/(x1 - x0); return GYT - 4*h*u*(1 - u); };
+  function arcDots(x0, x1, h, from, to){ const p = []; for (let x = x0 + 6; x < x1 - 2; x += 7){ const u = (x - x0)/(x1 - x0); if (u >= (from || 0) && u <= (to == null ? 1 : to)) p.push([x, arcY(x, x0, x1, h) - 24]); } dotted(p, 'rgba(255,255,255,.85)'); }
+  function txt8(s, x, y){ g.font = 'bold 9px "Pixelify Sans", monospace'; g.textAlign = 'center'; g.lineWidth = 3; g.strokeStyle = C.plum; g.strokeText(s, x, y); g.fillStyle = C.white; g.fillText(s, x, y); }
+  const HAND = mk(12, 13, h => pm(h, ['....oo......', '...owwo.....', '...owwo.....', '...owwoooo..', '...owwowwoo.', '.oowwwwwwwwo', 'owwowwwwwwwo',
+    'owwwwwwwwwwo', '.owwwwwwwwwo', '..owwwwwwwo.', '...owwwwwo..', '...ooooooo..', '............'], 0, 0, false, { o:C.plum, w:C.white }));
+  const STAR = mk(7, 7, h => pm(h, ['...o...', '..oyo..', 'ooyyyoo', '.oyyyo.', '..oyo..', '.oo.oo.', '.......'], 0, 0, false, { o:C.plum, y:C.yellow }));
+  const CROSS = mk(11, 11, h => pm(h, ['oo.......oo', 'orro...orro', '.orro.orro.', '..orrorro..', '...orrro...', '...orrro...', '..orrorro..', '.orro.orro.', 'orro...orro', 'oo.......oo', '...........'],
+    0, 0, false, { o:C.plum, r:C.red }));
+
+  // ---------- décor commun : ciel, tribunes au loin, pelouse du stade ----------
+  function scene(){
+    g.fillStyle = '#7FC8EE'; g.fillRect(0, 0, TW, TH); g.fillStyle = '#9AD6F3'; g.fillRect(0, 34, TW, 40);
+    g.fillStyle = '#C9EBFA'; for (const [x, y, w] of [[22, 16, 26], [150, 10, 34], [96, 28, 18], [204, 30, 22]]){ g.fillRect(x, y, w, 4); g.fillRect(x + 4, y - 3, w - 10, 3); }
+    g.fillStyle = '#5E6A8A'; g.fillRect(0, 74, TW, 20); g.fillStyle = '#4C5675'; for (let x = 0; x < TW; x += 6) g.fillRect(x, 78 + (x % 12 ? 0 : 3), 4, 2);
+    g.fillStyle = C.g1; g.fillRect(0, 94, TW, TH - 94); g.fillStyle = C.g2; for (let x = 0; x < TW; x += 24) g.fillRect(x, 94, 12, TH - 94);
+    g.fillStyle = C.line; g.fillRect(0, GYT, TW, 1); g.fillStyle = C.g3; g.fillRect(0, GYT + 1, TW, 1);
+  }
+
+  // 1. un tap = un saut par-dessus le plot
+  function img1(){ scene(); const x0 = 70, x1 = 190, h = 52;
+    onGround(CONES[0], 130); arcDots(x0, x1, h);
+    stelly(RUN[0], 46, GYT, .35); stelly(RISE, 88, arcY(88, x0, x1, h), .5); stelly(APEX, 130, arcY(130, x0, x1, h)); stelly(FALL, 172, arcY(172, x0, x1, h), .5);
+    // doigt qui tape, avec deux ondes
+    const hx = 30, hy = 112; ring(hx + 4, hy + 1, 5, C.white); ring(hx + 4, hy + 1, 9, 'rgba(255,255,255,.55)'); g.drawImage(HAND, hx, hy);
+  }
+  // 2. les disques se ramassent en sautant dedans
+  function img2(){ scene(); const x0 = 40, x1 = 200, h = 60;
+    arcDots(x0, x1, h, 0, .3);
+    for (const x of [140, 162, 184]) at(DISC, x, arcY(x, x0, x1, h) - 30);
+    txt8('+10', 62, arcY(62, x0, x1, h) - 34); txt8('+20', 84, arcY(84, x0, x1, h) - 40);
+    stelly(RUN[2], 34, GYT, .35); stelly(APEX, 114, arcY(114, x0, x1, h));
+  }
+  // 3. un obstacle touché : c'est perdu
+  function img3(){ scene();
+    onGround(CONES[0], 132); stelly(RUN[1], 70, GYT, .35); stelly(DEAD, 122, GYT - 6);
+    for (const [x, y] of [[112, 46], [134, 40], [150, 54]]) at(STAR, x, y);
+    at(CROSS, 192, 40);
+  }
+  // 4. retomber sur un oiseau : il est assommé, Stelly rebondit
+  function img4(){ scene(); const x0 = 50, x1 = 176, h = 82;
+    arcDots(x0, x1, h, 0, .62);
+    const bx = 140, by = 58, bird = FLY_FR.pigeon[1];
+    g.save(); g.translate(bx, by); g.rotate(Math.PI); g.drawImage(bird, -bird.width/2, -bird.height/2); g.restore();
+    for (const [x, y] of [[126, 46], [154, 48]]) at(STAR, x, y);
+    stelly(FALL, bx, by - 5); txt8('+100', bx + 30, by - 30);
+    stelly(RUN[0], 46, GYT, .35);
+    // flèche vers le bas au-dessus de l'oiseau
+    g.fillStyle = C.white; g.strokeStyle = C.plum; const ax = bx - 30, ay = 18; g.fillRect(ax - 1, ay, 3, 12); g.beginPath(); g.moveTo(ax - 5, ay + 11); g.lineTo(ax + 6, ay + 11); g.lineTo(ax + .5, ay + 18); g.closePath(); g.fill();
+  }
+  const IMGS = [img1, img2, img3, img4];
+  let pg = 0, isOpen = false;
+  function render(){ g.clearRect(0, 0, TW, TH); IMGS[pg](); dots.querySelectorAll('i').forEach((d, i) => d.classList.toggle('on', i === pg)); }
+  const seen = () => { try { return !!localStorage.getItem(KEY); } catch(e){ return true; } };
+  const dbg = () => document.getElementById('dbg');
+  function finish(){ try { localStorage.setItem(KEY, '1'); } catch(e){} isOpen = false; page.hidden = true; if (dbg()) dbg().hidden = false; startGame(); }
+  function next(){ sfx.start(); if (pg < IMGS.length - 1){ pg++; render(); } else finish(); }
+  // appelé par startGame : la 1re fois ouvre le tutoriel ; ensuite (tap, espace) passe à l'image suivante
+  function open(){ if (isOpen){ next(); return; } pg = 0; render(); isOpen = true; page.hidden = false; $('soundmenu').hidden = true; if (dbg()) dbg().hidden = true; }
+  page.addEventListener('pointerdown', e => { e.stopPropagation(); e.preventDefault(); next(); });
+  // rejouer le tutoriel depuis le panneau debug
+  return { need: () => !seen(), open, isOpen: () => isOpen, reset(){ try { localStorage.removeItem(KEY); } catch(e){} } };
+})();
+
+/* ================= v7.0 : bonus de la boutique (1 500 disques l'unité) ================= */
+// On achète dans l'onglet « Bonus » de la boutique : chaque achat ajoute 1 au stock.
+// Bouclier, Chaussette de départ, Chrono de poche, Gant collant, Billet de biome : on en équipe UN ; une unité est utilisée au départ de chaque partie.
+// Cœur : pas besoin de l'équiper. S'il en reste, il s'affiche en haut à gauche ; à la chute, le jeu propose de ré-animer Stelly (un seul cœur par partie).
+// Toute partie où un bonus a servi est « boostée » : elle ne compte pas pour le classement.
+const CONS_PRICE = 1500;
+const BIOME_ORDER = [0, 1, 2, 3, 6, 4, 5];   // stade, indoor, beach, neige, campagne, ville, forêt
+let biomeOff = 0, consSkip = false;
+const RUN_C = { used:null, shield:0, glove:0, chrono:0, heart:0, heartUsed:0, boosted:false };
+
+// ---------- inventaire (stock + bonus équipé) ----------
+const BN = (() => {
+  const KEY = 'stellyrun_bonus';
+  const d = { stock:{ shield:0, sock:0, chrono:0, glove:0, ticket:0, heart:0 }, eq:null, biome:1 };
+  try { const j = JSON.parse(localStorage.getItem(KEY) || 'null'); if (j){ Object.assign(d.stock, j.stock || {}); d.eq = j.eq || null; d.biome = j.biome || 1; } } catch(e){}
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch(e){} };
+  return { d, save };
+})();
+
+// ---------- icônes ----------
+const ICO_SHIELD = mk(11, 12, g => pm(g, ['ooooooooooo', 'owwwwbbbbbo', 'owwwwbbbbbo', 'owwwwbbbbbo', 'owwwwbbbbbo', 'obbbbbwwwwo', '.obbbbwwwo.',
+  '.obbbbwwwo.', '..obbbwwo..', '..obbbwwo..', '...obbwo...', '....ooo....'], 0, 0, false, { o:C.plum, w:C.white, b:'#3FA3E0' }));
+const ICO_GLOVE = mk(12, 12, g => pm(g, ['....oo......', '...oyyo.....', '...oyyo.....', '...oyyoooo..', '...oyyoyyoo.', '.ooyyyyyyyyo', 'oyyoyyyyyyyo',
+  'oyyyyyyyyyyo', '.oyyyyyyyyyo', '..oyyyyyyyo.', '...oyyyyyo..', '...ooooooo..'], 0, 0, false, { o:C.plum, y:'#9BE07A' }));
+const ICO_TICKET = mk(14, 8, g => pm(g, ['oooooooooooooo', 'oyyyy.yyyyyyyo', 'oyyyyoyOOOOyyo', '.oyyy.yyyyyyo.', '.oyyyoyOOOyyo.', 'oyyyy.yyyyyyyo',
+  'oyyyyoyyyyyyyo', 'oooooooooooooo'], 0, 0, false, { o:C.plum, y:C.yellow, O:C.orange }));
+const ICO_HEART = mk(11, 10, g => pm(g, ['.ooo...ooo.', 'orrro.orrro', 'orwrrorrrro', 'orwrrrrrrro', 'orrrrrrrrro', '.orrrrrrro.', '..orrrrro..',
+  '...orrro...', '....oro....', '.....o.....'], 0, 0, false, { o:C.plum, r:'#E8384F', w:'#FFB3BE' }));
+const CONS = [
+  { id:'shield', icon: () => ICO_SHIELD }, { id:'sock', icon: () => SOCK[0] }, { id:'chrono', icon: () => CHRONO[0] },
+  { id:'glove', icon: () => ICO_GLOVE }, { id:'ticket', icon: () => ICO_TICKET }, { id:'heart', icon: () => ICO_HEART }
+];
+const cvOf = img => { const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; c.getContext('2d').drawImage(img, 0, 0); return c; };
+const coinCv = () => { const c = document.createElement('canvas'); c.width = 9; c.height = 5; c.getContext('2d').drawImage(COIN, 0, 0); return c; };
+const biomeName = k => THEME_NAMES[BIOME_ORDER[k]];
+
+// ---------- styles : la boutique de bonus a son propre habillage (vitrine bleu nuit, capsules lumineuses) ----------
+{ const css = document.createElement('style');
+  css.textContent = ''
+    + '.shtab.bn{ background:#1B4A6B; color:#9FEBFF; box-shadow:inset 0 0 0 calc(var(--s)*1px) #5FD3F5; }'
+    + '.shtab.bn.on{ background:#5FD3F5; color:#0B2236; box-shadow:0 0 calc(var(--s)*4px) rgba(95,211,245,.8); }'
+    + '#shop.bonus{ background:radial-gradient(ellipse at 60% 40%, rgba(95,211,245,.18), transparent 60%),'
+    + ' repeating-linear-gradient(0deg, rgba(255,255,255,.04) 0 calc(var(--s)*1px), transparent 0 calc(var(--s)*4px)), #0B2236; border-bottom-color:#5FD3F5; }'
+    + '#shop.bonus .trhead h2{ color:#9FEBFF; text-shadow:0 0 calc(var(--s)*4px) rgba(95,211,245,.9); }'
+    + '#shop.bonus .shprev{ display:none; }'
+    + '#bnprev{ display:none; position:relative; width:calc(var(--s)*70px); height:calc(var(--s)*92px); border-radius:calc(var(--s)*3px); background:#12324A;'
+    + ' box-shadow:inset 0 0 0 calc(var(--s)*1.5px) #5FD3F5, 0 0 calc(var(--s)*8px) rgba(95,211,245,.35); }'
+    + '#shop.bonus #bnprev{ display:block; }'
+    + '#bnprev canvas{ position:absolute; inset:calc(var(--s)*3px); width:calc(100% - var(--s)*6px); height:calc(100% - var(--s)*6px); image-rendering:pixelated; border-radius:calc(var(--s)*2px); }'
+    + '#bnnote{ position:absolute; left:-4%; right:-4%; top:calc(100% + var(--s)*4px); text-align:center; font-weight:700; font-size:max(calc(var(--s)*4.6px),9px); color:#9FEBFF; line-height:1.25; }'
+    + '#shgrid .bn{ position:relative; display:flex; align-items:center; justify-content:center; padding:0; cursor:pointer; border-radius:calc(var(--s)*8px);'
+    + ' background:radial-gradient(circle at 35% 30%, #2C6E96, #16405E 70%); border:calc(var(--s)*1.5px) solid #5FD3F5; box-shadow:0 calc(var(--s)*2px) 0 rgba(0,0,0,.45), inset 0 calc(var(--s)*2px) 0 rgba(255,255,255,.18); }'
+    + '#shgrid .bn canvas.ic{ width:calc(var(--s)*22px); height:calc(var(--s)*22px); object-fit:contain; image-rendering:pixelated; }'
+    + '#shgrid .bn.eq{ border-color:var(--yellow); box-shadow:0 0 calc(var(--s)*5px) rgba(255,207,0,.8), inset 0 calc(var(--s)*2px) 0 rgba(255,255,255,.18); }'
+    + '#shgrid .bn.sel{ transform:translateY(calc(var(--s)*-1.5px)); border-color:#FFFFFF; }'
+    + '#shgrid .bn .stk{ position:absolute; top:calc(var(--s)*-4px); left:calc(var(--s)*-4px); min-width:calc(var(--s)*9px); height:calc(var(--s)*9px); padding:0 calc(var(--s)*1.5px); box-sizing:border-box;'
+    + ' border-radius:calc(var(--s)*5px); background:#5FD3F5; border:calc(var(--s)*1px) solid #0B2236; color:#0B2236; font-family:var(--num); font-size:max(calc(var(--s)*3.8px),8px);'
+    + ' display:flex; align-items:center; justify-content:center; }'
+    + '#shgrid .bn .stk.zero{ background:#16405E; color:#7FA9C2; border-color:#5FD3F5; }'
+    + '#shgrid .bn .price{ position:absolute; bottom:calc(var(--s)*-5px); left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:calc(var(--s)*1px); white-space:nowrap;'
+    + ' padding:calc(var(--s)*.6px) calc(var(--s)*2px); background:#0B2236; border:calc(var(--s)*.8px) solid #5FD3F5; border-radius:calc(var(--s)*2px); font-family:var(--num); font-size:max(calc(var(--s)*3.6px),7px); color:var(--yellow); }'
+    + '#shgrid .bn .price.no{ color:#FF8A8A; }'
+    + '#shgrid .bn .price canvas{ width:auto; height:calc(var(--s)*3.5px); image-rendering:pixelated; }'
+    + '#shgrid .bn .eqk{ position:absolute; top:calc(var(--s)*-4px); right:calc(var(--s)*-4px); font-size:max(calc(var(--s)*3.6px),7px); font-weight:700; text-transform:uppercase; letter-spacing:.04em;'
+    + ' background:var(--yellow); color:var(--plum); border:calc(var(--s)*1px) solid var(--plum); border-radius:calc(var(--s)*2px); padding:calc(var(--s)*.5px) calc(var(--s)*1.5px); }'
+    + '#shop.bonus .shright{ display:grid; grid-template-columns:auto calc(var(--s)*104px); column-gap:calc(var(--s)*8px); row-gap:calc(var(--s)*5px); align-items:start; }'
+    + '#shop.bonus .shtabs{ grid-column:1 / -1; }'
+    + '#shop.bonus #shgrid{ grid-template-columns:repeat(3, calc(var(--s)*36px)); grid-template-rows:repeat(2, calc(var(--s)*36px)); gap:calc(var(--s)*8px) calc(var(--s)*6px); padding-top:calc(var(--s)*3px); }'
+    + '#bnbub{ position:relative; min-height:calc(var(--s)*80px); padding:calc(var(--s)*4px) calc(var(--s)*5px); background:#F2FBFF; color:#0B2236; border:calc(var(--s)*1.5px) solid #5FD3F5;'
+    + ' border-radius:calc(var(--s)*3px); box-shadow:0 calc(var(--s)*3px) 0 rgba(0,0,0,.4); display:flex; flex-direction:column; gap:calc(var(--s)*2px); }'
+    + '#bnbub[hidden]{ display:none; }'
+    + '#bnbub b{ font-size:max(calc(var(--s)*7px),12px); line-height:1.1; }'
+    + '#bnbub p{ margin:0; font-weight:500; font-size:max(calc(var(--s)*5px),10px); line-height:1.25; }'
+    + '#bnbub i{ font-style:normal; font-weight:700; font-size:max(calc(var(--s)*4.6px),9px); color:#2C6E96; }'
+    + '#bnbub .row{ display:flex; gap:calc(var(--s)*3px); flex-wrap:wrap; }'
+    + '#bnbub .btn{ font-size:max(calc(var(--s)*6px),11px); padding:calc(var(--s)*1.5px) calc(var(--s)*5px) calc(var(--s)*2px); animation:none; display:flex; align-items:center; gap:calc(var(--s)*1.5px); }'
+    + '#bnbub .btn canvas{ height:calc(var(--s)*3.5px); width:auto; image-rendering:pixelated; }'
+    + '#bnbub .btn:disabled{ filter:grayscale(1); opacity:.6; cursor:default; }'
+    + '#bnbub .bios{ display:flex; flex-wrap:wrap; gap:calc(var(--s)*1.5px); }'
+    + '#bnbub .bios[hidden]{ display:none; }'
+    + '#bnbub .bios button{ font:inherit; font-weight:700; font-size:max(calc(var(--s)*4.2px),8px); padding:calc(var(--s)*.8px) calc(var(--s)*2px); border-radius:calc(var(--s)*2px);'
+    + ' border:calc(var(--s)*1px) solid #5FD3F5; background:#fff; color:#0B2236; cursor:pointer; }'
+    + '#bnbub .bios button.on{ background:#5FD3F5; }'
+    + '#conshud{ display:flex; gap:calc(var(--s)*3px); margin-top:calc(var(--s)*3px); pointer-events:none; } #conshud:empty{ display:none; }'
+    + '#conshud > *{ display:flex; align-items:center; justify-content:center; gap:calc(var(--s)*1px); height:calc(var(--s)*12px); min-width:calc(var(--s)*12px); background:rgba(255,255,255,.85);'
+    + ' border:calc(var(--s)*1px) solid var(--plum); border-radius:calc(var(--s)*2px); padding:0 calc(var(--s)*1.5px); font-family:var(--num); font-size:max(calc(var(--s)*4px),8px); color:var(--plum); }'
+    + '#conshud canvas{ height:calc(var(--s)*9px); width:auto; image-rendering:pixelated; }'
+    + '#conshud button{ pointer-events:auto; cursor:pointer; background:var(--yellow); animation:breathe 1.3s ease-in-out infinite; }'
+    + '#revive{ position:absolute; inset:0; z-index:45; display:flex; align-items:center; justify-content:center; background:rgba(46,14,48,.45); }'
+    + '#revive[hidden]{ display:none; }'
+    + '#revive .rv{ display:flex; flex-direction:column; align-items:center; gap:calc(var(--s)*5px); max-width:calc(var(--s)*170px); padding:calc(var(--s)*7px) calc(var(--s)*10px); background:var(--plum);'
+    + ' border:calc(var(--s)*2px) solid #E8384F; border-radius:calc(var(--s)*3px); color:var(--white); }'
+    + '#revive .q{ display:flex; align-items:center; gap:calc(var(--s)*5px); font-weight:700; font-size:max(calc(var(--s)*7px),13px); line-height:1.2; }'
+    + '#revive .q canvas{ flex:none; height:calc(var(--s)*16px); width:auto; image-rendering:pixelated; animation:breathe 1s ease-in-out infinite; }'
+    + '#revive .row{ display:flex; gap:calc(var(--s)*5px); }'
+    + '#revive .btn{ font-size:max(calc(var(--s)*7px),12px); padding:calc(var(--s)*2px) calc(var(--s)*8px); animation:none; }'
+    + '#revive .bar{ width:100%; height:calc(var(--s)*2px); background:rgba(255,255,255,.2); border-radius:9px; overflow:hidden; }'
+    + '#revive .bar i{ display:block; height:100%; background:#E8384F; transform-origin:left; }'
+    + '#boosted{ margin:calc(var(--s)*1px) 0 0; font-size:max(calc(var(--s)*5px),10px); font-weight:700; color:var(--purple); }';
+  document.head.appendChild(css); }
+
+// ---------- onglet « Bonus » dans la boutique ----------
+const bonusShop = (() => {
+  const page = $('shop'), grid = $('shgrid'), tabs = page.querySelector('.shtabs');
+  const tab = document.createElement('button'); tab.className = 'shtab bn'; tab.type = 'button'; tabs.appendChild(tab);
+  const pv = document.createElement('div'); pv.id = 'bnprev'; const pc = document.createElement('canvas'); pc.width = 64; pc.height = 86; const note = document.createElement('div'); note.id = 'bnnote';
+  pv.append(pc, note); page.querySelector('.shprev').after(pv);
+  const bub = document.createElement('div'); bub.id = 'bnbub'; bub.hidden = true; page.querySelector('.shright').appendChild(bub);
+  const g = pc.getContext('2d'); g.imageSmoothingEnabled = false;
+  let on = false, sel = null, raf = 0;
+  const S = BN.d;
+  // ----- aperçu animé de l'effet -----
+  const st = (spr, x, y, a) => { g.globalAlpha = a == null ? 1 : a; g.drawImage(spr, Math.round(x - CX), Math.round(y - FB - PAD)); g.globalAlpha = 1; };
+  function ring(cx, cy, r, col){ g.fillStyle = col; let x = r, y = 0, e = 1 - r; while (x >= y){ for (const [a, b] of [[x,y],[y,x],[-y,x],[-x,y],[-x,-y],[-y,-x],[y,-x],[x,-y]]) g.fillRect(cx + a, cy + b, 1, 1); y++; if (e < 0) e += 2*y + 1; else { x--; e += 2*(y - x) + 1; } } }
+  function draw(){
+    const now = performance.now()/1000, f = RUN[Math.floor(now*16) % RUN_N], id = sel || S.eq || 'shield';
+    g.clearRect(0, 0, 64, 86); g.fillStyle = '#16405E'; g.fillRect(0, 0, 64, 86); g.fillStyle = '#1F5578'; g.fillRect(0, 70, 64, 16); g.fillStyle = '#5FD3F5'; g.fillRect(0, 70, 64, 1);
+    if (id === 'shield'){ st(f, 32, 80); ring(32, 54, 24 + Math.round(Math.sin(now*4)), '#7FE3FF'); g.globalAlpha = .15; g.fillStyle = '#7FE3FF'; g.beginPath(); g.arc(32, 54, 23, 0, 7); g.fill(); g.globalAlpha = 1; }
+    else if (id === 'sock'){ const y = 80 - Math.abs(Math.sin(now*2.2))*34; st(Math.cos(now*2.2)*Math.sin(now*2.2) > 0 ? RISE : FALL, 32, y); g.drawImage(SOCK[Math.floor(now*8) % 2], 40, 4); }
+    else if (id === 'chrono'){ g.fillStyle = 'rgba(122,87,160,.35)'; g.fillRect(0, 0, 64, 70); st(RUN[Math.floor(now*6) % RUN_N], 32, 80); g.drawImage(CHRONO[Math.floor(now*4) % 4], 24, 2);
+      g.fillStyle = '#fff'; for (const [x, y, w] of [[2, 30, 10], [50, 40, 12], [4, 56, 8], [52, 20, 9]]) g.fillRect(Math.round(((x - now*12) % 64 + 64) % 64), y, w, 1); }
+    else if (id === 'glove'){ st(f, 32, 80); for (let i = 0; i < 3; i++){ const x = ((i*24 - now*30) % 72 + 72) % 72 - 4; g.drawImage(DISC, Math.round(x - 14), 22); } g.drawImage(ICO_GLOVE, 46, 48); }
+    else if (id === 'ticket'){ const k = S.biome || 1; g.fillStyle = ['#7FC8EE', '#6FA3EC', '#F2D48A', '#E8F2FA', '#8C9AB5', '#3E7F4A', '#9AD08A'][BIOME_ORDER[k]] || '#7FC8EE'; g.fillRect(3, 3, 58, 64);
+      st(f, 32, 80); g.drawImage(ICO_TICKET, 25, 5); g.font = 'bold 8px "Pixelify Sans", monospace'; g.textAlign = 'center'; g.lineWidth = 3; g.strokeStyle = C.plum; g.strokeText(biomeName(k), 32, 22); g.fillStyle = '#fff'; g.fillText(biomeName(k), 32, 22); }
+    else if (id === 'heart'){ const up = Math.max(0, Math.sin(now*1.6)); st(up > .05 ? RISE : DEAD, 32, 80 - up*20, .35 + up*.65); const s = 1 + Math.round(Math.sin(now*6)*.5 + .5), w = ICO_HEART.width*s;
+      g.drawImage(ICO_HEART, Math.round(32 - w/2), 6, w, ICO_HEART.height*s); }
+    raf = requestAnimationFrame(draw);
+  }
+  function noteText(){
+    const eqs = S.eq && S.stock[S.eq] > 0 ? txt('bn.noteEq', { name: txt('cons.' + S.eq + '.n') + ' ×' + S.stock[S.eq] }) : txt('bn.noteNone');
+    note.textContent = eqs + (S.stock.heart ? ' · ' + txt('bn.noteHeart', { n: S.stock.heart }) : '');
+  }
+  const tileOf = id => grid.querySelector('[data-id="' + id + '"]');
+  function render(){
+    tab.textContent = txt('bn.tab'); if (!on) return;
+    tabs.querySelectorAll('.shtab').forEach(b => b.classList.toggle('on', b === tab));
+    $('shcoins').querySelector('b').textContent = TR.d.coins;
+    grid.textContent = '';
+    for (const c of CONS){
+      const n = S.stock[c.id], eq = S.eq === c.id && n > 0;
+      const el = document.createElement('button'); el.type = 'button'; el.className = 'bn' + (eq ? ' eq' : '') + (sel === c.id ? ' sel' : ''); el.dataset.id = c.id;
+      el.setAttribute('aria-label', txt('cons.' + c.id + '.n') + ', ' + txt('bn.stock', { n }));
+      const ic = cvOf(c.icon()); ic.className = 'ic'; el.appendChild(ic);
+      const sk = document.createElement('span'); sk.className = 'stk' + (n ? '' : ' zero'); sk.textContent = '×' + n; el.appendChild(sk);
+      if (eq){ const k = document.createElement('span'); k.className = 'eqk'; k.textContent = txt('bn.equipped'); el.appendChild(k); }
+      const p = document.createElement('span'); p.className = 'price' + (TR.d.coins < CONS_PRICE ? ' no' : ''); p.append(coinCv(), String(CONS_PRICE)); el.appendChild(p);
+      el.addEventListener('click', e => { e.stopPropagation(); if (sel === c.id) return; sel = c.id; sfx.disc(1); render(); showBub(); });
+      grid.appendChild(el);
+    }
+    noteText();
+  }
+  function showBub(){
+    const id = sel, el = tileOf(id), miss = CONS_PRICE - TR.d.coins; if (!el) return;
+    bub.innerHTML = '<b></b><p></p><i></i><div class="bios" hidden></div><div class="row"><button type="button" class="btn buy"></button><button type="button" class="btn alt eqb" hidden></button></div>';
+    bub.querySelector('b').textContent = txt('cons.' + id + '.n');
+    bub.querySelector('p').textContent = id === 'ticket' ? txt('cons.ticket.d', { b: biomeName(S.biome) }) : txt('cons.' + id + '.d');
+    bub.querySelector('i').textContent = txt('bn.stock', { n: S.stock[id] }) + (id === 'heart' ? '' : ' · ' + txt('bn.oneRun'));
+    const buy = bub.querySelector('.buy'); buy.append(miss > 0 ? txt('bn.missing', { n: fmtN(miss) }) : txt('bn.buy', { p: fmtN(CONS_PRICE) }), coinCv()); buy.disabled = miss > 0;
+    buy.addEventListener('click', e => { e.stopPropagation(); if (TR.d.coins < CONS_PRICE) return;
+      TR.d.coins -= CONS_PRICE; S.stock[id]++; if (id !== 'heart' && !(S.eq && S.stock[S.eq] > 0)) S.eq = id; BN.save(); TR.save(); sfx.sock(); render(); showBub(); });
+    if (id !== 'heart' && S.stock[id] > 0){ const eb = bub.querySelector('.eqb'); eb.hidden = false; eb.textContent = S.eq === id ? '✓ ' + txt('bn.equipped') : txt('bn.equip');
+      eb.addEventListener('click', e => { e.stopPropagation(); S.eq = S.eq === id ? null : id; BN.save(); sfx.jump(); render(); showBub(); }); }
+    if (id === 'ticket'){ const bios = bub.querySelector('.bios'); bios.hidden = false;
+      for (let k = 1; k < BIOME_ORDER.length; k++){ const b = document.createElement('button'); b.type = 'button'; b.textContent = biomeName(k); b.classList.toggle('on', S.biome === k);
+        b.addEventListener('click', e => { e.stopPropagation(); S.biome = k; BN.save(); sfx.jump(); showBub(); }); bios.appendChild(b); } }
+    bub.hidden = false;
+  }
+  function enter(){ on = true; sel = S.eq || 'shield'; page.classList.add('bonus'); $('shbub').hidden = true; render(); showBub(); cancelAnimationFrame(raf); draw(); }
+  function leave(){ if (!on) return; on = false; sel = null; bub.hidden = true; page.classList.remove('bonus'); cancelAnimationFrame(raf); }
+  tab.addEventListener('click', e => { e.stopPropagation(); sfx.jump(); enter(); });
+  tabs.querySelectorAll('.shtab:not(.bn)').forEach(b => b.addEventListener('click', () => leave()));
+  $('shclose').addEventListener('click', () => leave());
+  $('shopbtn').addEventListener('click', () => render());   // libellé de l'onglet dans la langue courante
+  render();
+  return { enter, leave, isOn: () => on, render };
+})();
+
+// ---------- pendant la partie ----------
+const hudC = document.createElement('div'); hudC.id = 'conshud'; $('hi').after(hudC);   // dans la colonne du score : les barres de super saut et d'invincibilité passent dessous
+function hudRefresh(){
+  hudC.textContent = '';
+  const chip = (img, n) => { const s = document.createElement('span'); s.appendChild(cvOf(img)); if (n != null) s.append('×' + n); hudC.appendChild(s); };
+  if (RUN_C.heart && !RUN_C.heartUsed) chip(ICO_HEART, BN.d.stock.heart);
+  if (RUN_C.shield) chip(ICO_SHIELD);
+  if (RUN_C.glove) chip(ICO_GLOVE);
+  if (RUN_C.chrono){ const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', txt('cons.chrono.n')); b.appendChild(cvOf(CHRONO[0]));
+    b.addEventListener('pointerdown', e => { e.stopPropagation(); e.preventDefault(); useChrono(); }); hudC.appendChild(b); }
+}
+function useChrono(){
+  if (!RUN_C.chrono || state !== 'play') return; RUN_C.chrono = 0;
+  TR.slow(); safeT = .5; slowMul = Math.max(.35, slowMul*.78); slowFx = 1.1; slowX = P.x; slowY = P.y - 30; sfx.slow(); toast(txt('toast.timeout'));
+  hudRefresh();
+}
+// appelé au départ de chaque partie (startGame) : une unité du bonus équipé est utilisée ; le cœur reste en réserve
+function consStart(){
+  Object.assign(RUN_C, { used:null, shield:0, glove:0, chrono:0, heart:0, heartUsed:0, boosted:false }); biomeOff = 0; consSkip = false; reviveUI.hide(); bonusShop.leave();
+  const S = BN.d, id = S.eq;
+  if (id && S.stock[id] > 0){
+    S.stock[id]--; RUN_C.used = id; RUN_C.boosted = true;
+    if (id === 'shield') RUN_C.shield = 1;
+    else if (id === 'glove') RUN_C.glove = 1;
+    else if (id === 'chrono') RUN_C.chrono = 1;
+    else if (id === 'sock'){ P.sockT = 7; sfx.sock(); toast(txt('toast.superJump')); }
+    else if (id === 'ticket') biomeOff = S.biome || 1;
+    BN.save();
+  }
+  RUN_C.heart = S.stock.heart > 0 ? 1 : 0;
+  hudRefresh();
+}
+// un disque raté : le gant garde la série (une fois)
+function consGlove(){ if (!RUN_C.glove) return false; RUN_C.glove = 0; toast(txt('cons.gloveUsed')); hudRefresh(); return true; }
+// appelé au tout début de die() : true = la mort est évitée (bouclier) ou suspendue (cœur proposé)
+function consHit(kind){
+  if (consSkip){ consSkip = false; return false; }
+  if (RUN_C.shield){ RUN_C.shield = 0; graceT = 1.5; safeT = .3; sfx.smash(); shake = Math.max(shake, .12); burst(P.x, P.y - 28, 14, [C.white, '#9AD8F5', C.purpleL], 90, 200);
+    toast(txt('cons.shieldUsed')); hudRefresh(); return true; }
+  if (RUN_C.heart && !RUN_C.heartUsed && BN.d.stock.heart > 0){ reviveUI.offer(kind); return true; }
+  return false;
+}
+// ---------- le Cœur, proposé à la chute ----------
+const reviveUI = (() => {
+  const el = document.createElement('div'); el.id = 'revive'; el.hidden = true;
+  el.innerHTML = '<div class="rv"><div class="q"><span></span></div><div class="row"><button type="button" class="btn yes"></button><button type="button" class="btn alt no"></button></div><div class="bar"><i></i></div></div>';
+  el.querySelector('.q').insertBefore(cvOf(ICO_HEART), el.querySelector('.q span'));
+  $('news').parentElement.appendChild(el);
+  const yes = el.querySelector('.yes'), no = el.querySelector('.no'), bar = el.querySelector('.bar i');
+  let kind = null, t0 = 0, raf = 0, armed = false;
+  const DUR = 4000;
+  function tick(now){ const k = Math.max(0, 1 - (now - t0)/DUR); bar.style.transform = 'scaleX(' + k.toFixed(3) + ')'; armed = now - t0 > 350; if (k <= 0) decline(); else raf = requestAnimationFrame(tick); }
+  function hide(){ cancelAnimationFrame(raf); el.hidden = true; kind = null; }
+  function offer(k){ kind = k; state = 'revive'; MUSIC.pause(); $('pausebtn').hidden = true;
+    el.querySelector('.q span').textContent = txt('cons.heart.q'); yes.textContent = txt('cons.yes'); no.textContent = txt('cons.no');
+    el.hidden = false; t0 = performance.now(); armed = false; raf = requestAnimationFrame(tick); }
+  function accept(){ if (!kind || !armed) return; hide();
+    BN.d.stock.heart--; BN.save(); RUN_C.heartUsed = 1; RUN_C.boosted = true;
+    state = 'play'; MUSIC.resume(); last = 0; $('pausebtn').hidden = false;
+    P.vy = -460; P.ground = false; P.buf = 0; P.sink = false; graceT = 2; safeT = .3; sfx.sock(); burst(P.x, P.y - 20, 18, ['#E8384F', '#FFB3BE', C.white], 90, 160);
+    toast(txt('cons.heartUsed')); hudRefresh(); }
+  function decline(){ if (!kind) return; const k = kind; hide(); RUN_C.heartUsed = 1; state = 'play'; consSkip = true; die(k); }
+  yes.addEventListener('click', e => { e.stopPropagation(); accept(); });
+  no.addEventListener('click', e => { e.stopPropagation(); if (armed) decline(); });
+  el.addEventListener('pointerdown', e => e.stopPropagation());
+  return { offer, hide };
+})();
+// ---------- écran de fin : partie boostée ----------
+{ const p = document.createElement('p'); p.id = 'boosted'; p.hidden = true; $('bestline').after(p);
+  setInterval(() => { const on = state === 'over' && RUN_C.boosted; if (p.hidden === on){ p.hidden = !on; p.textContent = txt('cons.boosted'); } }, 200); }
+
+const DQ_DATA = {"start":"2026-11-02","plan":[[["F","discsDay",160,"Attrape 160 disques aujourd’hui","Catch 160 discs today","Atrapa 160 discos hoy"],["M","smash",10,"Renverse 10 obstacles avec la gourde en une partie","Smash 10 obstacles with the bottle in one run","Derriba 10 obstáculos con la cantimplora en una partida"],["D","streak",45,"Attrape 45 disques d’affilée","Catch 45 discs in a row","Atrapa 45 discos seguidos"]],[["F","firesDay",2,"Bois 2 gourdes aujourd’hui","Drink 2 water bottles today","Bebe 2 cantimploras hoy"],["M","time",65,"Tiens 65 secondes en une partie","Last 65 seconds in one run","Aguanta 65 segundos en una partida"],["D","noSock",11000,"Fais 11 000 points sans ramasser de chaussette","Score 11,000 points without picking up a sock","Consigue 11.000 puntos sin coger ningún calcetín"]],[["F","comboDay",6,"Réussis 6 Combos aujourd’hui","Land 6 Combos today","Consigue 6 Combos hoy"],["M","dist",1000,"Parcours 1 000 m en une partie","Run 1,000 m in one run","Recorre 1.000 m en una partida"],["D","fires",3,"Bois 3 gourdes en une partie","Drink 3 water bottles in one run","Bebe 3 cantimploras en una partida"]],[["F","gamesDay",3,"Joue 3 parties aujourd’hui","Play 3 runs today","Juega 3 partidas hoy"],["M","superC",2,"Déclenche 2 Super Combos en une partie","Trigger 2 Super Combos in one run","Activa 2 Super Combos en una partida"],["D","discs",150,"Attrape 150 disques en une partie","Catch 150 discs in one run","Atrapa 150 discos en una partida"]],[["F","scoreDay",14000,"Cumule 14 000 points aujourd’hui","Rack up 14,000 points today","Acumula 14.000 puntos hoy"],["M","noFire",5500,"Fais 5 500 points sans boire de gourde","Score 5,500 points without drinking a bottle","Consigue 5.500 puntos sin beber la cantimplora"],["D","slows",2,"Attrape 2 chronos Fast Count en une partie","Grab 2 Fast Count stopwatches in one run","Coge 2 cronómetros Fast Count en una partida"]],[["F","stompsDay",4,"Assomme 4 oiseaux aujourd’hui","Knock out 4 birds today","Noquea 4 pájaros hoy"],["M","noSock",4500,"Fais 4 500 points sans ramasser de chaussette","Score 4,500 points without picking up a sock","Consigue 4.500 puntos sin coger ningún calcetín"],["D","score",18000,"Fais 18 000 points en une partie","Score 18,000 points in one run","Consigue 18.000 puntos en una partida"]],[["F","distDay",2,"Parcours 2 km aujourd’hui","Run 2 km today","Recorre 2 km hoy"],["M","stompSock",1,"Assomme un oiseau pendant une chaussette ailée","Knock out a bird while wearing the winged sock","Noquea un pájaro con el calcetín alado"],["D","heros",1,"Aie la chaussette et la gourde actives en même temps","Have the sock and the bottle active at the same time","Ten el calcetín y la cantimplora activos a la vez"]],[["F","scoreDay",14000,"Cumule 14 000 points aujourd’hui","Rack up 14,000 points today","Acumula 14.000 puntos hoy"],["M","biome","Indoor","Atteins l’Indoor (10 000 points)","Reach the Indoor (10,000 points)","Llega al Indoor (10.000 puntos)"],["D","dist",1500,"Parcours 1 500 m en une partie","Run 1,500 m in one run","Recorre 1.500 m en una partida"]],[["F","streak",14,"Attrape 14 disques d’affilée","Catch 14 discs in a row","Atrapa 14 discos seguidos"],["M","gamesDay",6,"Joue 6 parties aujourd’hui","Play 6 runs today","Juega 6 partidas hoy"],["D","highRow",2,"Attrape en entier 2 rangées hautes de la chaussette","Catch 2 full high rows during the winged sock","Atrapa 2 filas altas enteras con el calcetín alado"]],[["F","discsDay",160,"Attrape 160 disques aujourd’hui","Catch 160 discs today","Atrapa 160 discos hoy"],["M","noMiss",1500,"Fais 1 500 points sans rater un seul disque","Score 1,500 points without missing a single disc","Consigue 1.500 puntos sin fallar ni un disco"],["D","stomps",6,"Assomme 6 oiseaux en une partie","Knock out 6 birds in one run","Noquea 6 pájaros en una partida"]],[["F","combo5",2,"Réussis 2 Combos en une partie","Land 2 Combos in one run","Consigue 2 Combos en una partida"],["M","scoreDay",52000,"Cumule 52 000 points aujourd’hui","Rack up 52,000 points today","Acumula 52.000 puntos hoy"],["D","noSock",10000,"Fais 10 000 points sans ramasser de chaussette","Score 10,000 points without picking up a sock","Consigue 10.000 puntos sin coger ningún calcetín"]],[["F","dist",450,"Parcours 450 m en une partie","Run 450 m in one run","Recorre 450 m en una partida"],["M","discs",80,"Attrape 80 disques en une partie","Catch 80 discs in one run","Atrapa 80 discos en una partida"],["D","stompHigh",1,"Assomme un oiseau tout en haut du ciel","Knock out a bird flying at the very top","Noquea un pájaro que vuela en lo más alto"]],[["F","gamesDay",3,"Joue 3 parties aujourd’hui","Play 3 runs today","Juega 3 partidas hoy"],["M","streak",25,"Attrape 25 disques d’affilée","Catch 25 discs in a row","Atrapa 25 discos seguidos"],["D","stompShuttle",1,"Assomme un volant de badminton dans l’Indoor","Knock out a shuttlecock in the Indoor","Noquea un volante en el Indoor"]],[["F","combo5",2,"Réussis 2 Combos en une partie","Land 2 Combos in one run","Consigue 2 Combos en una partida"],["M","biome","Indoor","Atteins l’Indoor (10 000 points)","Reach the Indoor (10,000 points)","Llega al Indoor (10.000 puntos)"],["D","stompHigh",1,"Assomme un oiseau tout en haut du ciel","Knock out a bird flying at the very top","Noquea un pájaro que vuela en lo más alto"]],[["F","firesDay",2,"Bois 2 gourdes aujourd’hui","Drink 2 water bottles today","Bebe 2 cantimploras hoy"],["M","highRow",1,"Attrape en entier une rangée haute de la chaussette","Catch a full high row during the winged sock","Atrapa una fila alta entera con el calcetín alado"],["D","noMiss",4500,"Fais 4 500 points sans rater un seul disque","Score 4,500 points without missing a single disc","Consigue 4.500 puntos sin fallar ni un disco"]],[["F","discs",40,"Attrape 40 disques en une partie","Catch 40 discs in one run","Atrapa 40 discos en una partida"],["M","streak",25,"Attrape 25 disques d’affilée","Catch 25 discs in a row","Atrapa 25 discos seguidos"],["D","biome","Beach","Atteins la Beach (20 000 points)","Reach the Beach (20,000 points)","Llega a la Beach (20.000 puntos)"]],[["F","stomps",1,"Assomme un oiseau en une partie","Knock out a bird in one run","Noquea un pájaro en una partida"],["M","fires",2,"Bois 2 gourdes en une partie","Drink 2 water bottles in one run","Bebe 2 cantimploras en una partida"],["D","time",95,"Tiens 95 secondes en une partie","Last 95 seconds in one run","Aguanta 95 segundos en una partida"]],[["F","streak",14,"Attrape 14 disques d’affilée","Catch 14 discs in a row","Atrapa 14 discos seguidos"],["M","stompEarly",1,"Assomme un oiseau dans les 15 premières secondes","Knock out a bird in the first 15 seconds","Noquea un pájaro en los primeros 15 segundos"],["D","superC",4,"Déclenche 4 Super Combos en une partie","Trigger 4 Super Combos in one run","Activa 4 Super Combos en una partida"]],[["F","stompsDay",4,"Assomme 4 oiseaux aujourd’hui","Knock out 4 birds today","Noquea 4 pájaros hoy"],["M","discs",110,"Attrape 110 disques en une partie","Catch 110 discs in one run","Atrapa 110 discos en una partida"],["D","dist",2000,"Parcours 2 000 m en une partie","Run 2,000 m in one run","Recorre 2.000 m en una partida"]],[["F","timeDay",6,"Joue 6 minutes au total aujourd’hui","Play 6 minutes in total today","Juega 6 minutos en total hoy"],["M","highRow",1,"Attrape en entier une rangée haute de la chaussette","Catch a full high row during the winged sock","Atrapa una fila alta entera con el calcetín alado"],["D","noMiss",5000,"Fais 5 000 points sans rater un seul disque","Score 5,000 points without missing a single disc","Consigue 5.000 puntos sin fallar ni un disco"]],[["F","dist",400,"Parcours 400 m en une partie","Run 400 m in one run","Recorre 400 m en una partida"],["M","comboDay",15,"Réussis 15 Combos aujourd’hui","Land 15 Combos today","Consigue 15 Combos hoy"],["D","stompHigh",1,"Assomme un oiseau tout en haut du ciel","Knock out a bird flying at the very top","Noquea un pájaro que vuela en lo más alto"]],[["F","fires",1,"Bois une gourde en une partie","Drink a water bottle in one run","Bebe una cantimplora en una partida"],["M","score",8000,"Fais 8 000 points en une partie","Score 8,000 points in one run","Consigue 8.000 puntos en una partida"],["D","noFire",14000,"Fais 14 000 points sans boire de gourde","Score 14,000 points without drinking a bottle","Consigue 14.000 puntos sin beber la cantimplora"]],[["F","socksDay",3,"Ramasse 3 chaussettes ailées aujourd’hui","Grab 3 winged socks today","Coge 3 calcetines alados hoy"],["M","highRow",1,"Attrape en entier une rangée haute de la chaussette","Catch a full high row during the winged sock","Atrapa una fila alta entera con el calcetín alado"],["D","streak",60,"Attrape 60 disques d’affilée","Catch 60 discs in a row","Atrapa 60 discos seguidos"]],[["F","score",3500,"Fais 3 500 points en une partie","Score 3,500 points in one run","Consigue 3.500 puntos en una partida"],["M","noMiss",1500,"Fais 1 500 points sans rater un seul disque","Score 1,500 points without missing a single disc","Consigue 1.500 puntos sin fallar ni un disco"],["D","discs",180,"Attrape 180 disques en une partie","Catch 180 discs in one run","Atrapa 180 discos en una partida"]],[["F","socksDay",3,"Ramasse 3 chaussettes ailées aujourd’hui","Grab 3 winged socks today","Coge 3 calcetines alados hoy"],["M","noSock",5500,"Fais 5 500 points sans ramasser de chaussette","Score 5,500 points without picking up a sock","Consigue 5.500 puntos sin coger ningún calcetín"],["D","biome","Beach","Atteins la Beach (20 000 points)","Reach the Beach (20,000 points)","Llega a la Beach (20.000 puntos)"]],[["F","firesDay",2,"Bois 2 gourdes aujourd’hui","Drink 2 water bottles today","Bebe 2 cantimploras hoy"],["M","stompSock",1,"Assomme un oiseau pendant une chaussette ailée","Knock out a bird while wearing the winged sock","Noquea un pájaro con el calcetín alado"],["D","superC",4,"Déclenche 4 Super Combos en une partie","Trigger 4 Super Combos in one run","Activa 4 Super Combos en una partida"]],[["F","comboDay",7,"Réussis 7 Combos aujourd’hui","Land 7 Combos today","Consigue 7 Combos hoy"],["M","socks",2,"Ramasse 2 chaussettes ailées en une partie","Grab 2 winged socks in one run","Coge 2 calcetines alados en una partida"],["D","discs",180,"Attrape 180 disques en une partie","Catch 180 discs in one run","Atrapa 180 discos en una partida"]],[["F","gamesDay",3,"Joue 3 parties aujourd’hui","Play 3 runs today","Juega 3 partidas hoy"],["M","dist",1000,"Parcours 1 000 m en une partie","Run 1,000 m in one run","Recorre 1.000 m en una partida"],["D","heros",1,"Aie la chaussette et la gourde actives en même temps","Have the sock and the bottle active at the same time","Ten el calcetín y la cantimplora activos a la vez"]],[["F","streak",15,"Attrape 15 disques d’affilée","Catch 15 discs in a row","Atrapa 15 discos seguidos"],["M","firesDay",5,"Bois 5 gourdes aujourd’hui","Drink 5 water bottles today","Bebe 5 cantimploras hoy"],["D","noMiss",4500,"Fais 4 500 points sans rater un seul disque","Score 4,500 points without missing a single disc","Consigue 4.500 puntos sin fallar ni un disco"]],[["F","scoreDay",17000,"Cumule 17 000 points aujourd’hui","Rack up 17,000 points today","Acumula 17.000 puntos hoy"],["M","stomps",3,"Assomme 3 oiseaux en une partie","Knock out 3 birds in one run","Noquea 3 pájaros en una partida"],["D","combo5",11,"Réussis 11 Combos en une partie","Land 11 Combos in one run","Consigue 11 Combos en una partida"]],[["F","discsDay",170,"Attrape 170 disques aujourd’hui","Catch 170 discs today","Atrapa 170 discos hoy"],["M","biome","Indoor","Atteins l’Indoor (10 000 points)","Reach the Indoor (10,000 points)","Llega al Indoor (10.000 puntos)"],["D","noFire",12000,"Fais 12 000 points sans boire de gourde","Score 12,000 points without drinking a bottle","Consigue 12.000 puntos sin beber la cantimplora"]],[["F","time",30,"Tiens 30 secondes en une partie","Last 30 seconds in one run","Aguanta 30 segundos en una partida"],["M","stompsDay",10,"Assomme 10 oiseaux aujourd’hui","Knock out 10 birds today","Noquea 10 pájaros hoy"],["D","quick",2500,"Atteins 2 500 points en moins de 30 secondes","Reach 2,500 points in under 30 seconds","Llega a 2.500 puntos en menos de 30 segundos"]],[["F","score",4000,"Fais 4 000 points en une partie","Score 4,000 points in one run","Consigue 4.000 puntos en una partida"],["M","slows",1,"Attrape un chrono Fast Count en une partie","Grab a Fast Count stopwatch in one run","Coge un cronómetro Fast Count en una partida"],["D","noMiss",4500,"Fais 4 500 points sans rater un seul disque","Score 4,500 points without missing a single disc","Consigue 4.500 puntos sin fallar ni un disco"]],[["F","timeDay",6,"Joue 6 minutes au total aujourd’hui","Play 6 minutes in total today","Juega 6 minutos en total hoy"],["M","discs",90,"Attrape 90 disques en une partie","Catch 90 discs in one run","Atrapa 90 discos en una partida"],["D","dist",1500,"Parcours 1 500 m en une partie","Run 1,500 m in one run","Recorre 1.500 m en una partida"]],[["F","comboDay",7,"Réussis 7 Combos aujourd’hui","Land 7 Combos today","Consigue 7 Combos hoy"],["M","slows",1,"Attrape un chrono Fast Count en une partie","Grab a Fast Count stopwatch in one run","Coge un cronómetro Fast Count en una partida"],["D","quick",2500,"Atteins 2 500 points en moins de 30 secondes","Reach 2,500 points in under 30 seconds","Llega a 2.500 puntos en menos de 30 segundos"]],[["F","distDay",2,"Parcours 2 km aujourd’hui","Run 2 km today","Recorre 2 km hoy"],["M","noMiss",2000,"Fais 2 000 points sans rater un seul disque","Score 2,000 points without missing a single disc","Consigue 2.000 puntos sin fallar ni un disco"],["D","streak",60,"Attrape 60 disques d’affilée","Catch 60 discs in a row","Atrapa 60 discos seguidos"]],[["F","time",40,"Tiens 40 secondes en une partie","Last 40 seconds in one run","Aguanta 40 segundos en una partida"],["M","noSock",6500,"Fais 6 500 points sans ramasser de chaussette","Score 6,500 points without picking up a sock","Consigue 6.500 puntos sin coger ningún calcetín"],["D","stompGull",1,"Assomme une mouette sur la Beach","Knock out a seagull on the Beach","Noquea una gaviota en la Beach"]],[["F","stompsDay",4,"Assomme 4 oiseaux aujourd’hui","Knock out 4 birds today","Noquea 4 pájaros hoy"],["M","smash",13,"Renverse 13 obstacles avec la gourde en une partie","Smash 13 obstacles with the bottle in one run","Derriba 13 obstáculos con la cantimplora en una partida"],["D","score",23000,"Fais 23 000 points en une partie","Score 23,000 points in one run","Consigue 23.000 puntos en una partida"]],[["F","distDay",2,"Parcours 2 km aujourd’hui","Run 2 km today","Recorre 2 km hoy"],["M","noMiss",2000,"Fais 2 000 points sans rater un seul disque","Score 2,000 points without missing a single disc","Consigue 2.000 puntos sin fallar ni un disco"],["D","socks",3,"Ramasse 3 chaussettes ailées en une partie","Grab 3 winged socks in one run","Coge 3 calcetines alados en una partida"]],[["F","timeDay",5,"Joue 5 minutes au total aujourd’hui","Play 5 minutes in total today","Juega 5 minutos en total hoy"],["M","dist",1000,"Parcours 1 000 m en une partie","Run 1,000 m in one run","Recorre 1.000 m en una partida"],["D","streak",50,"Attrape 50 disques d’affilée","Catch 50 discs in a row","Atrapa 50 discos seguidos"]],[["F","socks",1,"Ramasse une chaussette ailée en une partie","Grab a winged sock in one run","Coge un calcetín alado en una partida"],["M","discsDay",450,"Attrape 450 disques aujourd’hui","Catch 450 discs today","Atrapa 450 discos hoy"],["D","superC",4,"Déclenche 4 Super Combos en une partie","Trigger 4 Super Combos in one run","Activa 4 Super Combos en una partida"]],[["F","score",3500,"Fais 3 500 points en une partie","Score 3,500 points in one run","Consigue 3.500 puntos en una partida"],["M","timeDay",18,"Joue 18 minutes au total aujourd’hui","Play 18 minutes in total today","Juega 18 minutos en total hoy"],["D","biome","Beach","Atteins la Beach (20 000 points)","Reach the Beach (20,000 points)","Llega a la Beach (20.000 puntos)"]],[["F","gamesDay",3,"Joue 3 parties aujourd’hui","Play 3 runs today","Juega 3 partidas hoy"],["M","highRow",1,"Attrape en entier une rangée haute de la chaussette","Catch a full high row during the winged sock","Atrapa una fila alta entera con el calcetín alado"],["D","time",105,"Tiens 105 secondes en une partie","Last 105 seconds in one run","Aguanta 105 segundos en una partida"]],[["F","stomps",1,"Assomme un oiseau en une partie","Knock out a bird in one run","Noquea un pájaro en una partida"],["M","socksDay",6,"Ramasse 6 chaussettes ailées aujourd’hui","Grab 6 winged socks today","Coge 6 calcetines alados hoy"],["D","discs",190,"Attrape 190 disques en une partie","Catch 190 discs in one run","Atrapa 190 discos en una partida"]],[["F","discsDay",180,"Attrape 180 disques aujourd’hui","Catch 180 discs today","Atrapa 180 discos hoy"],["M","noMiss",2000,"Fais 2 000 points sans rater un seul disque","Score 2,000 points without missing a single disc","Consigue 2.000 puntos sin fallar ni un disco"],["D","biome","Beach","Atteins la Beach (20 000 points)","Reach the Beach (20,000 points)","Llega a la Beach (20.000 puntos)"]],[["F","streak",13,"Attrape 13 disques d’affilée","Catch 13 discs in a row","Atrapa 13 discos seguidos"],["M","discs",110,"Attrape 110 disques en une partie","Catch 110 discs in one run","Atrapa 110 discos en una partida"],["D","noFire",14000,"Fais 14 000 points sans boire de gourde","Score 14,000 points without drinking a bottle","Consigue 14.000 puntos sin beber la cantimplora"]],[["F","score",4000,"Fais 4 000 points en une partie","Score 4,000 points in one run","Consigue 4.000 puntos en una partida"],["M","gamesDay",6,"Joue 6 parties aujourd’hui","Play 6 runs today","Juega 6 partidas hoy"],["D","stomps",7,"Assomme 7 oiseaux en une partie","Knock out 7 birds in one run","Noquea 7 pájaros en una partida"]],[["F","discsDay",180,"Attrape 180 disques aujourd’hui","Catch 180 discs today","Atrapa 180 discos hoy"],["M","noFire",6500,"Fais 6 500 points sans boire de gourde","Score 6,500 points without drinking a bottle","Consigue 6.500 puntos sin beber la cantimplora"],["D","heros",1,"Aie la chaussette et la gourde actives en même temps","Have the sock and the bottle active at the same time","Ten el calcetín y la cantimplora activos a la vez"]],[["F","distDay",2,"Parcours 2 km aujourd’hui","Run 2 km today","Recorre 2 km hoy"],["M","slows",1,"Attrape un chrono Fast Count en une partie","Grab a Fast Count stopwatch in one run","Coge un cronómetro Fast Count en una partida"],["D","biome","Beach","Atteins la Beach (20 000 points)","Reach the Beach (20,000 points)","Llega a la Beach (20.000 puntos)"]],[["F","socks",1,"Ramasse une chaussette ailée en une partie","Grab a winged sock in one run","Coge un calcetín alado en una partida"],["M","combo5",6,"Réussis 6 Combos en une partie","Land 6 Combos in one run","Consigue 6 Combos en una partida"],["D","quick",2500,"Atteins 2 500 points en moins de 30 secondes","Reach 2,500 points in under 30 seconds","Llega a 2.500 puntos en menos de 30 segundos"]],[["F","streak",13,"Attrape 13 disques d’affilée","Catch 13 discs in a row","Atrapa 13 discos seguidos"],["M","stompEarly",1,"Assomme un oiseau dans les 15 premières secondes","Knock out a bird in the first 15 seconds","Noquea un pájaro en los primeros 15 segundos"],["D","discs",180,"Attrape 180 disques en une partie","Catch 180 discs in one run","Atrapa 180 discos en una partida"]],[["F","stompsDay",4,"Assomme 4 oiseaux aujourd’hui","Knock out 4 birds today","Noquea 4 pájaros hoy"],["M","score",11000,"Fais 11 000 points en une partie","Score 11,000 points in one run","Consigue 11.000 puntos en una partida"],["D","combo5",12,"Réussis 12 Combos en une partie","Land 12 Combos in one run","Consigue 12 Combos en una partida"]],[["F","discs",50,"Attrape 50 disques en une partie","Catch 50 discs in one run","Atrapa 50 discos en una partida"],["M","stompSock",1,"Assomme un oiseau pendant une chaussette ailée","Knock out a bird while wearing the winged sock","Noquea un pájaro con el calcetín alado"],["D","noSock",12000,"Fais 12 000 points sans ramasser de chaussette","Score 12,000 points without picking up a sock","Consigue 12.000 puntos sin coger ningún calcetín"]],[["F","discs",25,"Joyeux Noël ! Attrape 25 disques en une partie","Merry Christmas! Catch 25 discs in one run","¡Feliz Navidad! Atrapa 25 discos en una partida"],["M","stomps",3,"Le traîneau passe : assomme 3 oiseaux en une partie","Sleigh in the sky: knock out 3 birds in one run","Pasa el trineo: noquea 3 pájaros en una partida"],["D","biome","Catch La Peuf","Il neige pour Noël : atteins Catch La Peuf (30 000 points)","Snow for Christmas: reach Catch La Peuf (30,000 points)","Nieve por Navidad: llega a Catch La Peuf (30.000 puntos)"]],[["F","time",40,"Tiens 40 secondes en une partie","Last 40 seconds in one run","Aguanta 40 segundos en una partida"],["M","streak",30,"Attrape 30 disques d’affilée","Catch 30 discs in a row","Atrapa 30 discos seguidos"],["D","quick",2500,"Atteins 2 500 points en moins de 30 secondes","Reach 2,500 points in under 30 seconds","Llega a 2.500 puntos en menos de 30 segundos"]],[["F","socksDay",3,"Ramasse 3 chaussettes ailées aujourd’hui","Grab 3 winged socks today","Coge 3 calcetines alados hoy"],["M","score",10000,"Fais 10 000 points en une partie","Score 10,000 points in one run","Consigue 10.000 puntos en una partida"],["D","stompHigh",1,"Assomme un oiseau tout en haut du ciel","Knock out a bird flying at the very top","Noquea un pájaro que vuela en lo más alto"]],[["F","combo5",3,"Réussis 3 Combos en une partie","Land 3 Combos in one run","Consigue 3 Combos en una partida"],["M","stompSock",1,"Assomme un oiseau pendant une chaussette ailée","Knock out a bird while wearing the winged sock","Noquea un pájaro con el calcetín alado"],["D","smash",30,"Renverse 30 obstacles avec la gourde en une partie","Smash 30 obstacles with the bottle in one run","Derriba 30 obstáculos con la cantimplora en una partida"]],[["F","fires",1,"Bois une gourde en une partie","Drink a water bottle in one run","Bebe una cantimplora en una partida"],["M","timeDay",21,"Joue 21 minutes au total aujourd’hui","Play 21 minutes in total today","Juega 21 minutos en total hoy"],["D","dist",2000,"Parcours 2 000 m en une partie","Run 2,000 m in one run","Recorre 2.000 m en una partida"]],[["F","combo5",3,"Réussis 3 Combos en une partie","Land 3 Combos in one run","Consigue 3 Combos en una partida"],["M","noSock",6500,"Fais 6 500 points sans ramasser de chaussette","Score 6,500 points without picking up a sock","Consigue 6.500 puntos sin coger ningún calcetín"],["D","quick",2500,"Atteins 2 500 points en moins de 30 secondes","Reach 2,500 points in under 30 seconds","Llega a 2.500 puntos en menos de 30 segundos"]],[["F","gamesDay",3,"Dernier jour de 2026 : joue 3 parties avant minuit","Last day of 2026: play 3 runs before midnight","Último día de 2026: juega 3 partidas antes de medianoche"],["M","noMiss",2026,"Fais 2 026 points sans rater un seul disque","Score 2,026 points without missing a single disc","Consigue 2.026 puntos sin fallar ni un disco"],["D","score",20260,"Termine l’année en beauté : 20 260 points en une partie","Finish the year strong: 20,260 points in one run","Cierra el año a lo grande: 20.260 puntos en una partida"]],[["F","discs",27,"Bonne année ! Attrape 27 disques en une partie","Happy New Year! Catch 27 discs in one run","¡Feliz Año Nuevo! Atrapa 27 discos en una partida"],["M","streak",27,"Attrape 27 disques d’affilée pour 2027","Catch 27 discs in a row for 2027","Atrapa 27 discos seguidos por 2027"],["D","score",20270,"Lance 2027 : 20 270 points en une partie","Kick off 2027: 20,270 points in one run","Arranca 2027: 20.270 puntos en una partida"]],[["F","time",40,"Tiens 40 secondes en une partie","Last 40 seconds in one run","Aguanta 40 segundos en una partida"],["M","biome","Indoor","Atteins l’Indoor (10 000 points)","Reach the Indoor (10,000 points)","Llega al Indoor (10.000 puntos)"],["D","noMiss",5000,"Fais 5 000 points sans rater un seul disque","Score 5,000 points without missing a single disc","Consigue 5.000 puntos sin fallar ni un disco"]],[["F","discs",45,"Attrape 45 disques en une partie","Catch 45 discs in one run","Atrapa 45 discos en una partida"],["M","gamesDay",7,"Joue 7 parties aujourd’hui","Play 7 runs today","Juega 7 partidas hoy"],["D","smash",30,"Renverse 30 obstacles avec la gourde en une partie","Smash 30 obstacles with the bottle in one run","Derriba 30 obstáculos con la cantimplora en una partida"]],[["F","stomps",1,"Assomme un oiseau en une partie","Knock out a bird in one run","Noquea un pájaro en una partida"],["M","scoreDay",64000,"Cumule 64 000 points aujourd’hui","Rack up 64,000 points today","Acumula 64.000 puntos hoy"],["D","fires",3,"Bois 3 gourdes en une partie","Drink 3 water bottles in one run","Bebe 3 cantimploras en una partida"]],[["F","timeDay",7,"Joue 7 minutes au total aujourd’hui","Play 7 minutes in total today","Juega 7 minutos en total hoy"],["M","stompSock",1,"Assomme un oiseau pendant une chaussette ailée","Knock out a bird while wearing the winged sock","Noquea un pájaro con el calcetín alado"],["D","socks",3,"Ramasse 3 chaussettes ailées en une partie","Grab 3 winged socks in one run","Coge 3 calcetines alados en una partida"]],[["F","scoreDay",19000,"Cumule 19 000 points aujourd’hui","Rack up 19,000 points today","Acumula 19.000 puntos hoy"],["M","time",85,"Tiens 85 secondes en une partie","Last 85 seconds in one run","Aguanta 85 segundos en una partida"],["D","stompHigh",1,"Trouve la fève : assomme un oiseau tout en haut du ciel","Find the charm: knock out a bird flying at the very top","Encuentra el haba: noquea un pájaro que vuela en lo más alto"]],[["F","comboDay",8,"Réussis 8 Combos aujourd’hui","Land 8 Combos today","Consigue 8 Combos hoy"],["M","streak",30,"Attrape 30 disques d’affilée","Catch 30 discs in a row","Atrapa 30 discos seguidos"],["D","score",26000,"Fais 26 000 points en une partie","Score 26,000 points in one run","Consigue 26.000 puntos en una partida"]],[["F","fires",1,"Bois une gourde en une partie","Drink a water bottle in one run","Bebe una cantimplora en una partida"],["M","scoreDay",65000,"Cumule 65 000 points aujourd’hui","Rack up 65,000 points today","Acumula 65.000 puntos hoy"],["D","highRow",3,"Attrape en entier 3 rangées hautes de la chaussette","Catch 3 full high rows during the winged sock","Atrapa 3 filas altas enteras con el calcetín alado"]],[["F","comboDay",8,"Réussis 8 Combos aujourd’hui","Land 8 Combos today","Consigue 8 Combos hoy"],["M","stompEarly",1,"Assomme un oiseau dans les 15 premières secondes","Knock out a bird in the first 15 seconds","Noquea un pájaro en los primeros 15 segundos"],["D","streak",70,"Attrape 70 disques d’affilée","Catch 70 discs in a row","Atrapa 70 discos seguidos"]],[["F","distDay",2,"Parcours 2 km aujourd’hui","Run 2 km today","Recorre 2 km hoy"],["M","smash",13,"Renverse 13 obstacles avec la gourde en une partie","Smash 13 obstacles with the bottle in one run","Derriba 13 obstáculos con la cantimplora en una partida"],["D","stompGull",1,"Assomme une mouette sur la Beach","Knock out a seagull on the Beach","Noquea una gaviota en la Beach"]],[["F","streak",16,"Attrape 16 disques d’affilée","Catch 16 discs in a row","Atrapa 16 discos seguidos"],["M","stompSock",1,"Assomme un oiseau pendant une chaussette ailée","Knock out a bird while wearing the winged sock","Noquea un pájaro con el calcetín alado"],["D","time",130,"Tiens 130 secondes en une partie","Last 130 seconds in one run","Aguanta 130 segundos en una partida"]],[["F","comboDay",9,"Réussis 9 Combos aujourd’hui","Land 9 Combos today","Consigue 9 Combos hoy"],["M","dist",1000,"Parcours 1 000 m en une partie","Run 1,000 m in one run","Recorre 1.000 m en una partida"],["D","score",24000,"Fais 24 000 points en une partie","Score 24,000 points in one run","Consigue 24.000 puntos en una partida"]],[["F","distDay",3,"Parcours 3 km aujourd’hui","Run 3 km today","Recorre 3 km hoy"],["M","combo5",7,"Réussis 7 Combos en une partie","Land 7 Combos in one run","Consigue 7 Combos en una partida"],["D","fires",3,"Bois 3 gourdes en une partie","Drink 3 water bottles in one run","Bebe 3 cantimploras en una partida"]],[["F","socksDay",3,"Ramasse 3 chaussettes ailées aujourd’hui","Grab 3 winged socks today","Coge 3 calcetines alados hoy"],["M","dist",1000,"Parcours 1 000 m en une partie","Run 1,000 m in one run","Recorre 1.000 m en una partida"],["D","noSock",12000,"Fais 12 000 points sans ramasser de chaussette","Score 12,000 points without picking up a sock","Consigue 12.000 puntos sin coger ningún calcetín"]],[["F","discsDay",180,"Attrape 180 disques aujourd’hui","Catch 180 discs today","Atrapa 180 discos hoy"],["M","biome","Indoor","Atteins l’Indoor (10 000 points)","Reach the Indoor (10,000 points)","Llega al Indoor (10.000 puntos)"],["D","stompHigh",1,"Assomme un oiseau tout en haut du ciel","Knock out a bird flying at the very top","Noquea un pájaro que vuela en lo más alto"]],[["F","time",45,"Tiens 45 secondes en une partie","Last 45 seconds in one run","Aguanta 45 segundos en una partida"],["M","streak",30,"Attrape 30 disques d’affilée","Catch 30 discs in a row","Atrapa 30 discos seguidos"],["D","stompGull",1,"Assomme une mouette sur la Beach","Knock out a seagull on the Beach","Noquea una gaviota en la Beach"]],[["F","timeDay",7,"Joue 7 minutes au total aujourd’hui","Play 7 minutes in total today","Juega 7 minutos en total hoy"],["M","discs",130,"Attrape 130 disques en une partie","Catch 130 discs in one run","Atrapa 130 discos en una partida"],["D","stompShuttle",1,"Assomme un volant de badminton dans l’Indoor","Knock out a shuttlecock in the Indoor","Noquea un volante en el Indoor"]],[["F","scoreDay",22000,"Cumule 22 000 points aujourd’hui","Rack up 22,000 points today","Acumula 22.000 puntos hoy"],["M","noSock",6500,"Fais 6 500 points sans ramasser de chaussette","Score 6,500 points without picking up a sock","Consigue 6.500 puntos sin coger ningún calcetín"],["D","combo5",15,"Réussis 15 Combos en une partie","Land 15 Combos in one run","Consigue 15 Combos en una partida"]],[["F","socks",1,"Ramasse une chaussette ailée en une partie","Grab a winged sock in one run","Coge un calcetín alado en una partida"],["M","time",80,"Tiens 80 secondes en une partie","Last 80 seconds in one run","Aguanta 80 segundos en una partida"],["D","superC",4,"Déclenche 4 Super Combos en une partie","Trigger 4 Super Combos in one run","Activa 4 Super Combos en una partida"]],[["F","comboDay",8,"Réussis 8 Combos aujourd’hui","Land 8 Combos today","Consigue 8 Combos hoy"],["M","streak",35,"Attrape 35 disques d’affilée","Catch 35 discs in a row","Atrapa 35 discos seguidos"],["D","dist",2000,"Parcours 2 000 m en une partie","Run 2,000 m in one run","Recorre 2.000 m en una partida"]],[["F","combo5",3,"Réussis 3 Combos en une partie","Land 3 Combos in one run","Consigue 3 Combos en una partida"],["M","time",75,"Tiens 75 secondes en une partie","Last 75 seconds in one run","Aguanta 75 segundos en una partida"],["D","noMiss",5500,"Fais 5 500 points sans rater un seul disque","Score 5,500 points without missing a single disc","Consigue 5.500 puntos sin fallar ni un disco"]],[["F","stomps",1,"Assomme un oiseau en une partie","Knock out a bird in one run","Noquea un pájaro en una partida"],["M","streak",35,"Attrape 35 disques d’affilée","Catch 35 discs in a row","Atrapa 35 discos seguidos"],["D","superC",4,"Déclenche 4 Super Combos en une partie","Trigger 4 Super Combos in one run","Activa 4 Super Combos en una partida"]],[["F","distDay",2,"Parcours 2 km aujourd’hui","Run 2 km today","Recorre 2 km hoy"],["M","score",11000,"Fais 11 000 points en une partie","Score 11,000 points in one run","Consigue 11.000 puntos en una partida"],["D","noFire",18000,"Fais 18 000 points sans boire de gourde","Score 18,000 points without drinking a bottle","Consigue 18.000 puntos sin beber la cantimplora"]],[["F","scoreDay",18000,"Cumule 18 000 points aujourd’hui","Rack up 18,000 points today","Acumula 18.000 puntos hoy"],["M","stomps",3,"Assomme 3 oiseaux en une partie","Knock out 3 birds in one run","Noquea 3 pájaros en una partida"],["D","highRow",3,"Attrape en entier 3 rangées hautes de la chaussette","Catch 3 full high rows during the winged sock","Atrapa 3 filas altas enteras con el calcetín alado"]],[["F","socks",1,"Ramasse une chaussette ailée en une partie","Grab a winged sock in one run","Coge un calcetín alado en una partida"],["M","noMiss",2000,"Fais 2 000 points sans rater un seul disque","Score 2,000 points without missing a single disc","Consigue 2.000 puntos sin fallar ni un disco"],["D","noSock",14000,"Fais 14 000 points sans ramasser de chaussette","Score 14,000 points without picking up a sock","Consigue 14.000 puntos sin coger ningún calcetín"]],[["F","firesDay",2,"Bois 2 gourdes aujourd’hui","Drink 2 water bottles today","Bebe 2 cantimploras hoy"],["M","superC",2,"Déclenche 2 Super Combos en une partie","Trigger 2 Super Combos in one run","Activa 2 Super Combos en una partida"],["D","streak",70,"Attrape 70 disques d’affilée","Catch 70 discs in a row","Atrapa 70 discos seguidos"]],[["F","score",4500,"Fais 4 500 points en une partie","Score 4,500 points in one run","Consigue 4.500 puntos en una partida"],["M","combo5",8,"Réussis 8 Combos en une partie","Land 8 Combos in one run","Consigue 8 Combos en una partida"],["D","stomps",8,"Assomme 8 oiseaux en une partie","Knock out 8 birds in one run","Noquea 8 pájaros en una partida"]],[["F","discs",60,"Attrape 60 disques en une partie","Catch 60 discs in one run","Atrapa 60 discos en una partida"],["M","stompEarly",1,"Assomme un oiseau dans les 15 premières secondes","Knock out a bird in the first 15 seconds","Noquea un pájaro en los primeros 15 segundos"],["D","superC",4,"Déclenche 4 Super Combos en une partie","Trigger 4 Super Combos in one run","Activa 4 Super Combos en una partida"]],[["F","discsDay",250,"Attrape 250 disques aujourd’hui","Catch 250 discs today","Atrapa 250 discos hoy"],["M","fires",2,"Bois 2 gourdes en une partie","Drink 2 water bottles in one run","Bebe 2 cantimploras en una partida"],["D","biome","Beach","Atteins la Beach (20 000 points)","Reach the Beach (20,000 points)","Llega a la Beach (20.000 puntos)"]],[["F","streak",18,"Attrape 18 disques d’affilée","Catch 18 discs in a row","Atrapa 18 discos seguidos"],["M","noFire",7500,"Fais 7 500 points sans boire de gourde","Score 7,500 points without drinking a bottle","Consigue 7.500 puntos sin beber la cantimplora"],["D","stompGull",1,"Assomme une mouette sur la Beach","Knock out a seagull on the Beach","Noquea una gaviota en la Beach"]],[["F","timeDay",7,"Joue 7 minutes au total aujourd’hui","Play 7 minutes in total today","Juega 7 minutos en total hoy"],["M","discs",130,"Attrape 130 disques en une partie","Catch 130 discs in one run","Atrapa 130 discos en una partida"],["D","heros",1,"Aie la chaussette et la gourde actives en même temps","Have the sock and the bottle active at the same time","Ten el calcetín y la cantimplora activos a la vez"]]]};
+
+/* ================= v7.0 : défis quotidiens (3 par jour, plan de 91 jours en boucle) ================= */
+// le plan (tools/beta_defis.json) est injecté par make_beta.py dans DQ_DATA
+const DQ_REW = { F:60, M:150, D:300 }, DQ_TRIO = 190;
+const DQ_BOOL = { stompSock:1, stompEarly:1, stompHigh:1, stompShuttle:1, stompGull:1, heros:1, biome:1 };
+const DQ_DAY = { gamesDay:1, timeDay:1, discsDay:1, scoreDay:1, stompsDay:1, socksDay:1, firesDay:1, distDay:1, comboDay:1 };
+const dqUI = (() => {
+  const KEY = 'stellyrun_daily';
+  const D0 = (() => { const [y, m, d] = DQ_DATA.start.split('-').map(Number); return Date.UTC(y, m - 1, d); })();
+  let shift = 0;   // décalage de jours (bouton debug)
+  const today = () => { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate() + shift); };
+  const iso = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  const dayIdx = () => { const d = today(), n = Math.round((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - D0)/864e5), L = DQ_DATA.plan.length; return ((n % L) + L) % L; };
+  const fresh = () => ({ date: iso(today()), done:[0, 0, 0], trio:0, D:{ games:0, time:0, discs:0, score:0, stomps:0, socks:0, fires:0, dist:0, combos:0 }, B:{ biome:0 } });
+  let S = fresh();
+  try { const j = JSON.parse(localStorage.getItem(KEY) || 'null'); if (j && j.date === S.date) S = Object.assign(fresh(), j); } catch(e){}
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} };
+  const roll = () => { if (S.date !== iso(today())){ S = fresh(); save(); } };
+  const chal = () => DQ_DATA.plan[dayIdx()].map(([slot, metric, target, fr, en, es]) => ({ slot, metric, target, fr, en, es }));
+
+  // ---------- suivi de la partie en cours ----------
+  const R = { active:false };
+  function start(){ roll(); Object.assign(R, { active:true, c0: TR.d.st.combo, s0: TR.d.st.superC, combos:0, superC:0, high:0, stomps:0, stompSock:0, stompEarly:0, stompHigh:0, sp:{},
+    socks:0, fires:0, slows:0, heros:0, smash:0, miss:0, noMiss:0, noFire:0, noSock:0, quick:0, th:0 }); }
+  const wrap = (name, fn) => { const f = TR[name]; TR[name] = function(...a){ if (R.active) fn(...a); return f.apply(this, a); }; };
+  wrap('stomp', (sp, tier) => { R.stomps++; if (P.sockT > 0) R.stompSock = 1; if (t < 15) R.stompEarly = 1; if (tier === 2) R.stompHigh = 1; R.sp[sp] = 1; });
+  wrap('sock', () => R.socks++); wrap('fire', () => R.fires++); wrap('slow', () => R.slows++); wrap('miss', () => R.miss++);
+  wrap('smash', n => { R.smash += n || 1; });
+  { const f = TR.tick; TR.tick = function(){ if (R.active && state === 'play'){
+      R.combos = TR.d.st.combo - R.c0; R.superC = TR.d.st.superC - R.s0;
+      if (fireT > 0 && P.sockT > 0) R.heros = 1;
+      if (R.miss === 0) R.noMiss = score; if (R.fires === 0) R.noFire = score; if (R.socks === 0) R.noSock = score; if (t < 30) R.quick = score;
+      if (!biomeOff) R.th |= 1 << theme; }
+    return f.apply(this, arguments); }; }
+  const runVal = m => ({ score, discs: discCount, streak: bestStreak, combo5: R.combos, superC: R.superC, highRow: R.high, stomps: R.stomps,
+    stompSock: R.stompSock, stompEarly: R.stompEarly, stompHigh: R.stompHigh, stompShuttle: R.sp.shuttle ? 1 : 0, stompGull: R.sp.gull ? 1 : 0,
+    socks: R.socks, fires: R.fires, slows: R.slows, heros: R.heros, smash: R.smash, dist: Math.floor(dist/30), time: Math.floor(t),
+    noMiss: R.noMiss, noFire: R.noFire, noSock: R.noSock, quick: R.quick })[m] || 0;
+  function value(c){
+    const live = R.active, D = S.D;
+    if (c.metric === 'biome'){ const i = THEME_NAMES.indexOf(c.target); return ((S.B.biome | (live ? R.th : 0)) >> i) & 1; }
+    if (DQ_DAY[c.metric]) return ({ gamesDay: D.games, timeDay: Math.floor((D.time + (live ? t : 0))/60), discsDay: D.discs + (live ? discCount : 0),
+      scoreDay: D.score + (live ? score : 0), stompsDay: D.stomps + (live ? R.stomps : 0), socksDay: D.socks + (live ? R.socks : 0), firesDay: D.fires + (live ? R.fires : 0),
+      distDay: Math.floor((D.dist + (live ? dist : 0))/3000)/10, comboDay: D.combos + (live ? R.combos : 0) })[c.metric];
+    return Math.max(S.B[c.metric] || 0, live ? runVal(c.metric) : 0);
+  }
+  const goal = c => (DQ_BOOL[c.metric] ? 1 : c.target);
+  function countHigh(){ let n = 0; for (const k in groups){ const G = groups[k]; if (G.hi && G.got === G.n) n++; } R.high = n; }
+  function check(){
+    roll(); if (R.active) countHigh();
+    const cs = chal(); let changed = false;
+    cs.forEach((c, i) => { if (S.done[i] || value(c) < goal(c)) return;
+      S.done[i] = 1; changed = true; TR.d.coins += DQ_REW[c.slot]; TR.save();
+      toast(txt('dq.done') + ' +' + DQ_REW[c.slot], true); sfx.mile(); });
+    if (!S.trio && S.done.every(Boolean)){ S.trio = 1; changed = true; TR.d.coins += DQ_TRIO; TR.save();
+      setTimeout(() => { toast(txt('dq.trio') + ' +' + DQ_TRIO, true); sfx.world(); }, 1600); }
+    if (changed){ save(); badge(); if (isOpen) render(); }
+  }
+  function end(){
+    if (!R.active) return; countHigh();
+    const D = S.D; D.games++; D.time += t; D.discs += discCount; D.score += score; D.stomps += R.stomps; D.socks += R.socks; D.fires += R.fires; D.dist += dist; D.combos += R.combos;
+    for (const m of ['score', 'discs', 'streak', 'combo5', 'superC', 'highRow', 'stomps', 'stompSock', 'stompEarly', 'stompHigh', 'stompShuttle', 'stompGull',
+      'socks', 'fires', 'slows', 'heros', 'smash', 'dist', 'time', 'noMiss', 'noFire', 'noSock', 'quick']) S.B[m] = Math.max(S.B[m] || 0, runVal(m));
+    S.B.biome |= R.th; R.active = false; save(); check();
+  }
+  wrap('die', () => end()); wrap('end', () => end());
+  setInterval(() => { if (R.active && state === 'play') check(); }, 250);
+
+  // ---------- bouton sur l'accueil et panneau ----------
+  const css = document.createElement('style');
+  css.textContent = '#dqbtn{ position:relative; height:100%; aspect-ratio:1; padding:0; display:flex; align-items:center; justify-content:center; }'
+    + '#dqbtn canvas{ height:calc(var(--s)*11px); width:auto; image-rendering:pixelated; display:block; }'
+    + '#dqbtn b{ position:absolute; right:calc(var(--s)*-3px); top:calc(var(--s)*-3px); font-family:var(--num); font-weight:400; font-size:max(calc(var(--s)*4px),9px); line-height:1;'
+    + ' background:var(--red,#E0413A); color:#fff; border:calc(var(--s)*.8px) solid var(--plum); border-radius:calc(var(--s)*2px); padding:calc(var(--s)*.8px) calc(var(--s)*1.2px); }'
+    + '#dqbtn b.ok{ background:#3FB75A; }'
+    + '#daily{ position:absolute; inset:0; z-index:30; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:calc(var(--s)*4px);'
+    + ' background:repeating-linear-gradient(135deg, rgba(255,255,255,.035) 0 calc(var(--s)*6px), transparent 0 calc(var(--s)*12px)), var(--plum);'
+    + ' border-bottom:calc(var(--s)*2px) solid var(--yellow); transform:translateY(calc(-100% - var(--s)*6px)); transition:transform .45s cubic-bezier(.6,0,.4,1); }'
+    + '#daily.open{ transform:none; transition:transform .55s cubic-bezier(.25,1.25,.45,1); }'
+    + '#daily[hidden]{ display:none; }'
+    + '#daily h2{ margin:0; font-weight:700; line-height:1; font-size:calc(var(--s)*12px); color:var(--yellow); }'
+    + '#dqclose{ position:absolute; top:calc(var(--s)*7px); right:calc(var(--s)*9px); font-size:max(calc(var(--s)*7px),12px); padding:calc(var(--s)*1.5px) calc(var(--s)*5px) calc(var(--s)*2px); }'
+    + '#dqlist{ display:flex; flex-direction:column; gap:calc(var(--s)*3px); width:calc(var(--s)*230px); }'
+    + '#dqlist .nart{ align-items:center; padding:calc(var(--s)*3px) calc(var(--s)*5px); }'
+    + '#dqlist .lv{ flex:none; width:calc(var(--s)*30px); font-size:max(calc(var(--s)*4.6px),9px); font-weight:700; text-transform:uppercase; text-align:center; color:#fff; border-radius:calc(var(--s)*1.5px); padding:calc(var(--s)*1px) 0; }'
+    + '#dqlist .lv.F{ background:#2E8B57 } #dqlist .lv.M{ background:#C9690E } #dqlist .lv.D{ background:#B5304A }'
+    + '#dqlist .mid{ flex:1; min-width:0; display:flex; flex-direction:column; gap:calc(var(--s)*1.5px); font-size:max(calc(var(--s)*5.5px),11px); font-weight:700; line-height:1.15; }'
+    + '#dqlist .pb{ height:calc(var(--s)*2.5px); background:#EBD8A6; border-radius:9px; overflow:hidden; }'
+    + '#dqlist .pb i{ display:block; height:100%; background:var(--purple); }'
+    + '#dqlist .done .pb i{ background:#3FB75A; }'
+    + '#dqlist .pv{ font-family:var(--num); font-weight:400; font-size:max(calc(var(--s)*4px),9px); color:#8E7C93; }'
+    + '#dqlist .rw{ flex:none; display:flex; align-items:center; gap:calc(var(--s)*1.5px); font-family:var(--num); font-size:max(calc(var(--s)*5px),10px); }'
+    + '#dqlist .rw canvas{ height:calc(var(--s)*5px); width:auto; image-rendering:pixelated; }'
+    + '#dqlist .done .rw{ color:#3FB75A; }'
+    + '#dqfoot{ display:flex; gap:calc(var(--s)*8px); color:var(--white); font-size:max(calc(var(--s)*5px),10px); font-weight:700; }'
+    + '#dqfoot .dqtr.ok{ color:#9BE07A; }';
+  document.head.appendChild(css);
+  const TARGET = mk(12, 12, g => pm(g, ['...oooooo...', '.oorrrrrroo.', '.orrwwwwrro.', 'orrwwrrwwrro', 'orwwrrrrwwro', 'orwrrwwrrwro', 'orwrrwwrrwro',
+    'orwwrrrrwwro', 'orrwwrrwwrro', '.orrwwwwrro.', '.oorrrrrroo.', '...oooooo...'], 0, 0, false, { o:C.plum, r:C.red, w:C.white }));
+  const btn = document.createElement('button'); btn.id = 'dqbtn'; btn.className = 'btn alt'; btn.type = 'button';
+  btn.appendChild(cvOf(TARGET)); const bdg = document.createElement('b'); btn.appendChild(bdg);
+  $('lbbtn').after(btn);
+  const page = document.createElement('div'); page.id = 'daily'; page.hidden = true; page.setAttribute('role', 'dialog'); page.setAttribute('aria-modal', 'true');
+  page.innerHTML = '<div class="trhead"><h2></h2></div><button id="dqclose" class="btn alt"></button><div id="dqlist"></div><div id="dqfoot"><span class="dqtr"></span><span class="dqnx"></span></div>';
+  $('news').parentElement.appendChild(page);
+  let isOpen = false, hideT = 0;
+  function badge(){ const n = S.done.filter(Boolean).length; bdg.textContent = n + '/3'; bdg.classList.toggle('ok', n === 3); btn.setAttribute('aria-label', txt('dq.title') + ' ' + n + '/3'); }
+  const fmtV = (c, v) => c.metric === 'distDay' ? String(v).replace('.', LANG === 'en' ? '.' : ',') : fmtN(v);
+  function render(){
+    roll(); page.querySelector('h2').textContent = txt('dq.title'); $('dqclose').textContent = txt('ui.close');
+    const list = $('dqlist'); list.textContent = '';
+    chal().forEach((c, i) => { const v = value(c), gl = goal(c), done = !!S.done[i], k = Math.min(1, v/gl);
+      const el = document.createElement('article'); el.className = 'nart' + (done ? ' done' : '');
+      el.innerHTML = '<span class="lv ' + c.slot + '"></span><div class="mid"><span class="tx"></span><div class="pb"><i></i></div><span class="pv"></span></div><span class="rw"></span>';
+      el.querySelector('.lv').textContent = txt('dq.lv.' + c.slot);
+      el.querySelector('.tx').textContent = c[LANG] || c.fr;
+      el.querySelector('.pb i').style.width = (done ? 100 : Math.round(k*100)) + '%';
+      el.querySelector('.pv').textContent = DQ_BOOL[c.metric] ? (done || v >= 1 ? '1 / 1' : '0 / 1') : fmtV(c, Math.min(v, gl)) + ' / ' + fmtV(c, gl);
+      const rw = el.querySelector('.rw'); rw.textContent = (done ? '✓ ' : '+') + DQ_REW[c.slot]; rw.appendChild(cvOf(DISC));
+      list.appendChild(el); });
+    const ft = page.querySelector('.dqtr'); ft.textContent = txt('dq.trioLine', { n: DQ_TRIO }); ft.classList.toggle('ok', !!S.trio);
+    const n = new Date(), mid = new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1), left = Math.max(0, mid - n);
+    page.querySelector('.dqnx').textContent = txt('dq.next', { h: Math.floor(left/36e5), m: String(Math.floor(left/6e4) % 60).padStart(2, '0') });
+    badge();
+  }
+  function open(){ if (isOpen || state !== 'title') return; render(); clearTimeout(hideT); page.hidden = false; void page.offsetWidth; page.classList.add('open'); isOpen = true; $('soundmenu').hidden = true; sfx.start(); }
+  function close(){ if (!isOpen) return; isOpen = false; page.classList.remove('open'); clearTimeout(hideT); hideT = setTimeout(() => { if (!isOpen) page.hidden = true; }, 500); if (document.activeElement) document.activeElement.blur(); }
+  btn.addEventListener('click', e => { e.stopPropagation(); ensureAudio(); open(); });
+  $('dqclose').addEventListener('click', e => { e.stopPropagation(); close(); });
+  page.addEventListener('pointerdown', e => e.stopPropagation());
+  setInterval(() => { if (state === 'title'){ roll(); badge(); } }, 2000);
+  badge();
+  return { start, isOpen: () => isOpen, close, shiftDay(){ shift++; S = fresh(); save(); badge(); if (isOpen) render(); return iso(today()); }, state: () => S, challenges: chal, value };
+})();
+const dqStart = () => dqUI.start();
+
+/* ================= v7.0 : tout remettre à zéro (Réglages) ================= */
+// Efface sur CET appareil : trophées (et les compteurs qui les débloquent), disques, record local.
+// Efface aussi : accessoires achetés et portés, stock de bonus et bonus équipé.
+// Conserve : record du classement mondial (lbBest), nom et identifiant du classement.
+// L'appareil est délié avant d'effacer (sinon la synchro ramènerait trophées et disques des autres appareils).
+// Les stats déjà envoyées restent comptées dans les stats mondiales : elles sont mises de côté dans d.arch et ajoutées à l'envoi.
+// stats envoyées au classement mondial : on y ajoute ce qui a été mis de côté lors d'une remise à zéro
+function statsArchive(p){
+  const A = TR.d.arch; if (!A) return p;
+  for (const k in A){
+    if (k === 'deathBy' || k === 'deathTh'){ const m = Object.assign({}, p[k] || {}); for (const i in A[k]) m[i] = (m[i] || 0) + A[k][i]; p[k] = m; }
+    else if (k === 'streak') p[k] = Math.max(p[k] || 0, A[k]);
+    else if (typeof A[k] === 'number') p[k] = (p[k] || 0) + A[k];
+  }
+  return p;
+}
+function resetAll(){
+  if (SYNC.linked()) SYNC.unlink();
+  const d = TR.d, st = d.st, A = d.arch || {};
+  const add = (k, v) => { A[k] = (A[k] || 0) + (+v || 0); };
+  for (const k of ['games', 'discs', 'rb', 'spent', 'sharks']) add(k, d[k]);
+  for (const k of ['ko', 'doe', 'stag', 'dist', 'missed', 'fires', 'socks', 'slows', 'time', 'combo', 'superC', 'mega', 'giga']) add(k, st[k]);
+  A.streak = Math.max(A.streak || 0, st.streak || 0);
+  for (const m of ['deathBy', 'deathTh']){ A[m] = A[m] || {}; for (const k in st[m] || {}) A[m][k] = (A[m][k] || 0) + (+st[m][k] || 0); }
+  d.arch = A;
+  Object.assign(d, { u:{}, s:{}, games:0, discs:0, sharks:0, th:0, birds:0, rbMiss:0, rb:0, deer:0, deaths:0, spent:0, tried:{}, helmet:0, coins:0, own:{}, eq:{}, eqT: Date.now() });
+  d.st = { combo:0, superC:0, mega:0, giga:0, ko:0, doe:0, stag:0, dist:0, streak:0, missed:0, fires:0, socks:0, slows:0, time:0, deathBy:{}, deathTh:{} };
+  TR.save(); applyEquip();
+  if (typeof BN !== 'undefined'){ for (const k in BN.d.stock) BN.d.stock[k] = 0; BN.d.eq = null; BN.save(); }
+  best = 0; sealedSave('stellyrun_best', '0');
+  refreshTrophyBadge(); showTitleRecord(); setUI.refresh();
+  try { LB.sendStats(); } catch(e){}
+}
+{ const css = document.createElement('style');
+  css.textContent = '#rstbtn{ font-family:inherit; font-weight:700; font-size:max(calc(var(--s)*4.2px),9px); color:#FF8A7A; background:none; border:0; text-decoration:underline; cursor:pointer; padding:calc(var(--s)*1px); }'
+    + '#rstbox{ display:flex; flex-direction:column; align-items:center; gap:calc(var(--s)*3px); max-width:calc(var(--s)*200px); padding:calc(var(--s)*4px) calc(var(--s)*6px); border:calc(var(--s)*1px) solid #FF8A7A; border-radius:calc(var(--s)*3px); background:rgba(255,138,122,.12); }'
+    + '#rstbox[hidden]{ display:none; }'
+    + '#rstbox p{ margin:0; text-align:center; font-weight:600; font-size:max(calc(var(--s)*4.8px),10px); color:#FFD9D3; line-height:1.3; }'
+    + '#rstbox .row{ display:flex; gap:calc(var(--s)*4px); }'
+    + '#rstbox .btn{ font-size:max(calc(var(--s)*6px),11px); padding:calc(var(--s)*1.5px) calc(var(--s)*5px) calc(var(--s)*2px); animation:none; }'
+    + '#rstbox .btn.danger{ background:#E0413A; color:#fff; box-shadow:inset 0 calc(var(--s)*-2px) 0 #A82A2A, 0 calc(var(--s)*2px) 0 var(--plum); }';
+  document.head.appendChild(css);
+  const b = document.createElement('button'); b.id = 'rstbtn'; b.type = 'button';
+  const box = document.createElement('div'); box.id = 'rstbox'; box.hidden = true;
+  box.innerHTML = '<p></p><div class="row"><button type="button" class="btn danger yes"></button><button type="button" class="btn alt no"></button></div>';
+  $('xunlink').after(b, box);
+  const label = () => { b.textContent = txt('rst.btn'); };
+  b.addEventListener('click', e => { e.stopPropagation(); box.querySelector('p').textContent = txt('rst.q') + (SYNC.linked() ? txt('rst.linked') : '');
+    box.querySelector('.yes').textContent = txt('rst.yes'); box.querySelector('.no').textContent = txt('rst.no'); box.hidden = false; b.hidden = true; });
+  box.querySelector('.no').addEventListener('click', e => { e.stopPropagation(); box.hidden = true; b.hidden = false; });
+  box.querySelector('.yes').addEventListener('click', e => { e.stopPropagation(); resetAll(); box.hidden = true; b.hidden = false; sfx.world(); toast(txt('rst.done'), true); });
+  $('setbtn').addEventListener('click', () => { box.hidden = true; b.hidden = false; label(); });
+  label(); }
+
+/* ================= v7.0 : flèches de défilement des Nouvelles ================= */
+// Une flèche en haut et/ou en bas de la liste dès qu'il reste des nouvelles à faire défiler ; un tap sur la flèche fait défiler.
+{ const list = $('newslist');
+  const css = document.createElement('style');
+  css.textContent = '.nscroll{ width:calc(var(--s)*20px); height:calc(var(--s)*7px); display:flex; align-items:center; justify-content:center; padding:0; border:0; background:none; cursor:pointer; flex:none; }'
+    + '.nscroll[hidden]{ visibility:hidden; display:flex; }'
+    + '.nscroll i{ display:block; width:calc(var(--s)*4.5px); height:calc(var(--s)*4.5px); border:solid var(--yellow); border-width:0 calc(var(--s)*1.6px) calc(var(--s)*1.6px) 0; }'
+    + '.nscroll.dn i{ transform:rotate(45deg); animation:nsdn 1.1s ease-in-out infinite; }'
+    + '.nscroll.up i{ transform:rotate(-135deg); animation:nsup 1.1s ease-in-out infinite; }'
+    + '@keyframes nsdn{ 50%{ transform:translateY(calc(var(--s)*1.5px)) rotate(45deg); } }'
+    + '@keyframes nsup{ 50%{ transform:translateY(calc(var(--s)*-1.5px)) rotate(-135deg); } }'
+    + '@media (prefers-reduced-motion: reduce){ .nscroll i{ animation:none !important; } }';
+  document.head.appendChild(css);
+  const mkArrow = cls => { const b = document.createElement('button'); b.type = 'button'; b.className = 'nscroll ' + cls; b.hidden = true; b.appendChild(document.createElement('i')); return b; };
+  const up = mkArrow('up'), dn = mkArrow('dn');
+  list.before(up); list.after(dn);
+  const update = () => { const more = list.scrollHeight - list.clientHeight > 2;
+    up.hidden = !more || list.scrollTop <= 2; dn.hidden = !more || list.scrollTop + list.clientHeight >= list.scrollHeight - 2;
+    up.setAttribute('aria-label', txt('ui.prevPage')); dn.setAttribute('aria-label', txt('ui.nextPage')); };
+  list.addEventListener('scroll', update, { passive:true });
+  up.addEventListener('click', e => { e.stopPropagation(); list.scrollBy({ top: -list.clientHeight*.8, behavior:'smooth' }); });
+  dn.addEventListener('click', e => { e.stopPropagation(); list.scrollBy({ top: list.clientHeight*.8, behavior:'smooth' }); });
+  $('newsbtn').addEventListener('click', () => { list.scrollTop = 0; setTimeout(update, 60); setTimeout(update, 600); });
+  addEventListener('resize', () => setTimeout(update, 100));
+  update(); }
 setTimeout(() => SYNC.now(), 1500);   // synchro au lancement
 
 // le jeu est prêt : barre pleine, fondu, et l'animation d'accueil repart de zéro
