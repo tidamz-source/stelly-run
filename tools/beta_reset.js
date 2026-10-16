@@ -1,12 +1,15 @@
 
 /* ================= BETA : tout remettre à zéro (Réglages) ================= */
 // Efface sur CET appareil : trophées (et les compteurs qui les débloquent), disques, record local.
-// Conserve : record du classement mondial (lbBest), nom et identifiant du classement, accessoires achetés.
+// Efface aussi : accessoires achetés et portés, stock de bonus et bonus équipé.
+// Conserve : record du classement mondial (lbBest), nom et identifiant du classement.
 // L'appareil est délié avant d'effacer (sinon la synchro ramènerait trophées et disques des autres appareils).
 // Les stats déjà envoyées restent comptées dans les stats mondiales : elles sont mises de côté dans d.arch et ajoutées à l'envoi.
 Object.assign(TEXTS, {
   "rst.btn":    { fr:"Tout remettre à zéro", en:"Reset everything", es:"Reiniciar todo" },
-  "rst.q":      { fr:"Effacer tous tes trophées, tes disques et ton record sur cet appareil ? Ton record au classement mondial est conservé.", en:"Erase all your trophies, discs and record on this device? Your world ranking record is kept.", es:"¿Borrar todos tus trofeos, discos y récord en este dispositivo? Tu récord en la clasificación mundial se conserva." },
+  "rst.q":      { fr:"Effacer tous tes trophées, tes disques, tes accessoires, tes bonus et ton record sur cet appareil ? Ton record au classement mondial est conservé.", en:"Erase all your trophies, discs, accessories, boosts and record on this device? Your world ranking record is kept.", es:"¿Borrar todos tus trofeos, discos, accesorios, bonus y récord en este dispositivo? Tu récord en la clasificación mundial se conserva." },
+  "tr.dam.n":   { fr:"La Tenue de Dam", en:"Dam's Outfit", es:"El atuendo de Dam" },
+  "tr.dam.d":   { fr:"Vous avez joué avec la tenue préférée du créateur de Stelly Run", en:"You played in the favourite outfit of Stelly Run's creator", es:"Has jugado con el atuendo favorito del creador de Stelly Run" },
   "rst.linked": { fr:" Cet appareil sera aussi délié de tes autres appareils.", en:" This device will also be unlinked from your other devices.", es:" Este dispositivo también se desvinculará de tus otros dispositivos." },
   "rst.yes":    { fr:"Tout effacer", en:"Erase everything", es:"Borrar todo" },
   "rst.no":     { fr:"Annuler", en:"Cancel", es:"Cancelar" },
@@ -31,9 +34,10 @@ function resetAll(){
   A.streak = Math.max(A.streak || 0, st.streak || 0);
   for (const m of ['deathBy', 'deathTh']){ A[m] = A[m] || {}; for (const k in st[m] || {}) A[m][k] = (A[m][k] || 0) + (+st[m][k] || 0); }
   d.arch = A;
-  Object.assign(d, { u:{}, s:{}, games:0, discs:0, sharks:0, th:0, birds:0, rbMiss:0, rb:0, deer:0, deaths:0, spent:0, tried:{}, helmet:0, coins:0 });
+  Object.assign(d, { u:{}, s:{}, games:0, discs:0, sharks:0, th:0, birds:0, rbMiss:0, rb:0, deer:0, deaths:0, spent:0, tried:{}, helmet:0, coins:0, own:{}, eq:{}, eqT: Date.now() });
   d.st = { combo:0, superC:0, mega:0, giga:0, ko:0, doe:0, stag:0, dist:0, streak:0, missed:0, fires:0, socks:0, slows:0, time:0, deathBy:{}, deathTh:{} };
-  TR.save();
+  TR.save(); applyEquip();
+  if (typeof BN !== 'undefined'){ for (const k in BN.d.stock) BN.d.stock[k] = 0; BN.d.eq = null; BN.save(); }
   best = 0; sealedSave('stellyrun_best', '0');
   refreshTrophyBadge(); showTitleRecord(); setUI.refresh();
   try { LB.sendStats(); } catch(e){}

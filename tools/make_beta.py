@@ -14,7 +14,7 @@ Conventions BETA :
 import pathlib, re, sys
 
 # Numéro de la beta : à incrémenter à chaque nouvelle beta (affiché « v<version du jeu>-b<numéro> »)
-BETA_REV = 11
+BETA_REV = 12
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 src = (ROOT / 'index.html').read_text(encoding='utf-8')
@@ -95,7 +95,10 @@ PATCHES = [
     ("function startGame(){\n  AC.reset();", "function startGame(){\n  if (tutoUI.need()){ tutoUI.open(); return; }\n  AC.reset();", 'tutoriel avant la partie'),
     # Trophées de costumes (Cow Boy, Sur son 31, Prom Queen) : plus cachés, et comptés pour « Greatest » (tous les trophées)
     ("'accro', 'marathon', 'rainbow', 'greatest', 'parzival'];", "'accro', 'marathon', 'rainbow', 'cowboy', 'son31', 'promqueen', 'greatest', 'parzival'];", 'trophées de costumes : liste normale'),
-    ("'flambeur', 'cowboy', 'son31', 'promqueen'];", "'flambeur'];", 'trophées de costumes : plus secrets'),
+    ("'flambeur', 'cowboy', 'son31', 'promqueen'];", "'flambeur', 'dam'];", 'trophées de costumes : plus secrets ; nouveau trophée caché La Tenue de Dam'),
+    # La Tenue de Dam : Casque Viking, lunettes du futur (RPO), Noeud Pap' Rouge, chaussons Bunny
+    ("promqueen:['hat-tiare', 'shoes-heels', 'glasses-demi_lune', 'shirt-red_bow'] };",
+     "promqueen:['hat-tiare', 'shoes-heels', 'glasses-demi_lune', 'shirt-red_bow'], dam:['hat-viking', 'glasses-future', 'shirt-red_bow', 'shoes-bunny'] };", 'La Tenue de Dam : tenue'),
     # Remise à zéro : les stats mises de côté restent comptées dans les stats mondiales
     ("    return JSON.stringify({ name: n || '', games: d.games,", "    return JSON.stringify(statsArchive({ name: n || '', games: d.games,", 'stats mondiales : archive (début)'),
     ("giga: st.giga, deathBy: st.deathBy, deathTh: st.deathTh });", "giga: st.giga, deathBy: st.deathBy, deathTh: st.deathTh }));", 'stats mondiales : archive (fin)'),
