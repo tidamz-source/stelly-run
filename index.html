@@ -3334,7 +3334,16 @@ const tutoUI = (() => {
   const g = cv.getContext('2d'); g.imageSmoothingEnabled = false;
 
   // ---------- petits outils de dessin ----------
-  const stelly = (spr, x, y, a) => { g.globalAlpha = a == null ? 1 : a; g.drawImage(spr, Math.round(x - CX), Math.round(y - FB - PAD)); g.globalAlpha = 1; };
+  // Stelly porte la tenue de Dam complète (Viking, lunettes Future, Noeud Pap' Rouge, Bunny)
+  const DRESS = new Map();
+  function dressed(spr){
+    if (DRESS.has(spr)) return DRESS.get(spr);
+    const eq = {}; for (const id of LOOKS.dam){ const it = shopItem(id); if (it && it.img) eq[it.slot] = it; }
+    if (Object.keys(eq).length < LOOKS.dam.length) return spr;   // boutique pas encore chargée : Stelly sans tenue, on réessaiera
+    const c = mk(spr.width, spr.height); c.opt = spr.opt; paintStelly(c, eq);
+    const t = mk(spr.width, spr.height), tg = t.getContext('2d'); tg.drawImage(c, 0, 0); drawHat(tg, c, 0, 0, eq.hat, 0);
+    DRESS.set(spr, t); return t; }
+  const stelly = (spr, x, y, a) => { g.globalAlpha = a == null ? 1 : a; g.drawImage(dressed(spr), Math.round(x - CX), Math.round(y - FB - PAD)); g.globalAlpha = 1; };
   const at = (img, x, y, a) => { g.globalAlpha = a == null ? 1 : a; g.drawImage(img, Math.round(x - img.width/2), Math.round(y - img.height/2)); g.globalAlpha = 1; };
   const onGround = (img, x) => g.drawImage(img, Math.round(x - img.width/2), GYT - img.height);
   function ring(cx, cy, r, col){ g.fillStyle = col; let x = r, y = 0, e = 1 - r;
@@ -3361,14 +3370,14 @@ const tutoUI = (() => {
   }
 
   // 1. un tap = un saut par-dessus le plot
-  function img1(){ scene(); const x0 = 70, x1 = 190, h = 52;
+  function img1(){ scene(); const x0 = 70, x1 = 190, h = 40;
     onGround(CONES[0], 130); arcDots(x0, x1, h);
     stelly(RUN[0], 46, GYT, .35); stelly(RISE, 88, arcY(88, x0, x1, h), .5); stelly(APEX, 130, arcY(130, x0, x1, h)); stelly(FALL, 172, arcY(172, x0, x1, h), .5);
     // doigt qui tape, avec deux ondes
     const hx = 30, hy = 112; ring(hx + 4, hy + 1, 5, C.white); ring(hx + 4, hy + 1, 9, 'rgba(255,255,255,.55)'); g.drawImage(HAND, hx, hy);
   }
   // 2. les disques se ramassent en sautant dedans
-  function img2(){ scene(); const x0 = 40, x1 = 200, h = 60;
+  function img2(){ scene(); const x0 = 40, x1 = 200, h = 40;
     arcDots(x0, x1, h, 0, .3);
     for (const x of [140, 162, 184]) at(DISC, x, arcY(x, x0, x1, h) - 30);
     txt8('+10', 62, arcY(62, x0, x1, h) - 34); txt8('+20', 84, arcY(84, x0, x1, h) - 40);
@@ -3381,15 +3390,15 @@ const tutoUI = (() => {
     at(CROSS, 192, 40);
   }
   // 4. retomber sur un oiseau : il est assommé, Stelly rebondit
-  function img4(){ scene(); const x0 = 50, x1 = 176, h = 82;
+  function img4(){ scene(); const x0 = 50, x1 = 176, h = 66;
     arcDots(x0, x1, h, 0, .62);
-    const bx = 140, by = 58, bird = FLY_FR.pigeon[1];
+    const bx = 140, by = 72, bird = FLY_FR.pigeon[1];
     g.save(); g.translate(bx, by); g.rotate(Math.PI); g.drawImage(bird, -bird.width/2, -bird.height/2); g.restore();
     for (const [x, y] of [[126, 46], [154, 48]]) at(STAR, x, y);
     stelly(FALL, bx, by - 5); txt8('+100', bx + 30, by - 30);
     stelly(RUN[0], 46, GYT, .35);
     // flèche vers le bas au-dessus de l'oiseau
-    g.fillStyle = C.white; g.strokeStyle = C.plum; const ax = bx - 30, ay = 18; g.fillRect(ax - 1, ay, 3, 12); g.beginPath(); g.moveTo(ax - 5, ay + 11); g.lineTo(ax + 6, ay + 11); g.lineTo(ax + .5, ay + 18); g.closePath(); g.fill();
+    g.fillStyle = C.white; g.strokeStyle = C.plum; const ax = bx - 30, ay = 30; g.fillRect(ax - 1, ay, 3, 12); g.beginPath(); g.moveTo(ax - 5, ay + 11); g.lineTo(ax + 6, ay + 11); g.lineTo(ax + .5, ay + 18); g.closePath(); g.fill();
   }
   const IMGS = [img1, img2, img3, img4];
   let pg = 0, isOpen = false;
