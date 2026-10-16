@@ -14,7 +14,7 @@ Conventions BETA :
 import pathlib, re, sys
 
 # Numéro de la beta : à incrémenter à chaque nouvelle beta (affiché « v<version du jeu>-b<numéro> »)
-BETA_REV = 6
+BETA_REV = 7
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 src = (ROOT / 'index.html').read_text(encoding='utf-8')
@@ -75,7 +75,7 @@ PATCHES = [
     # Biomes : un nouveau biome tous les 10 000 points, ordre fixe en boucle
     # STADE (0) > INDOOR (1) > BEACH (2) > NEIGE (3) > CAMPAGNE (6) > VILLE (4) > FORÊT (5)
     ("    if (zoneT <= 0){ zoneT = 12 + Math.random()*6; do { nt = Math.floor(Math.random()*THEME_NAMES.length); } while (nt === theme); }",
-     "    nt = [0, 1, 2, 3, 6, 4, 5][Math.floor(score/10000) % 7];", 'biomes tous les 10 000 points'),
+     "    nt = [0, 1, 2, 3, 6, 4, 5][(Math.floor(score/10000) + biomeOff) % 7];", 'biomes tous les 10 000 points (biomeOff : Billet de biome)'),
     # Oiseaux : plus d'ondulation, le dessin vole droit à la hauteur exacte de sa hitbox (les ailes battent toujours)
     ("function flyerY(f){ return f.y0 + Math.sin(f.t*f.fs + f.ph)*f.amp + Math.sin(f.t*.8 + f.ph*2)*f.drift; }",
      "function flyerY(f){ return f.y0; }", 'oiseaux sans ondulation'),
@@ -93,6 +93,15 @@ PATCHES = [
      "const room = Math.max(spEff, 190)*.85, start = Math.max(mx - 60, arcEnd + room, x0 + o.w + 1.2*Math.max(spEff, 190)), need = start + 120 + room - x0;", 'rangée haute : piste libre avant'),
     # Tutoriel : avant la toute première partie (clé stellyrun_tuto absente)
     ("function startGame(){\n  AC.reset();", "function startGame(){\n  if (tutoUI.need()){ tutoUI.open(); return; }\n  AC.reset();", 'tutoriel avant la partie'),
+    # Consommables et défis quotidiens : branchements (le code est dans tools/beta_cons.js et tools/beta_daily.js)
+    ("rbAt = TR.rainbowAt(); state = 'play';", "rbAt = TR.rainbowAt(); state = 'play'; consStart(); dqStart();", 'consommables + défis : départ de partie'),
+    ("function die(kind){\n  if (state !== 'play') return;", "function die(kind){\n  if (state !== 'play') return;\n  if (consHit(kind)) return;   // bouclier ou ressort", 'consommables : bouclier et ressort'),
+    ("if (state !== 'pause'){ const n = Math.min(42", "if (state !== 'pause' && state !== 'revive'){ const n = Math.min(42", 'ressort : jeu figé pendant la proposition'),
+    ("  if (state === 'pause'){ resume(); return; }\n  P.hold = true;", "  if (state === 'pause'){ resume(); return; }\n  if (state === 'revive') return;\n  P.hold = true;", 'ressort : pas de saut pendant la proposition'),
+    ("if (trUI.isOpen() || shopUI.isOpen() || lbUI.isOpen()", "if (dqUI.isOpen() || trUI.isOpen() || shopUI.isOpen() || lbUI.isOpen()", 'défis : panneau ouvert'),
+    ("o.missed = true; streak = 0; TR.miss();", "o.missed = true; if (!consGlove()) streak = 0; TR.miss();", 'consommables : gant collant'),
+    ("const gid = newGroup(5); for (let i=0;i<5;i++) discs.push({ x: start + i*30, y: GY - 128, g: gid });",
+     "const gid = newGroup(5); groups[gid].hi = 1; for (let i=0;i<5;i++) discs.push({ x: start + i*30, y: GY - 128, g: gid });", 'défis : rangée haute repérée'),
 ]
 for old, new, label in PATCHES:
     sub_once(old, new, label)
@@ -106,13 +115,21 @@ DBG = r"""
   const b = document.createElement('button'); b.type = 'button'; b.tabIndex = -1; b.textContent = '🧦 donner une chaussette';
   b.style.cssText = 'margin-top:3px;font:10px monospace;padding:3px 8px;border-radius:5px;border:1px solid #fff;background:#7B4FA0;color:#fff';
   b.addEventListener('click', e => { e.stopPropagation(); b.blur(); if (state !== 'play') return; P.sockT = 7; sfx.sock(); toast(txt('toast.superJump')); });
-  d.append(info, b); document.body.appendChild(d);
+  const mkb = (label, fn) => { const x = document.createElement('button'); x.type = 'button'; x.tabIndex = -1; x.textContent = label; x.style.cssText = b.style.cssText + ';display:block;margin:3px auto 0';
+    x.addEventListener('click', e => { e.stopPropagation(); x.blur(); fn(x); }); return x; };
+  const bCoins = mkb('+5 000 disques', () => { TR.d.coins += 5000; TR.save(); toast('+5000'); });
+  const bTuto = mkb('revoir le tuto', () => { tutoUI.reset(); toast('tuto au prochain départ'); });
+  const bDay = mkb('défis : jour suivant', x => { x.textContent = 'défis : ' + dqUI.shiftDay(); });
+  d.append(info, b, bCoins, bTuto, bDay); document.body.appendChild(d);
   setInterval(() => { info.textContent = 'BETA v' + APP_VERSION + '-b""" + str(BETA_REV) + r"""' + ' · chaussette\n' + (state === 'play'
     ? 'vitesse ' + Math.round(spEff) + ' (x' + slowMul.toFixed(2) + ')\nchaussette ' + (P.sockT > 0 ? 'ACTIVE ' + P.sockT.toFixed(1) + ' s' : 'dans ' + Math.max(0, sockIn).toFixed(1) + ' s') + '\nFast Count x' + slowMul.toFixed(2) + ' · ' + (t > 25 ? 'chrono dans ' + Math.max(0, slowIn).toFixed(1) + ' s' : 'pas de chrono avant 25 s')
-    : 'lance une partie'); }, 200); }
+    : 'lance une partie') + '\ndisques en poche ' + TR.d.coins; }, 200); }
 """
-TUTO = open(ROOT / 'tools' / 'beta_tuto.js', encoding='utf-8').read().replace("'stellyrun_", "'stellyrun_test_")
-sub_once('\nrequestAnimationFrame(frame);\n', '\nrequestAnimationFrame(frame);\n' + DBG + TUTO, 'injection debug et tutoriel')
+beta_js = lambda f: open(ROOT / 'tools' / f, encoding='utf-8').read().replace("'stellyrun_", "'stellyrun_test_")
+TUTO = beta_js('beta_tuto.js')
+CONS = beta_js('beta_cons.js')
+DAILY = '\nconst DQ_DATA = ' + open(ROOT / 'tools' / 'beta_defis.json', encoding='utf-8').read().strip() + ';\n' + beta_js('beta_daily.js')
+sub_once('\nrequestAnimationFrame(frame);\n', '\nrequestAnimationFrame(frame);\n' + TUTO + CONS + DAILY + DBG, 'injection tutoriel, consommables, défis et debug')
 
 (ROOT / 'beta.html').write_text(out, encoding='utf-8')
 print('[make_beta] beta.html v' + re.search(r"APP_VERSION = '([^']+)'", src).group(1) + '-b' + str(BETA_REV) + ' généré depuis index.html')
