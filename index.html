@@ -3448,9 +3448,11 @@ const ICO_TICKET = mk(14, 8, g => pm(g, ['oooooooooooooo', 'oyyyy.yyyyyyyo', 'oy
 const ICO_HEART = mk(11, 10, g => pm(g, ['.ooo...ooo.', 'orrro.orrro', 'orwrrorrrro', 'orwrrrrrrro', 'orrrrrrrrro', '.orrrrrrro.', '..orrrrro..',
   '...orrro...', '....oro....', '.....o.....'], 0, 0, false, { o:C.plum, r:'#E8384F', w:'#FFB3BE' }));
 const CONS = [
-  { id:'shield', icon: () => ICO_SHIELD }, { id:'sock', icon: () => SOCK[0] }, { id:'chrono', icon: () => CHRONO[0] },
-  { id:'glove', icon: () => ICO_GLOVE }, { id:'ticket', icon: () => ICO_TICKET }, { id:'heart', icon: () => ICO_HEART }
+  { id:'shield', icon: () => ICO_SHIELD }, { id:'ticket', icon: () => ICO_TICKET }, { id:'heart', icon: () => ICO_HEART }
 ];
+// Chaussette de départ, Chrono de poche et Gant collant retirés de la boutique : le stock déjà acheté est remboursé en disques
+{ let back = 0; for (const id of ['sock', 'chrono', 'glove']){ back += (BN.d.stock[id] || 0)*CONS_PRICE; BN.d.stock[id] = 0; if (BN.d.eq === id) BN.d.eq = null; }
+  if (back){ TR.d.coins += back; TR.save(); } BN.save(); }
 const cvOf = img => { const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; c.getContext('2d').drawImage(img, 0, 0); return c; };
 const coinCv = () => { const c = document.createElement('canvas'); c.width = 9; c.height = 5; c.getContext('2d').drawImage(COIN, 0, 0); return c; };
 const biomeName = k => THEME_NAMES[BIOME_ORDER[k]];
@@ -3486,7 +3488,7 @@ const biomeName = k => THEME_NAMES[BIOME_ORDER[k]];
     + ' background:var(--yellow); color:var(--plum); border:calc(var(--s)*1px) solid var(--plum); border-radius:calc(var(--s)*2px); padding:calc(var(--s)*.5px) calc(var(--s)*1.5px); }'
     + '#shop.bonus .shright{ display:grid; grid-template-columns:auto calc(var(--s)*104px); column-gap:calc(var(--s)*8px); row-gap:calc(var(--s)*5px); align-items:start; }'
     + '#shop.bonus .shtabs{ grid-column:1 / -1; }'
-    + '#shop.bonus #shgrid{ grid-template-columns:repeat(3, calc(var(--s)*36px)); grid-template-rows:repeat(2, calc(var(--s)*36px)); gap:calc(var(--s)*8px) calc(var(--s)*6px); padding-top:calc(var(--s)*3px); }'
+    + '#shop.bonus #shgrid{ grid-template-columns:repeat(3, calc(var(--s)*36px)); grid-template-rows:repeat(1, calc(var(--s)*36px)); gap:calc(var(--s)*8px) calc(var(--s)*6px); padding-top:calc(var(--s)*3px); }'
     + '#bnbub{ position:relative; min-height:calc(var(--s)*80px); padding:calc(var(--s)*4px) calc(var(--s)*5px); background:#F2FBFF; color:#0B2236; border:calc(var(--s)*1.5px) solid #5FD3F5;'
     + ' border-radius:calc(var(--s)*3px); box-shadow:0 calc(var(--s)*3px) 0 rgba(0,0,0,.4); display:flex; flex-direction:column; gap:calc(var(--s)*2px); }'
     + '#bnbub[hidden]{ display:none; }'
@@ -3667,7 +3669,7 @@ const DQ_DATA = {"start":"2026-11-02","plan":[[["F","discsDay",160,"Attrape 160 
 
 /* ================= v7.0 : défis quotidiens (3 par jour, plan de 91 jours en boucle) ================= */
 // le plan (tools/beta_defis.json) est injecté par make_beta.py dans DQ_DATA
-const DQ_REW = { F:60, M:150, D:300 }, DQ_TRIO = 190;
+const DQ_REW = { F:60, M:150, D:300 }, DQ_TRIO = 500;
 const DQ_BOOL = { stompSock:1, stompEarly:1, stompHigh:1, stompShuttle:1, stompGull:1, heros:1, biome:1 };
 const DQ_DAY = { gamesDay:1, timeDay:1, discsDay:1, scoreDay:1, stompsDay:1, socksDay:1, firesDay:1, distDay:1, comboDay:1 };
 const dqUI = (() => {

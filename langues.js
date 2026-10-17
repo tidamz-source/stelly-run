@@ -351,9 +351,9 @@ const TEXTS = {
 const NEWS = [
   { id:'2026-10-17-bonus', date:'2026-10-17', icon:'bonus',
     title:{ fr:'La boutique Bonus est ouverte', en:'The Boosts shop is open', es:'Abre la tienda de Bonus' },
-    text:{ fr:'Nouvel onglet Bonus dans la boutique : Bouclier, Chaussette de départ, Chrono de poche, Gant collant, Billet de biome et Cœur pour ré-animer Stelly. Achète, équipe, et c\u2019est parti !',
-      en:'New Boosts tab in the shop: Shield, Head-start sock, Pocket stopwatch, Sticky glove, Biome ticket and Heart to revive Stelly. Buy, equip and go!',
-      es:'Nueva pestaña Bonus en la tienda: Escudo, Calcetín de salida, Cronómetro de bolsillo, Guante pegajoso, Billete de bioma y Corazón para reanimar a Stelly. ¡Compra, equipa y a correr!' } },
+    text:{ fr:'Nouvel onglet Bonus dans la boutique : Bouclier, Billet de biome et Cœur pour ré-animer Stelly. Achète, équipe, et c\u2019est parti !',
+      en:'New Boosts tab in the shop: Shield, Biome ticket and Heart to revive Stelly. Buy, equip and go!',
+      es:'Nueva pestaña Bonus en la tienda: Escudo, Billete de bioma y Corazón para reanimar a Stelly. ¡Compra, equipa y a correr!' } },
   { id:'2026-10-09-synchro', date:'2026-10-09', icon:'reglages',
     title:{ fr:'Joue sur tous tes appareils', en:'Play on all your devices', es:'Juega en todos tus dispositivos' },
     text:{ fr:'Lie ton ordi et ton téléphone avec un code depuis la roue dentée : trophées, disques et stats se synchronisent tout seuls.',
