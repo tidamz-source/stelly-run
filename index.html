@@ -600,9 +600,9 @@ __ld(10); setTimeout(() => { const L = document.getElementById('loader'); if (L)
   </div>
 </div>
 <script>__ld(30);</script>
-<script src="langues.js?v=7.0"></script>
+<script src="langues.js?v=7.1"></script>
 <script>__ld(45);</script>
-<script src="stelly.js?v=7.0"></script>
+<script src="stelly.js?v=7.1"></script>
 <script>__ld(60);</script>
 <script>
 /* ================= Langues ================= */
@@ -1424,6 +1424,46 @@ const MUSIC = (() => {
     [71,'.',75,'.',78,'.',75,'.',71,'.',75,'.',78,'.',83,'-']
   ];
   const ROOTS = [40, 40, 36, 38, 40, 40, 36, 35];           // Mi Mi Do Ré | Mi Mi Do Si (le Si majeur crée la tension)
+  // ---- morceau en sections (≈ 85 s avant de boucler) ----
+  // intro · couplet · couplet (lead doublé) · montée · refrain · break · solo · montée · refrain, puis on reboucle sur le couplet
+  // gtr : P = accord, x = palm mute, H = accord tenu ; dr = style de batterie
+  const SEC = {
+    intro: { roots:[40, 40, 36, 35], dr:'intro', gtr:['x.x.x.x.x.x.x.x.', 'x.x.x.x.x.x.x.x.', 'x.xxx.xxx.xxx.xx', 'P..P..P.x.x.PPPP'] },
+    A:     { roots:ROOTS, mel:MEL, dr:'rock' },
+    A2:    { roots:ROOTS, mel:MEL, dr:'rock', oct:true },
+    B:     { roots:[33, 33, 36, 35], dr:'build', gtr:['H.......H.......', 'H.......H.......', 'H.......H.......', 'P.P.P.P.PPPPPPPP'], mel:[
+      [69,'-','-','.',72,'-','-','.',71,'-',69,'-',67,'-',69,'-'],
+      [72,'-','-','.',76,'-','-','.',74,'-',72,'-',71,'-',72,'-'],
+      [72,'-',74,'-',76,'-',79,'-',76,'-',74,'-',72,'-',74,'-'],
+      [75,'-','-','-',78,'-','-','-',81,'-','-','-',83,'-','-','-'] ] },
+    C:     { roots:[43, 38, 40, 36, 43, 38, 36, 35], dr:'chorus', gtr:['P.xxP.xxP.xxP.xx'], mel:[
+      [79,'-','-','.',79,'-',78,'-',79,'-',83,'-',81,'-',79,'-'],
+      [78,'-','-','.',74,'-','-','.',74,'-',76,'-',78,'-',81,'-'],
+      [79,'-','-','.',76,'-','-','.',71,'-',74,'-',76,'-','-','.'],
+      [72,'-',76,'-',79,'-',84,'-',83,'-',79,'-',76,'-',74,'-'],
+      [79,'-','-','.',79,'-',78,'-',79,'-',83,'-',81,'-',79,'-'],
+      [78,'-','-','.',81,'-','-','.',83,'-',81,'-',78,'-',74,'-'],
+      [76,'-','-','-',79,'-','-','-',84,'-','-','-',83,'-',81,'-'],
+      [83,'-','-','-','-','-','-','-',78,'-',75,'-',71,'-','.','.'] ] },
+    BR:    { roots:[40, 40, 36, 35], dr:'half', echo:true, gtr:['H...............', 'H...............', 'H...............', 'P..P..P.x.x.PPPP'], mel:[
+      [76,'-','-','-','.','.','.','.',71,'-',74,'-',76,'-','-','-'],
+      ['.','.','.','.','.','.','.','.',79,'-',78,'-',76,'-',74,'-'],
+      [72,'-','-','-','.','.','.','.',76,'-',79,'-',84,'-','-','-'],
+      [83,'-','-','-',78,'-','-','-',75,'-','-','-',71,'-','-','-'] ] },
+    SOLO:  { roots:ROOTS, dr:'rock', mel:[
+      [76,79,83,79,76,79,83,88,86,83,79,83,86,83,79,76],
+      [74,76,79,76,74,71,74,76,79,81,83,81,79,76,74,71],
+      [72,76,79,84,79,76,72,76,79,84,88,84,79,76,72,67],
+      [74,78,81,86,81,78,74,78,81,86,'-','-',84,'-',83,'-'],
+      [76,79,83,79,76,79,83,88,86,83,79,83,86,83,79,76],
+      [83,'-',81,79,81,'-',79,76,79,'-',76,74,76,'-',74,71],
+      [72,74,76,79,76,79,84,79,84,88,84,88,91,'-','-','.'],
+      [83,'-',81,'-',78,'-',75,'-',71,'-',75,'-',78,'-',83,'-'] ] }
+  };
+  const ORDER = ['intro', 'A', 'A2', 'B', 'C', 'BR', 'SOLO', 'B', 'C'];
+  const BARS = []; ORDER.forEach(k => SEC[k].roots.forEach((r, b) => BARS.push({ X: SEC[k], b })));
+  const LOOP_AT = SEC.intro.roots.length;   // après l'intro, on reboucle sur le couplet
+  const barAt = n => n < BARS.length ? BARS[n] : BARS[LOOP_AT + (n - LOOP_AT) % (BARS.length - LOOP_AT)];
   const GTR  = ['P.xx.xxxP.xx.xxx', 'P.xx.xxxP.xx.xxx', 'P.xx.xxxP.xx.xxx', 'P..P..P.x.x.PPPP'];   // P = accord plein, x = palm mute
   const KICK = 'k.......k.k.....', SNARE = '....s.......s...', HATS = 'h.h.h.h.h.h.h.h.';
   const SONGS = {
@@ -1509,33 +1549,70 @@ const MUSIC = (() => {
     if (kind === 'o'){ burst(t, 'highpass', 7000, .12, vol*.6); return; }
     burst(t, 'highpass', 8500, .035, vol*.45);
   }
-  function holdLen(bar, i){ let n = 1; while (i + n < 16 && MEL[bar][i + n] === '-') n++; return n; }
+  function holdLen(row, i){ let n = 1; while (i + n < 16 && row[i + n] === '-') n++; return n; }
+  function drums(t, dr, b, i, nb, lv){
+    const turn = b % 4 === 3, last = b === nb - 1;
+    if (API.fire){   // invincibilité : double grosse caisse et charleston serré, quelle que soit la section
+      if (i === 0 && b % 4 === 0) drum(t, 'cr', lv);
+      if (i % 2 === 0) drum(t, 'k', lv); if (i === 4 || i === 12) drum(t, 's', lv); drum(t, 'h', lv*(i % 2 ? .6 : 1)); return; }
+    if (dr === 'intro'){
+      if (b >= 2 && i % 4 === 0) drum(t, 'k', lv);
+      if (last && i >= 8) drum(t, 's', lv*(.4 + (i - 8)*.08));
+      else if (i % 2 === 0) drum(t, 'h', lv*(b < 2 ? .5 : .8));
+      return; }
+    if (dr === 'build'){
+      if (i === 0 && b === 0) drum(t, 'cr', lv);
+      if (i % 4 === 0) drum(t, 'k', lv);
+      if (last){ if (i % (i >= 8 ? 1 : 2) === 0) drum(t, 's', lv*(.6 + i*.03)); }
+      else { if (i === 4 || i === 12) drum(t, 's', lv); if (i % 2 === 0) drum(t, 'h', lv*.8); }
+      return; }
+    if (dr === 'chorus'){
+      if (i === 0 && b % 2 === 0) drum(t, 'cr', lv);
+      if (i % 4 === 0 || i === 10) drum(t, 'k', lv);
+      if (last && i >= 12){ drum(t, i % 2 ? 't' : 's', lv); return; }
+      if (i === 4 || i === 12) drum(t, 's', lv);
+      if (i % 2 === 0) drum(t, i % 4 === 2 ? 'o' : 'h', lv);
+      return; }
+    if (dr === 'half'){
+      if (i === 0 && b === 0) drum(t, 'cr', lv);
+      if (i === 0 || i === 10) drum(t, 'k', lv);
+      if (last && i >= 12){ drum(t, i % 2 ? 't' : 's', lv); return; }
+      if (i === 8) drum(t, 's', lv);
+      if (i % 4 === 0) drum(t, 'h', lv*.7);
+      return; }
+    // rock (couplet et solo) : le groove d'origine
+    if (i === 0 && b % 4 === 0) drum(t, 'cr', lv);
+    if (KICK[i] === 'k') drum(t, 'k', lv);
+    if (turn && i >= 12){ drum(t, i % 2 ? 't' : 's', lv); }
+    else if (SNARE[i] === 's') drum(t, 's', lv);
+    if (HATS[i] === 'h') drum(t, i % 4 === 2 ? 'o' : 'h', lv);
+  }
   function schedule(t, st){
-    const S = song, bar = Math.floor(st/16) % S.bars, i = st % 16, sd = 60/(S.bpm*API.tempo)/4, lv = S.lv;
-    const root = ROOTS[bar] + S.tr, turn = bar % 4 === 3;
+    const S = song, n = Math.floor(st/16), i = st % 16, sd = 60/(S.bpm*API.tempo)/4, lv = S.lv;
+    // écran titre : le couplet seul, en boucle ; en partie : le morceau complet
+    const B = S.drums ? barAt(n) : { X: SEC.A, b: n % 8 }, X = B.X, b = B.b, nb = X.roots.length;
+    const root = X.roots[b] + S.tr, turn = b % 4 === 3;
     // guitare rythmique
-    const pat = S.gtr || GTR[bar % 4], c = pat[i];
+    const pat = S.gtr || (X.gtr ? X.gtr[b % X.gtr.length] : GTR[b % 4]), c = pat[i];
     if (c === 'P') voice(t, N(root + 12), sd*(turn ? 1.6 : 1.8), 'gtr', lv*.32, false);
     else if (c === 'x') voice(t, N(root + 12), sd*.7, 'chug', lv*.42, false);
-    // basse aux croches, marche à la fin des mesures de transition
-    if (i % 2 === 0){ const walk = turn && i >= 12 ? [0, 3, 5, 7][(i - 12)/2 | 0] || 0 : 0; voice(t, N(root + walk), sd*1.7, 'rbass', lv*1.1, false); }
-    // lead
-    if (S.lead){ const m = MEL[bar][i]; if (typeof m === 'number') voice(t, N(m + S.tr), holdLen(bar, i)*sd*.92, 'lead', lv*.36, S.echo); }
+    else if (c === 'H') voice(t, N(root + 12), sd*7.4, 'gtr', lv*.26, false);
+    // basse : croches (noires pendant le break), marche à la fin des mesures de transition
+    if (X.dr === 'half'){ if (i % 4 === 0) voice(t, N(root), sd*3.4, 'rbass', lv*1.1, false); }
+    else if (i % 2 === 0){ const walk = turn && i >= 12 ? [0, 3, 5, 7][(i - 12)/2 | 0] || 0 : 0; voice(t, N(root + walk), sd*1.7, 'rbass', lv*1.1, false); }
+    // lead (doublé à l'octave grave au 2e couplet)
+    if (S.lead && X.mel){ const m = X.mel[b][i];
+      if (typeof m === 'number'){ const d = holdLen(X.mel[b], i)*sd*.92; voice(t, N(m + S.tr), d, 'lead', lv*.36, S.echo || X.echo); if (X.oct) voice(t, N(m + S.tr - 12), d, 'lead', lv*.2, false); } }
     // batterie
-    if (S.drums){
-      if (i === 0 && bar % 4 === 0) drum(t, 'cr', lv);
-      if (KICK[i] === 'k' || (API.fire && i % 2 === 0)) drum(t, 'k', lv);
-      if (turn && i >= 12){ drum(t, i % 2 ? 't' : 's', lv); }
-      else if (SNARE[i] === 's') drum(t, 's', lv);
-      if (API.fire) drum(t, 'h', lv*(i % 2 ? .6 : 1)); else if (HATS[i] === 'h') drum(t, i % 4 === 2 ? 'o' : 'h', lv);
-    } else if (i % 4 === 0) drum(t, 'h', lv*.6);
+    if (S.drums) drums(t, X.dr, b, i, nb, lv); else if (i % 4 === 0) drum(t, 'h', lv*.6);
   }
   function tick(){
     if (!actx || !running || paused || !song) return;
     while (nextT < actx.currentTime + .14){
       schedule(nextT, step);
       nextT += 60/(song.bpm*API.tempo)/4; step++;
-      if (step % 16 === 0){ if (next){ song = next; next = null; step = 0; } else if (step >= song.bars*16) step = 0; }
+      // changement de biome : nouveau son, mais le morceau continue là où il en est
+      if (step % 16 === 0 && next){ song = next; next = null; }
     }
   }
   setInterval(tick, 25);
@@ -1588,7 +1665,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '7.0';
+const APP_VERSION = '7.1';
 // icônes de trophées retouchées dans l'atelier (trophees.json) : remplacent celles dessinées par le code
 const TR_OVR = {}; let TR_OVR_N = 0;
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
