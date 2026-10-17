@@ -2593,12 +2593,17 @@ function smash(o){
 // Stelly retombe sur la tête d'un animal volant : il est assommé, elle rebondit ; enchaîner sans toucher le sol multiplie les points
 // bonus d'altitude (points de base seulement) : bas x1, milieu x1,5, haut x2
 const ALT_MULT = [1, 1.5, 2];
+// oiseau assommé : bas 250, milieu 500, haut 1000 (aussi quand Stelly le percute en invincibilité)
+const BIRD_PTS = [250, 500, 1000];
+function birdKO(f, fy){
+  const tier = f.tier || 0, pts = BIRD_PTS[tier]; bonus += pts;
+  pops.push({ x:f.x, y:fy - 14, s: '+' + pts, t:0, col: C.yellow });
+  koCount++; TR.stomp(f.sp, f.tier); return tier;
+}
 function stomp(f, fy){
   f.ko = true; f.ky = flyerY(f); f.kvy = -60; f.kr = 0;
   P.vy = -(P.sockT > 0 ? 420 : (P.hold ? 340 : 290)); P.y = Math.min(P.y, fy - FLY_SPECS[f.sp].hh);
-  const tier = f.tier || 0, pts = Math.round(100*ALT_MULT[tier]); bonus += pts;   // 100 / 150 / 200
-  pops.push({ x:f.x, y:fy - 14, s: '+' + pts, t:0, col: C.yellow });
-  koCount++; TR.stomp(f.sp, f.tier); sfx.stomp(1 + tier*2); shake = Math.max(shake, .06);
+  const tier = birdKO(f, fy); sfx.stomp(1 + tier*2); shake = Math.max(shake, .06);
   burst(f.x, fy - 4, 10, [C.white, C.yellow, '#E6DCF0'], 70, 160);
 }
 function catchDisc(o){
@@ -2701,7 +2706,7 @@ function update(dt){
         const mid = f.tier === 1;
         if (!P.ground && P.vy > (mid ? -60 : 40) && P.y < fy + (mid ? 9 : 3)){ stomp(f, fy); continue; }
         if (!(Math.abs(f.x - P.x) < S.hw*.5 + 7 && fy + S.hh*.6 > P.y - 46 && fy - S.hh*.6 < P.y - 2)) continue;   // frôlé sans être touché
-        if (fireT > 0 || graceT > 0){ f.gone = true; debris.push({ img: f.sp === 'shuttle' ? SHUTTLE : FLY_FR[f.sp][1], x: f.x - S.w/2, y: fy - S.h/2, vx: 220, vy: -260, rot: 0, vr: 14 }); sfx.smash(); }
+        if (fireT > 0 || graceT > 0){ f.gone = true; birdKO(f, fy); debris.push({ img: f.sp === 'shuttle' ? SHUTTLE : FLY_FR[f.sp][1], x: f.x - S.w/2, y: fy - S.h/2, vx: 220, vy: -260, rot: 0, vr: 14 }); sfx.smash(); }
         else { die(f.sp); break; }
       }
     }
@@ -3395,7 +3400,7 @@ const tutoUI = (() => {
     const bx = 140, by = 72, bird = FLY_FR.pigeon[1];
     g.save(); g.translate(bx, by); g.rotate(Math.PI); g.drawImage(bird, -bird.width/2, -bird.height/2); g.restore();
     for (const [x, y] of [[126, 46], [154, 48]]) at(STAR, x, y);
-    stelly(FALL, bx, by - 5); txt8('+100', bx + 30, by - 30);
+    stelly(FALL, bx, by - 5); txt8('+250', bx + 30, by - 30);
     stelly(RUN[0], 46, GYT, .35);
     // flèche vers le bas au-dessus de l'oiseau
     g.fillStyle = C.white; g.strokeStyle = C.plum; const ax = bx - 30, ay = 30; g.fillRect(ax - 1, ay, 3, 12); g.beginPath(); g.moveTo(ax - 5, ay + 11); g.lineTo(ax + 6, ay + 11); g.lineTo(ax + .5, ay + 18); g.closePath(); g.fill();
@@ -3595,7 +3600,7 @@ const hudC = document.createElement('div'); hudC.id = 'conshud'; $('hi').after(h
 function hudRefresh(){
   hudC.textContent = '';
   const chip = (img, n) => { const s = document.createElement('span'); s.appendChild(cvOf(img)); if (n != null) s.append('×' + n); hudC.appendChild(s); };
-  if (RUN_C.heart && !RUN_C.heartUsed) chip(ICO_HEART, BN.d.stock.heart);
+  if (RUN_C.heart && !RUN_C.heartUsed) chip(ICO_HEART);
   if (RUN_C.shield) chip(ICO_SHIELD);
   if (RUN_C.glove) chip(ICO_GLOVE);
   if (RUN_C.chrono){ const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', txt('cons.chrono.n')); b.appendChild(cvOf(CHRONO[0]));
