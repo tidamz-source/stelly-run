@@ -299,6 +299,8 @@ const TEXTS = {
   "tr.son31.d": { fr:"Élégant en toute circonstance", en:"Elegant in every circumstance", es:"Elegante en cualquier circunstancia" },
   "tr.promqueen.n": { fr:"Prom Queen", en:"Prom Queen", es:"Reina del baile" },
   "tr.promqueen.d": { fr:"La plus belle pour aller danser", en:"The belle of the ball", es:"La más guapa para ir a bailar" },
+  "tr.mercury.n": { fr:"Stelly Mercury", en:"Stelly Mercury", es:"Stelly Mercury" },
+  "tr.mercury.d": { fr:"Bohemian Rhapsody", en:"Bohemian Rhapsody", es:"Bohemian Rhapsody" },
   // v7.3 : manette
   "pad.on":     { fr:"Manette connectée : A pour sauter", en:"Controller connected: A to jump", es:"Mando conectado: A para saltar" },
   // v7.0 : tutoriel, boutique Bonus, Cœur, défis du jour, remise à zéro, récompenses de trophées
