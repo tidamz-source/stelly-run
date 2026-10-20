@@ -1,6 +1,6 @@
 /* Stelly Run : service worker
    Pour publier une mise à jour du jeu : modifier VERSION ci-dessous. */
-const VERSION = 'stelly-run-v7.4';
+const VERSION = 'stelly-run-v7.5';
 const FILES = [
   './',
   './index.html',
