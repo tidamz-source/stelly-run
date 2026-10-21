@@ -14,7 +14,7 @@ Conventions BETA :
 import pathlib, re, sys
 
 # Numéro de la beta : à incrémenter à chaque nouvelle beta (affiché « v<version du jeu>-b<numéro> »)
-BETA_REV = 1
+BETA_REV = 2
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 src = (ROOT / 'index.html').read_text(encoding='utf-8')
@@ -46,8 +46,35 @@ out = out[:i] + GUARD + out[i:]
 sub_once("navigator.serviceWorker.register('sw.js')", "Promise.resolve()", 'service worker')
 
 # 5. PATCHES de gameplay BETA (vides pour l'instant)
-# Modifs de gameplay à tester dans la beta (old, new, libellé). Vide : tout a été basculé dans le vrai jeu en v7.0.
-PATCHES = []
+# Modifs de gameplay à tester dans la beta (old, new, libellé).
+# b2 : squash & stretch léger de Stelly (étirée au décollage et en l'air, écrasée à l'atterrissage)
+SQUASH = r"""
+/* ================= BETA b2 : squash & stretch ================= */
+// décollage : étirée en hauteur (0,12 s) · en l'air : étirée selon la vitesse, normale au sommet · atterrissage : écrasée (0,16 s, selon la hauteur de chute)
+var sqJ = 0, sqT = 0, sqA = 0;
+const SQ_JUMP = .12, SQ_LAND = .16;
+function sqLand(vy){ if (state !== 'play') return; sqA = Math.min(1, Math.max(.35, vy/700)); sqT = SQ_LAND; }
+function sqApply(c){
+  if (state !== 'play' && state !== 'pause') return;
+  let sx = 1, sy = 1;
+  if (!P.ground && !P.sink){ const s = Math.min(1, Math.abs(P.vy)/460)*.10; sy += s; sx -= s*.6; }
+  if (sqJ > 0){ const k = sqJ/SQ_JUMP; sy += .08*k; sx -= .05*k; }
+  if (sqT > 0){ const k = sqT/SQ_LAND, q = sqA*.22*k*k; sy -= q; sx += q*.8; }
+  if (sx === 1 && sy === 1) return;
+  const ax = Math.round(P.x), ay = Math.round(P.y);   // ancrage : sous les baskets
+  c.imageSmoothingEnabled = false; c.translate(ax, ay); c.scale(sx, sy); c.translate(-ax, -ay);
+}
+"""
+PATCHES = [
+  ("if (P.sink){ ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, GY + 3); ctx.clip(); }",
+   "if (P.sink){ ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, GY + 3); ctx.clip(); }\n    ctx.save(); sqApply(ctx);", 'squash : transformation'),
+  ("    if (P.sink) ctx.restore();\n  }\n",
+   "    ctx.restore();\n    if (P.sink) ctx.restore();\n  }\n", 'squash : fin de transformation'),
+  ("P.buf -= dt; P.land -= dt;", "P.buf -= dt; P.land -= dt; sqJ = Math.max(0, sqJ - dt); sqT = Math.max(0, sqT - dt);", 'squash : minuteries'),
+  ("P.vy = -(P.sockT > 0 ? 460 : 330); P.ground = false; P.buf = 0;", "P.vy = -(P.sockT > 0 ? 460 : 330); P.ground = false; P.buf = 0; sqJ = SQ_JUMP; sqT = 0;", 'squash : décollage'),
+  ("if (P.y >= GY){ P.y = GY; P.vy = 0; P.ground = true;", "if (P.y >= GY){ sqLand(P.vy); P.y = GY; P.vy = 0; P.ground = true;", 'squash : atterrissage'),
+  ("\n// le jeu est prêt : barre pleine", SQUASH + "\n// le jeu est prêt : barre pleine", 'squash : module'),
+]
 for old, new, label in PATCHES:
     sub_once(old, new, label)
 
