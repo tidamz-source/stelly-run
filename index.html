@@ -600,9 +600,9 @@ __ld(10); setTimeout(() => { const L = document.getElementById('loader'); if (L)
   </div>
 </div>
 <script>__ld(30);</script>
-<script src="langues.js?v=7.12"></script>
+<script src="langues.js?v=7.13"></script>
 <script>__ld(45);</script>
-<script src="stelly.js?v=7.12"></script>
+<script src="stelly.js?v=7.13"></script>
 <script>__ld(60);</script>
 <script>
 /* ================= Langues ================= */
@@ -1665,7 +1665,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '7.12';
+const APP_VERSION = '7.13';
 // icônes de trophées retouchées dans l'atelier (trophees.json) : remplacent celles dessinées par le code
 const TR_OVR = {}; let TR_OVR_N = 0;
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
@@ -2737,9 +2737,9 @@ function update(dt){
   }
   if (state === 'play'){
     nextObs -= dx; if (nextObs <= 0){ if (birdWait || flyers.some(f => !f.ko && f.x > P.x - 24)) nextObs = 4; else spawnObstacle(); }
-    P.buf -= dt; P.land -= dt;
+    P.buf -= dt; P.land -= dt; sqJ = Math.max(0, sqJ - dt); sqT = Math.max(0, sqT - dt);
     if (P.buf > 0 && P.ground){
-      P.vy = -(P.sockT > 0 ? 460 : 330); P.ground = false; P.buf = 0; sfx.jump(); dust(P.x-2, GY-1, 6);
+      P.vy = -(P.sockT > 0 ? 460 : 330); P.ground = false; P.buf = 0; sqJ = SQ_JUMP; sqT = 0; sfx.jump(); dust(P.x-2, GY-1, 6);
       if (P.sockT > 0) burst(P.x-8, P.y-4, 8, [C.white, '#E6DCF0'], 60, 80);
     }
     { const tg = fireT > 0 ? 1.3 : 1; MUSIC.tempo += (tg - MUSIC.tempo) * Math.min(1, dt*(tg > MUSIC.tempo ? 4 : 1.5)); MUSIC.fire = fireT > 0; }
@@ -2753,7 +2753,7 @@ function update(dt){
     else if (!P.ground){
       const g = P.vy < 0 ? (P.hold && state === 'play' ? 1000 : 2400) : 1600;
       P.vy += g*dt; P.y += P.vy*dt;
-      if (P.y >= GY){ P.y = GY; P.vy = 0; P.ground = true; P.stomps = 0; if (state === 'play'){ P.land = .09; dust(P.x, GY-1, 5); } }
+      if (P.y >= GY){ sqLand(P.vy); P.y = GY; P.vy = 0; P.ground = true; P.stomps = 0; if (state === 'play'){ P.land = .09; dust(P.x, GY-1, 5); } }
     }
   }
 
@@ -3226,6 +3226,7 @@ function draw(){
     else if (P.land > 0) spr = LAND;
     else spr = RUN[Math.floor(P.anim) % RUN_N];
     if (P.sink){ ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, GY + 3); ctx.clip(); }
+    ctx.save(); sqApply(ctx);
     if (fireT > 0 && state === 'play'){
       const col = Math.floor(clock*14) % 2 ? 'rgba(122,87,160,.7)' : 'rgba(255,255,255,.75)';
       ctx.globalAlpha = .25; ctx.drawImage(tinted(spr, 'rgba(128,88,162,.85)'), px - 14, py); ctx.globalAlpha = .45; ctx.drawImage(TMP, px - 7, py); ctx.globalAlpha = 1;
@@ -3233,6 +3234,7 @@ function draw(){
     } else { if ((graceT > 0 || safeT > 0) && state === 'play' && Math.floor(clock*16) % 2) ctx.globalAlpha = .4; ctx.drawImage(spr, px, py); drawHat(ctx, spr, px, py, EQUIPPED.hat, clock); drawSheen(ctx, spr, px, py, EQUIPPED.shirt, clock); ctx.globalAlpha = 1; }
     const blink = P.sockT > 0 && P.sockT < 1.6 && Math.floor(clock*10)%2;
     if (P.sockT > 0 && !blink && state === 'play' && spr.ank){ const f = Math.floor(clock*14)%2; for (const a of spr.ank) ctx.drawImage(HEEL_WINGS[f], px + a[0] - 10, py + a[1] - 3 - f); }
+    ctx.restore();
     if (P.sink) ctx.restore();
   }
 
@@ -4087,6 +4089,22 @@ function drawSheen(ctx, spr, x, y, it, tm){
   css.textContent = '.tr.locked > canvas:first-child{ filter:grayscale(.35) brightness(.78); }'
     + '.tr .lock{ position:absolute; bottom:calc(var(--s)*-4px); left:50%; transform:translateX(-50%); width:calc(var(--s)*7px); height:auto; image-rendering:pixelated; }';
   document.head.appendChild(css); }
+
+/* ================= v7.13 : squash & stretch ================= */
+// décollage : étirée en hauteur (0,12 s) · en l'air : étirée selon la vitesse, normale au sommet · atterrissage : écrasée (0,16 s, selon la hauteur de chute)
+var sqJ = 0, sqT = 0, sqA = 0;
+const SQ_JUMP = .12, SQ_LAND = .16;
+function sqLand(vy){ if (state !== 'play') return; sqA = Math.min(1, Math.max(.35, vy/700)); sqT = SQ_LAND; }
+function sqApply(c){
+  if (state !== 'play' && state !== 'pause') return;
+  let sx = 1, sy = 1;
+  if (!P.ground && !P.sink){ const s = Math.min(1, Math.abs(P.vy)/460)*.10; sy += s; sx -= s*.6; }
+  if (sqJ > 0){ const k = sqJ/SQ_JUMP; sy += .08*k; sx -= .05*k; }
+  if (sqT > 0){ const k = sqT/SQ_LAND, q = sqA*.22*k*k; sy -= q; sx += q*.8; }
+  if (sx === 1 && sy === 1) return;
+  const ax = Math.round(P.x), ay = Math.round(P.y);   // ancrage : sous les baskets
+  c.imageSmoothingEnabled = false; c.translate(ax, ay); c.scale(sx, sy); c.translate(-ax, -ay);
+}
 
 // le jeu est prêt : barre pleine, fondu, et l'animation d'accueil repart de zéro
 __ld(85);
