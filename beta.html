@@ -601,9 +601,9 @@ __ld(10); setTimeout(() => { const L = document.getElementById('loader'); if (L)
   </div>
 </div>
 <script>__ld(30);</script>
-<script src="langues.js?v=7.12"></script>
+<script src="langues.js?v=7.13"></script>
 <script>__ld(45);</script>
-<script src="stelly.js?v=7.12"></script>
+<script src="stelly.js?v=7.13"></script>
 <script>__ld(60);</script>
 <script>
 /* ================= Langues ================= */
@@ -1666,7 +1666,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '7.12';
+const APP_VERSION = '7.13';
 // icônes de trophées retouchées dans l'atelier (trophees.json) : remplacent celles dessinées par le code
 const TR_OVR = {}; let TR_OVR_N = 0;
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
@@ -4127,7 +4127,7 @@ function drawSheen(ctx, spr, x, y, it, tm){
     + '.tr .lock{ position:absolute; bottom:calc(var(--s)*-4px); left:50%; transform:translateX(-50%); width:calc(var(--s)*7px); height:auto; image-rendering:pixelated; }';
   document.head.appendChild(css); }
 
-/* ================= BETA b2 : squash & stretch ================= */
+/* ================= v7.13 : squash & stretch ================= */
 // décollage : étirée en hauteur (0,12 s) · en l'air : étirée selon la vitesse, normale au sommet · atterrissage : écrasée (0,16 s, selon la hauteur de chute)
 var sqJ = 0, sqT = 0, sqA = 0;
 const SQ_JUMP = .12, SQ_LAND = .16;
