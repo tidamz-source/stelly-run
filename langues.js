@@ -301,6 +301,11 @@ const TEXTS = {
   "tr.promqueen.d": { fr:"La plus belle pour aller danser", en:"The belle of the ball", es:"La más guapa para ir a bailar" },
   "tr.mercury.n": { fr:"Stelly Mercury", en:"Stelly Mercury", es:"Stelly Mercury" },
   "tr.mercury.d": { fr:"Bohemian Rhapsody", en:"Bohemian Rhapsody", es:"Bohemian Rhapsody" },
+  // v7.12 : récompenses de trophées en boutique
+  "item.shirt-adamantium": { fr:"Armure d’adamantium", en:"Adamantium Armor", es:"Armadura de adamantio" },
+  "shop.locked":     { fr:"récompense de trophée", en:"trophy reward", es:"recompensa de trofeo" },
+  "shop.trophyLock": { fr:"Pas à vendre : récompense du trophée {t} ({d})", en:"Not for sale: reward of the {t} trophy ({d})", es:"No está a la venta: recompensa del trofeo {t} ({d})" },
+  "shop.trophyGot":  { fr:"{name} débloquée !", en:"{name} unlocked!", es:"¡{name} desbloqueada!" },
   // v7.3 : manette
   "pad.on":     { fr:"Manette connectée : A pour sauter", en:"Controller connected: A to jump", es:"Mando conectado: A para saltar" },
   // v7.0 : tutoriel, boutique Bonus, Cœur, défis du jour, remise à zéro, récompenses de trophées
