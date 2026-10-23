@@ -369,8 +369,8 @@ body.obs .accOnly{ display:none !important; }
   </section>
 </main>
 
-<script src="langues.js?v=7.14"></script>
-<script src="stelly.js?v=7.14"></script>
+<script src="langues.js?v=7.15"></script>
+<script src="stelly.js?v=7.15"></script>
 <script>
 (() => {
 'use strict';
@@ -535,7 +535,7 @@ function problems(){
     if (seen.has(it.id)) out.push(Object.assign({ txt:'Identifiant en double : ' + it.id }, go)); seen.add(it.id);
     if (!/^(hat|glasses|shirt|shoes)-[a-z0-9_]+$/.test(it.id)) out.push(Object.assign({ txt:nm + ' : identifiant invalide' }, go));
     for (const l of ['fr', 'en', 'es']) if (!it.name || !String(it.name[l] || '').trim()) out.push(Object.assign({ txt:nm + ' : nom ' + l.toUpperCase() + ' manquant' }, go));
-    if (!(Number.isInteger(it.price) && it.price > 0)) out.push(Object.assign({ txt:nm + ' : prix invalide' }, go));
+    if (!it.trophy && !(Number.isInteger(it.price) && it.price > 0)) out.push(Object.assign({ txt:nm + ' : prix invalide' }, go));
     if (!it.src) out.push(Object.assign({ txt:nm + ' : ' + { hat:'image 1 vide', glasses:'lunettes vides', shirt:'vignette manquante', shoes:'pied avant vide' }[it.slot] }, go));
   }
   return out;
@@ -564,11 +564,11 @@ function renderSlots(){
 }
 function renderList(){
   const box = $('items'); box.innerHTML = '';
-  const list = DATA.items.filter(x => x.slot === slot).sort((a, b) => (a.price || 0) - (b.price || 0) || ((a.name && a.name.fr) || '').localeCompare((b.name && b.name.fr) || ''));
+  const list = DATA.items.filter(x => x.slot === slot).sort((a, b) => (a.trophy ? 1e9 : a.price || 0) - (b.trophy ? 1e9 : b.price || 0) || ((a.name && a.name.fr) || '').localeCompare((b.name && b.name.fr) || ''));
   for (const it of list){
     const b = document.createElement('button'); b.className = 'item' + (SES && SES.item === it ? ' sel' : ''); b.dataset.id = it.id;
     b.innerHTML = '<canvas width="32" height="32"></canvas><span></span><span><span class="price"></span> <span class="mod"></span></span>';
-    b.children[1].textContent = (it.name && it.name.fr) || it.id; b.querySelector('.price').textContent = it.price || '?';
+    b.children[1].textContent = (it.name && it.name.fr) || it.id; b.querySelector('.price').textContent = it.trophy ? '🔒' : (it.price || '?');
     b.onclick = () => select(it.id); box.appendChild(b); thumb(it);
   }
   refreshState();
@@ -607,6 +607,8 @@ function renderProps(){
   [['pFr', 'fr'], ['pEn', 'en'], ['pEs', 'es']].forEach(([f, l]) => { const e = $(f); e.value = it.name[l] || '';
     e.oninput = () => { it.name[l] = e.value; saveDraft(); refreshChecks(); refreshState(); if (l === 'fr'){ const b = document.querySelector('.item.sel span'); if (b) b.textContent = e.value || it.id; } }; });
   const pr = $('pPrice'); pr.value = it.price || '';
+  if (it.trophy){ pr.disabled = true; pr.value = ''; pr.placeholder = 'pas à vendre';
+    pr.parentNode.insertAdjacentHTML('afterend', '<p class="note" style="margin:4px 0 0;color:var(--lilac)">Récompense du trophée <b>' + it.trophy + '</b> : cadenas dans la boutique, pas de prix. Les reflets animés s\'ajoutent dans le jeu (pas dans l\'aperçu de l\'atelier).</p>'); }
   pr.oninput = () => { it.price = Math.round(+pr.value) || 0; saveDraft(); refreshChecks(); refreshState(); const b = document.querySelector('.item.sel .price'); if (b) b.textContent = it.price; };
 
   if (it.slot === 'shirt'){
