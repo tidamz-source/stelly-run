@@ -48,12 +48,8 @@ sub_once("navigator.serviceWorker.register('sw.js')", "Promise.resolve()", 'serv
 # 5. PATCHES de gameplay BETA (vides pour l'instant)
 # Modifs de gameplay à tester dans la beta (old, new, libellé).
 # b2 (squash & stretch) basculé dans le vrai jeu en v7.13.
-# b3 : audit CrazyGames (prise en main dans la course, accueil allégé, fin de partie, Échap) : tools/beta_b3.js
-PATCHES = [
-  ("  else if (e.code === 'Escape' || e.code === 'KeyP'){ state === 'pause' ? resume() : pause(); }",
-   "  else if (e.code === 'KeyP'){ state === 'pause' ? resume() : pause(); }", 'b3 : Échap ne met plus en pause'),
-  ("\n// le jeu est prêt : barre pleine", open(ROOT / 'tools' / 'beta_b3.js', encoding='utf-8').read().replace("'stellyrun_", "'stellyrun_test_") + "\n// le jeu est prêt : barre pleine", 'b3 : module'),
-]
+# b3 (prise en main dans la course, accueil allégé, fin de partie) basculé dans le vrai jeu en v7.18.
+PATCHES = []
 for old, new, label in PATCHES:
     sub_once(old, new, label)
 
