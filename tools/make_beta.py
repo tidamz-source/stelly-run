@@ -14,7 +14,7 @@ Conventions BETA :
 import pathlib, re, sys
 
 # Numéro de la beta : à incrémenter à chaque nouvelle beta (affiché « v<version du jeu>-b<numéro> »)
-BETA_REV = 2
+BETA_REV = 3
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 src = (ROOT / 'index.html').read_text(encoding='utf-8')
@@ -48,7 +48,12 @@ sub_once("navigator.serviceWorker.register('sw.js')", "Promise.resolve()", 'serv
 # 5. PATCHES de gameplay BETA (vides pour l'instant)
 # Modifs de gameplay à tester dans la beta (old, new, libellé).
 # b2 (squash & stretch) basculé dans le vrai jeu en v7.13.
-PATCHES = []
+# b3 : audit CrazyGames (prise en main dans la course, accueil allégé, fin de partie, Échap) : tools/beta_b3.js
+PATCHES = [
+  ("  else if (e.code === 'Escape' || e.code === 'KeyP'){ state === 'pause' ? resume() : pause(); }",
+   "  else if (e.code === 'KeyP'){ state === 'pause' ? resume() : pause(); }", 'b3 : Échap ne met plus en pause'),
+  ("\n// le jeu est prêt : barre pleine", open(ROOT / 'tools' / 'beta_b3.js', encoding='utf-8').read().replace("'stellyrun_", "'stellyrun_test_") + "\n// le jeu est prêt : barre pleine", 'b3 : module'),
+]
 for old, new, label in PATCHES:
     sub_once(old, new, label)
 
@@ -73,7 +78,7 @@ DBG = r"""
   const mkb = (label, fn) => { const x = document.createElement('button'); x.type = 'button'; x.tabIndex = -1; x.textContent = label; x.style.cssText = b.style.cssText + ';display:block;margin:3px auto 0';
     x.addEventListener('click', e => { e.stopPropagation(); x.blur(); fn(x); }); return x; };
   const bCoins = mkb('+5 000 disques', () => { TR.d.coins += 5000; TR.save(); toast('+5000'); });
-  const bTuto = mkb('revoir le tuto', () => { tutoUI.reset(); toast('tuto au prochain départ'); });
+  const bTuto = mkb('revoir le tuto', () => { ONB.reset(); toast('tuto au prochain départ'); });
   const bDay = mkb('défis : jour suivant', x => { x.textContent = 'défis : ' + dqUI.shiftDay(); });
   const det = document.createElement('div');
   box.append(det, b, bCoins, bTuto, bDay); d.append(info, box); document.body.appendChild(d);
