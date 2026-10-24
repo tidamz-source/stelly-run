@@ -4149,7 +4149,7 @@ function sqApply(c){
 }
 
 /* ================= BETA b3 : prise en main, accueil allégé, fin de partie (audit CrazyGames) ================= */
-// 1. premier lancement : la course démarre toute seule ; ralenti + « Espace / touche pour sauter » devant le premier obstacle ;
+// 1. premier lancement : la course démarre toute seule ; arrêt + « Espace / touche pour sauter » devant le premier obstacle ;
 //    petites bulles la première fois qu'apparaissent une chaussette, une gourde, un chrono, un oiseau ; tutoriel en diaporama retiré
 // 2. accueil : plus de légende, de version, de stats ni de news (dans Réglages ; point rouge sur la roue dentée s'il y a des news)
 // 3. fin de partie : nom pour le classement sur demande (bouton) si aucun nom n'a encore été donné ; chiffres plus gros ; objectifs
@@ -4171,8 +4171,7 @@ Object.assign(TEXTS, {
   'lb.ask':     { fr:'Mettre mon nom au classement', en:'Add my name to the leaderboard', es:'Poner mi nombre en la clasificación' },
   'goal.buy':   { fr:'Tu peux acheter {name} à la boutique !', en:'You can buy {name} in the shop!', es:'¡Puedes comprar {name} en la tienda!' },
   'goal.save':  { fr:'Encore {n} frisbees pour {name}', en:'{n} more frisbees for {name}', es:'{n} frisbees más para {name}' },
-  'goal.world': { fr:'Prochain monde : {w} à {n} pts', en:'Next world: {w} at {n} pts', es:'Próximo mundo: {w} a {n} pts' },
-});
+  });
 { const css = document.createElement('style');
   css.textContent =
     // accueil allégé
@@ -4216,12 +4215,15 @@ const ONB = (() => {
   const box = document.createElement('div'); box.id = 'onb'; box.hidden = true;
   const skip = document.createElement('button'); skip.id = 'onbskip'; skip.className = 'btn alt'; skip.hidden = true;
   $('wrap').append(box, skip);
-  let active = false, scale = 1, wait = false, last = null, jumps = 0;
-  var ONB_D = 52;   // distance (px) du premier obstacle où le jeu ralentit
+  let active = false, scale = 1, wait = false, last = null, jumps = 0, phase = 'obs', bird = null, helped = false;
+  var ONB_D = 52, ONB_B = 70;   // distances (px) où le jeu s'arrête : devant un obstacle, devant l'oiseau
   const need = () => get(KEY) !== '1';
-  function done(){ active = false; wait = false; scale = 1; box.hidden = true; skip.hidden = true; set(KEY, '1'); }
-  function prompt(){
-    box.innerHTML = '<div class="k">' + (touch ? '👆 ' + esc(txt('onb.tap')) : '<span class="key">SPACE</span>') + ' <span>' + esc(txt('onb.jump')) + '</span></div><div class="h">' + esc(txt('onb.hold')) + '</div>';
+  function done(){ if (phase !== 'obs' && nextObs > 330) nextObs = 320; active = false; wait = false; scale = 1; box.hidden = true; skip.hidden = true; set(KEY, '1'); }
+  function prompt(kind){
+    const key = touch ? '👆 ' + esc(txt('onb.tap')) : '<span class="key">SPACE</span>';
+    box.innerHTML = kind === 'bird'
+      ? '<div class="k">' + key + ' <span>' + esc(txt('onb.jump')) + '</span></div><div class="h">' + esc(txt('onb.bird')) + '</div>'
+      : '<div class="k">' + key + ' <span>' + esc(txt('onb.jump')) + '</span></div><div class="h">' + esc(txt('onb.hold')) + '</div>';
     skip.textContent = txt('onb.skip'); box.hidden = false; skip.hidden = false;
   }
   skip.addEventListener('pointerdown', e => e.stopPropagation());
@@ -4231,16 +4233,34 @@ const ONB = (() => {
   function tick(){
     if (state !== 'play') return;
     if (active){
-      const o = obs.find(o => !o.smashed && o.x + o.w > P.x && o.x - P.x < ONB_D);
-      if (o && o !== last && P.ground && !wait){ wait = true; last = o; scale = .05; prompt(); }
-      if (wait && !P.ground){ wait = false; scale = 1; box.hidden = true; if (++jumps >= 2) done(); }   // deux obstacles guidés, puis le tutoriel est fini
+      if (phase === 'obs' || phase === 'clear'){   // chaque obstacle jusqu'à l'oiseau : le jeu s'arrête devant
+        flyIn = Math.max(flyIn, 5); birdWait = false;   // pas d'oiseau avant l'étape de l'oiseau
+        const o = obs.find(o => !o.smashed && o.x + o.w > P.x && o.x - P.x < ONB_D);
+        if (o && o !== last && P.ground && !wait){ wait = true; last = o; scale = 0; prompt('jump'); }
+        if (wait && !P.ground){ wait = false; scale = 1; box.hidden = true; if (++jumps >= 2 && phase === 'obs') phase = 'clear'; }
+      }
+      if (phase === 'clear'){   // deux obstacles passés : plus d'obstacles, on attend que la piste soit libre, puis un oiseau en bas
+        nextObs = Math.max(nextObs, 400); flyIn = Math.max(flyIn, 5); birdWait = false;
+        if (!wait && P.ground && !obs.some(o => o.x + o.w > P.x - 10) && FLY_BY_THEME[theme]){
+          bird = { sp: FLY_BY_THEME[theme], tier: 0, x: W + 30, y0: GY - FLY_ALT[0][0], k: 1, t: 0, ph: 0, fs: 2, amp: 1.5, drift: .8, flap: 12 };
+          flyers.push(bird); phase = 'bird'; }
+      }
+      if (phase === 'bird'){
+        nextObs = Math.max(nextObs, 400); flyIn = Math.max(flyIn, 5);
+        if (!wait && P.ground && !bird.ko && bird.x - P.x < ONB_B && bird.x > P.x){ wait = true; scale = 0; prompt('bird'); }
+        if (wait && !P.ground){ wait = false; scale = 1; box.hidden = true; helped = true; }
+        // saut guidé : l'oiseau attend devant Stelly pendant la montée, puis se place sous elle à la descente (atterrissage réussi à coup sûr)
+        if (helped && !P.ground && !bird.ko){ const hw = FLY_SPECS[bird.sp].hw; bird.x = P.vy > 40 ? P.x + 1 : Math.max(bird.x, P.x + hw + 9); }
+        if (bird.ko || bird.x < P.x - 30 || !flyers.includes(bird)){ nextObs = 320; done(); }
+      }
     }
     if (discCount > 0) once('disc', 'onb.disc');
     for (const it of items) if (!it.got && it.x < W - 30 && ['sock', 'fire', 'slow'].includes(it.k)) once(it.k, 'onb.' + it.k);
     if (flyers.some(f => !f.ko && f.x < W - 30)) once('bird', 'onb.bird');
   }
-  { const u0 = update; update = function(dt){ u0(dt * (state === 'play' ? scale : 1)); tick(); }; }
-  return { need, start(){ if (!need()) return; active = true; scale = 1; wait = false; last = null; jumps = 0; },
+  { const u0 = update; update = function(dt){ if (wait && P.buf > 0) scale = 1;   // appui pendant l'arrêt : le jeu repart avec le saut
+    u0(dt * (state === 'play' ? scale : 1)); tick(); }; }
+  return { need, start(){ if (!need()) return; active = true; scale = 1; wait = false; last = null; jumps = 0; phase = 'obs'; bird = null; helped = false; seen.bird = 1; set(SEEN, JSON.stringify(seen)); },
     stop(){ if (wait){ wait = false; scale = 1; } box.hidden = true; skip.hidden = true; active = false; },
     reset(){ set(KEY, '0'); seen = {}; set(SEEN, '{}'); } };
 })();
@@ -4267,7 +4287,7 @@ new MutationObserver(() => { if (!ui.over.hidden) ONB.stop(); }).observe(ui.over
   new MutationObserver(sync).observe(set, { attributes:true, attributeFilter:['hidden'] });
   sync(); }
 
-// fin de partie : objectifs (prochain article à acheter, prochain monde)
+// fin de partie : objectif (prochain article à acheter)
 { const g = document.createElement('div'); g.id = 'ogoal'; g.hidden = true; $('lbentry').before(g);
   function fill(){
     const coins = TR.d.coins, list = SHOP.filter(it => it.img && it.ico && !it.trophy && !TR.d.own[it.id]).sort((a, b) => a.price - b.price);
@@ -4277,8 +4297,6 @@ new MutationObserver(() => { if (!ui.over.hidden) ONB.stop(); }).observe(ui.over
       const s = document.createElement('span'); s.innerHTML = it.price <= coins ? esc(txt('goal.buy', { name: '\u0001' })).replace('\u0001', '<b>' + esc(it.name) + '</b>')
         : esc(txt('goal.save', { n: '\u0002', name: '\u0001' })).replace('\u0002', '<b>' + fmtN(it.price - coins) + '</b>').replace('\u0001', '<b>' + esc(it.name) + '</b>');
       p.appendChild(s); lines.push(p); }
-    const ORDER = [0, 1, 2, 3, 6, 4, 5], k = Math.floor(score/10000) + 1;
-    { const p = document.createElement('p'); p.innerHTML = esc(txt('goal.world', { w: '\u0001', n: '\u0002' })).replace('\u0001', '<b>' + esc(THEME_NAMES[ORDER[k % 7]]) + '</b>').replace('\u0002', fmtN(k*10000)); lines.push(p); }
     g.replaceChildren(...lines); g.hidden = !lines.length;
   }
   new MutationObserver(() => { if (!ui.over.hidden) fill(); }).observe(ui.over, { attributes:true, attributeFilter:['hidden'] }); }
