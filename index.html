@@ -4201,6 +4201,7 @@ const ONB = (() => {
     if (active){
       if (phase === 'obs' || phase === 'clear'){   // chaque obstacle jusqu'à l'oiseau : le jeu s'arrête devant
         flyIn = Math.max(flyIn, 5); birdWait = false;   // pas d'oiseau avant l'étape de l'oiseau
+        if (obs.length || jumps) nextObs = Math.max(nextObs, 400);   // un seul obstacle avant l'oiseau
         const o = obs.find(o => !o.smashed && o.x + o.w > P.x && o.x - P.x < ONB_D);
         if (o && o !== last && P.ground && !wait){ wait = true; last = o; scale = 0; prompt('jump'); }
         if (wait && !P.ground){ wait = false; scale = 1; box.hidden = true; if (++jumps >= 1 && phase === 'obs') phase = 'clear'; }
