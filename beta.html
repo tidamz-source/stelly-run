@@ -209,6 +209,7 @@ body{
 /* bouton trophées : carré, collé à droite de Start, Start reste centré */
 .ctarow{ position:relative; display:flex; }
 .ctaside{ position:absolute; top:0; bottom:0; left:calc(100% + var(--s)*7px); display:flex; gap:calc(var(--s)*7px); }
+.ctaleft{ position:absolute; top:0; bottom:0; right:calc(100% + var(--s)*7px); display:flex; gap:calc(var(--s)*7px); }
 #trobtn{ position:relative; height:100%; aspect-ratio:1; padding:0; display:flex; align-items:center; justify-content:center; }
 #trobtn canvas{ height:calc(var(--s)*12px); width:auto; image-rendering:pixelated; display:block; margin-top:calc(var(--s)*-.5px); }
 .trstar{ position:absolute; display:flex; align-items:center; justify-content:center; pointer-events:none; }
@@ -283,7 +284,7 @@ body{
 @media (prefers-reduced-motion: reduce){ #trophies, #trophies.open{ transition-duration:.01s; } #trgrid.l, #trgrid.r, .tr .trstar, #trbub, #trbadge, .tr.chrome::after, .otro .ic.chrome::after{ animation:none; } }
 
 /* ----- Boutique ----- */
-#shopbtn{ position:absolute; top:0; height:100%; right:calc(100% + var(--s)*7px); aspect-ratio:1; padding:0; display:flex; align-items:center; justify-content:center; }
+#shopbtn{ position:relative; height:100%; aspect-ratio:1; padding:0; display:flex; align-items:center; justify-content:center; }
 #shopbtn canvas{ height:calc(var(--s)*12px); width:auto; image-rendering:pixelated; display:block; margin-top:calc(var(--s)*-.5px); }
 #shop{ position:absolute; inset:0; z-index:30; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:calc(var(--s)*5px);
   background:repeating-linear-gradient(135deg, rgba(255,255,255,.035) 0 calc(var(--s)*6px), transparent 0 calc(var(--s)*12px)), var(--plum);
@@ -601,9 +602,9 @@ __ld(10); setTimeout(() => { const L = document.getElementById('loader'); if (L)
   </div>
 </div>
 <script>__ld(30);</script>
-<script src="langues.js?v=7.17"></script>
+<script src="langues.js?v=7.18"></script>
 <script>__ld(45);</script>
-<script src="stelly.js?v=7.17"></script>
+<script src="stelly.js?v=7.18"></script>
 <script>__ld(60);</script>
 <script>
 /* ================= Langues ================= */
@@ -1666,7 +1667,7 @@ let flyers = [], flyIn = 6, rbAt = -1;
 let obs = [], discs = [], items = [], parts = [], pops = [], confetti = [], debris = [], lines = [];
 let shark = null, sharkIn = 4;
 const P = { x:52, y:0, vy:0, ground:true, hold:false, buf:0, anim:0, sockT:0, dust:0, land:0, newBest:false };
-const APP_VERSION = '7.17';
+const APP_VERSION = '7.18';
 // icônes de trophées retouchées dans l'atelier (trophees.json) : remplacent celles dessinées par le code
 const TR_OVR = {}; let TR_OVR_N = 0;
 const THEME_NAMES = ['Outdoor', 'Indoor', 'Beach', 'Catch La Peuf', 'City', 'Forest', 'Fields'];
@@ -3884,7 +3885,7 @@ const dqUI = (() => {
     'orwwrrrrwwro', 'orrwwrrwwrro', '.orrwwwwrro.', '.oorrrrrroo.', '...oooooo...'], 0, 0, false, { o:C.plum, r:C.red, w:C.white }));
   const btn = document.createElement('button'); btn.id = 'dqbtn'; btn.className = 'btn alt'; btn.type = 'button';
   btn.appendChild(cvOf(TARGET)); const bdg = document.createElement('b'); btn.appendChild(bdg);
-  $('lbbtn').after(btn);
+  { const left = document.createElement('div'); left.className = 'ctaleft'; $('shopbtn').before(left); left.append($('shopbtn'), btn); }   // boutique, défis | Start | trophées, classement
   const page = document.createElement('div'); page.id = 'daily'; page.hidden = true; page.setAttribute('role', 'dialog'); page.setAttribute('aria-modal', 'true');
   page.innerHTML = '<div class="trhead"><h2></h2></div><button id="dqclose" class="btn alt"></button><div id="dqlist"></div><div id="dqfoot"><span class="dqtr"></span><span class="dqnx"></span></div>';
   $('news').parentElement.appendChild(page);
@@ -4016,7 +4017,7 @@ const MANETTE = (() => {
   function targets(){
     if (state === 'revive'){ const r = revive(); return r ? [r.querySelector('.yes'), r.querySelector('.no')] : []; }
     if (overlay()) return [];
-    if (state === 'title') return ['shopbtn', 'start', 'trobtn', 'lbbtn', 'dqbtn'].map(id => document.getElementById(id));
+    if (state === 'title') return ['shopbtn', 'dqbtn', 'start', 'trobtn', 'lbbtn'].map(id => document.getElementById(id));
     if (state === 'over') return ['home', 'again'].map(id => document.getElementById(id));
     if (state === 'pause') return ['resume', 'quit'].map(id => document.getElementById(id));
     return [];
@@ -4148,7 +4149,7 @@ function sqApply(c){
   c.imageSmoothingEnabled = false; c.translate(ax, ay); c.scale(sx, sy); c.translate(-ax, -ay);
 }
 
-/* ================= BETA b3 : prise en main, accueil allégé, fin de partie (audit CrazyGames) ================= */
+/* ================= v7.18 : prise en main dans la course, accueil allégé, fin de partie (audit CrazyGames, beta b3) ================= */
 // 1. premier lancement : la course démarre toute seule ; arrêt + « Espace / touche pour sauter » devant le premier obstacle ;
 //    petites bulles la première fois qu'apparaissent une chaussette, une gourde, un chrono, un oiseau ; tutoriel en diaporama retiré
 // 2. accueil : plus de légende, de version, de stats ni de news (dans Réglages ; point rouge sur la roue dentée s'il y a des news)
@@ -4282,7 +4283,7 @@ new MutationObserver(() => { if (!ui.over.hidden) ONB.stop(); }).observe(ui.over
   more.append(bn, bs); set.append(more, ver);
   const src = $('newsbtn').querySelector('.dot');
   const sync = () => { const on = !src.hidden; dot.hidden = !on; gdot.hidden = !on;
-    bn.querySelector('span').textContent = txt('set.news'); bs.querySelector('span').textContent = txt('set.stats'); ver.textContent = 'v' + APP_VERSION + ' · beta b3'; };
+    bn.querySelector('span').textContent = txt('set.news'); bs.querySelector('span').textContent = txt('set.stats'); ver.textContent = 'v' + APP_VERSION; };
   new MutationObserver(sync).observe(src, { attributes:true, attributeFilter:['hidden'] });
   new MutationObserver(sync).observe(set, { attributes:true, attributeFilter:['hidden'] });
   sync(); }
