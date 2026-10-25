@@ -49,12 +49,8 @@ sub_once("navigator.serviceWorker.register('sw.js')", "Promise.resolve()", 'serv
 # Modifs de gameplay à tester dans la beta (old, new, libellé).
 # b2 (squash & stretch) basculé dans le vrai jeu en v7.13.
 # b3 (prise en main dans la course, accueil allégé, fin de partie) basculé dans le vrai jeu en v7.18.
-# b4 : traînée d'invincibilité qui suit les mouvements (tools/beta_b4.js)
-PATCHES = [
-  ("ctx.globalAlpha = .25; ctx.drawImage(tinted(spr, 'rgba(128,88,162,.85)'), px - 14, py); ctx.globalAlpha = .45; ctx.drawImage(TMP, px - 7, py); ctx.globalAlpha = 1;",
-   "trailGhosts(spr, px, py); ctx.globalAlpha = 1;", 'b4 : traînée'),
-  ("\n// le jeu est prêt : barre pleine", open(ROOT / 'tools' / 'beta_b4.js', encoding='utf-8').read() + "\n// le jeu est prêt : barre pleine", 'b4 : module'),
-]
+# b4 (traînée d'invincibilité qui suit les mouvements) basculé dans le vrai jeu en v7.21.
+PATCHES = []
 for old, new, label in PATCHES:
     sub_once(old, new, label)
 
