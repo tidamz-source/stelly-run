@@ -3231,7 +3231,7 @@ function draw(){
     ctx.save(); sqApply(ctx);
     if (fireT > 0 && state === 'play'){
       const col = Math.floor(clock*14) % 2 ? 'rgba(122,87,160,.7)' : 'rgba(255,255,255,.75)';
-      ctx.globalAlpha = .25; ctx.drawImage(tinted(spr, 'rgba(128,88,162,.85)'), px - 14, py); ctx.globalAlpha = .45; ctx.drawImage(TMP, px - 7, py); ctx.globalAlpha = 1;
+      trailGhosts(spr, px, py); ctx.globalAlpha = 1;
       ctx.drawImage(spr, px, py); ctx.drawImage(tinted(spr, col), px, py); drawHat(ctx, spr, px, py, EQUIPPED.hat, clock); drawSheen(ctx, spr, px, py, EQUIPPED.shirt, clock); hatTint(spr, px, py, col);
     } else { if ((graceT > 0 || safeT > 0) && state === 'play' && Math.floor(clock*16) % 2) ctx.globalAlpha = .4; ctx.drawImage(spr, px, py); drawHat(ctx, spr, px, py, EQUIPPED.hat, clock); drawSheen(ctx, spr, px, py, EQUIPPED.shirt, clock); ctx.globalAlpha = 1; }
     const blink = P.sockT > 0 && P.sockT < 1.6 && Math.floor(clock*10)%2;
@@ -3426,7 +3426,7 @@ requestAnimationFrame(frame);
   d.addEventListener('pointerdown', e => e.stopPropagation());
   d.addEventListener('click', e => { if (e.target.closest('button')) return; e.stopPropagation(); setOpen(!open); });
   function paint(){
-    info.textContent = 'BETA v' + APP_VERSION + '-b3' + ' · ' + PERF.fps + ' i/s · pire ' + PERF.w + ' ms ' + (open ? '▾' : '▸');
+    info.textContent = 'BETA v' + APP_VERSION + '-b4' + ' · ' + PERF.fps + ' i/s · pire ' + PERF.w + ' ms ' + (open ? '▾' : '▸');
     if (!open) return;
     det.textContent = 'jeu ' + PERF.u.toFixed(1) + ' ms + dessin ' + PERF.dr.toFixed(1) + ' ms par image\n' + (state === 'play'
       ? 'vitesse ' + Math.round(spEff) + ' (x' + slowMul.toFixed(2) + ')\nchaussette ' + (P.sockT > 0 ? 'ACTIVE ' + P.sockT.toFixed(1) + ' s' : 'dans ' + Math.max(0, sockIn).toFixed(1) + ' s') + '\nFast Count x' + slowMul.toFixed(2) + ' · ' + (t > 25 ? 'chrono dans ' + Math.max(0, slowIn).toFixed(1) + ' s' : 'pas de chrono avant 25 s')
@@ -4292,6 +4292,21 @@ new MutationObserver(() => { if (!ui.over.hidden) ONB.stop(); }).observe(ui.over
   lbEntry.submit = function(){ if (box.classList.contains('ask')){ box.classList.remove('ask'); lbEntry.hide(); return; } return sub0.apply(this, arguments); };
   ask.addEventListener('click', e => { e.stopPropagation(); box.classList.remove('ask'); sfx.disc(1); }); }
 
+
+/* ================= BETA b4 : traînée d'invincibilité qui suit les mouvements de Stelly ================= */
+// chaque silhouette de la traînée reprend la hauteur et la pose qu'avait Stelly un court instant plus tôt
+// (décalée de la distance parcourue par le décor pendant ce temps) : la traînée dessine l'arc du saut
+const TRAIL = [];
+function trailGhosts(spr, px, py){
+  const now = clock; TRAIL.push({ t: now, y: py, spr });
+  while (TRAIL.length > 2 && now - TRAIL[1].t > .2) TRAIL.shift();
+  const sp = Math.max(60, spEff);
+  for (const [dx, a] of [[27, .15], [18, .25], [9, .42]]){   // de la plus ancienne à la plus récente
+    const age = dx / sp; let s = TRAIL[0];
+    for (const e of TRAIL){ if (now - e.t >= age) s = e; else break; }
+    ctx.globalAlpha = a; ctx.drawImage(tinted(s.spr, 'rgba(128,88,162,.85)'), px - dx, s.y);
+  }
+}
 
 // le jeu est prêt : barre pleine, fondu, et l'animation d'accueil repart de zéro
 __ld(85);

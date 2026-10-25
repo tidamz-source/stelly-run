@@ -14,7 +14,7 @@ Conventions BETA :
 import pathlib, re, sys
 
 # Numéro de la beta : à incrémenter à chaque nouvelle beta (affiché « v<version du jeu>-b<numéro> »)
-BETA_REV = 3
+BETA_REV = 4
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 src = (ROOT / 'index.html').read_text(encoding='utf-8')
@@ -49,7 +49,12 @@ sub_once("navigator.serviceWorker.register('sw.js')", "Promise.resolve()", 'serv
 # Modifs de gameplay à tester dans la beta (old, new, libellé).
 # b2 (squash & stretch) basculé dans le vrai jeu en v7.13.
 # b3 (prise en main dans la course, accueil allégé, fin de partie) basculé dans le vrai jeu en v7.18.
-PATCHES = []
+# b4 : traînée d'invincibilité qui suit les mouvements (tools/beta_b4.js)
+PATCHES = [
+  ("ctx.globalAlpha = .25; ctx.drawImage(tinted(spr, 'rgba(128,88,162,.85)'), px - 14, py); ctx.globalAlpha = .45; ctx.drawImage(TMP, px - 7, py); ctx.globalAlpha = 1;",
+   "trailGhosts(spr, px, py); ctx.globalAlpha = 1;", 'b4 : traînée'),
+  ("\n// le jeu est prêt : barre pleine", open(ROOT / 'tools' / 'beta_b4.js', encoding='utf-8').read() + "\n// le jeu est prêt : barre pleine", 'b4 : module'),
+]
 for old, new, label in PATCHES:
     sub_once(old, new, label)
 
