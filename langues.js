@@ -363,11 +363,7 @@ const NEWS = [
     text:{ fr:'Nouvel onglet Bonus dans la boutique : Bouclier, Billet de biome et Cœur pour ré-animer Stelly. Achète, équipe, et c\u2019est parti !',
       en:'New Boosts tab in the shop: Shield, Biome ticket and Heart to revive Stelly. Buy, equip and go!',
       es:'Nueva pestaña Bonus en la tienda: Escudo, Billete de bioma y Corazón para reanimar a Stelly. ¡Compra, equipa y a correr!' } },
-  { id:'2026-10-09-synchro', date:'2026-10-09', icon:'reglages',
-    title:{ fr:'Joue sur tous tes appareils', en:'Play on all your devices', es:'Juega en todos tus dispositivos' },
-    text:{ fr:'Lie ton ordi et ton téléphone avec un code depuis la roue dentée : trophées, disques et stats se synchronisent tout seuls.',
-           en:'Link your computer and phone with a code from the gear menu: trophies, discs and stats sync automatically.',
-           es:'Vincula tu ordenador y tu móvil con un código desde la rueda dentada: trofeos, discos y estadísticas se sincronizan solos.' } },
+
   { id:'2026-10-09-boutique', date:'2026-10-09', icon:'cintre',
     title:{ fr:'Du nouveau dans la boutique', en:'New in the shop', es:'Novedades en la tienda' },
     text:{ fr:'Une dizaine de nouveaux accessoires t’attendent dans la boutique.',
